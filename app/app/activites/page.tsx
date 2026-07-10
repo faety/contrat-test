@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { demoChallenges, demoCourses, demoUser } from "@/lib/demo-data";
+import { demoChallenges, demoCourses, demoGamification } from "@/lib/demo-data";
 import { Badge, Button, Card } from "@/components/ui";
 
 type Tab = "challenges" | "courses";
@@ -14,7 +14,7 @@ export default function ActivitiesPage() {
     Object.fromEntries(demoChallenges.map((challenge) => [challenge.id, challenge.joined])),
   );
 
-  const xpPercent = Math.round((demoUser.xp / demoUser.xpNextLevel) * 100);
+  const xpPercent = Math.round((demoGamification.xp / demoGamification.xpNextLevel) * 100);
 
   return (
     <div className="space-y-6">
@@ -24,17 +24,17 @@ export default function ActivitiesPage() {
       <Card>
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold">
-            ⭐ {t("home.level")} · {locale === "fr" ? demoUser.levelFr : demoUser.levelEn}
+            ⭐ {t("home.level")} · {locale === "fr" ? demoGamification.levelFr : demoGamification.levelEn}
           </p>
           <p className="text-xs text-ink-500 dark:text-ink-400">
-            {demoUser.xp}/{demoUser.xpNextLevel} {t("activities.xp")}
+            {demoGamification.xp}/{demoGamification.xpNextLevel} {t("activities.xp")}
           </p>
         </div>
         <div
           role="progressbar"
-          aria-valuenow={demoUser.xp}
+          aria-valuenow={demoGamification.xp}
           aria-valuemin={0}
-          aria-valuemax={demoUser.xpNextLevel}
+          aria-valuemax={demoGamification.xpNextLevel}
           className="mt-2.5 h-2.5 overflow-hidden rounded-full bg-ink-100 dark:bg-ink-800"
         >
           <div

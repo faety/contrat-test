@@ -6,7 +6,7 @@ Application web responsive de la plateforme **Boyia App**, super-application com
 
 Le dépôt contient deux applications :
 
-- **`/` (racine)** — l'application web Next.js : parcours utilisateur de démonstration (données fictives §53) **et interface d'administration** (`/admin`) branchée sur l'API réelle.
+- **`/` (racine)** — l'application web Next.js : **parcours utilisateur branché sur l'API** (inscription OTP, connexion, portefeuille, transferts avec PIN, paiement QR) et **interface d'administration** (`/admin`). Les contenus de gamification (défis, formations, offres) restent des données de démonstration (§53) en attendant leurs modules API.
 - **`api/`** — le backend **NestJS** : authentification OTP + JWT, portefeuilles, **registre comptable à double entrée**, transactions idempotentes avec machine à états, règles de récompense, journal d'audit. SQLite en démo, PostgreSQL en production (mêmes entités TypeORM).
 
 ## Fonctionnalités
@@ -41,7 +41,7 @@ npm install && npm run dev
 - Application : http://localhost:3000 · Administration : http://localhost:3000/admin
 - Documentation OpenAPI : http://localhost:4000/docs
 - Connexion admin (démo, fictive) : `admin@boyia.ci` / `Boyia!Admin2026`
-- Utilisatrice de démo côté API : `+2250700000042` / PIN `1234` (Awa Kouassi)
+- Utilisatrice de démo : `+2250700000042` / PIN `1234` (Awa Kouassi) — ou crée un compte : l'OTP de démo est `123456` et la règle « Inscription complétée » crédite 20 ʙ automatiquement
 
 ```bash
 npm run typecheck && npm run build   # web
@@ -97,12 +97,20 @@ lib/
 ├── config.ts                # Valeur de référence, limites, feature flags
 ├── i18n.tsx                 # Dictionnaires FR/EN
 ├── demo-data.ts             # Données fictives (§53)
-└── wallet-store.tsx         # Store démo (le serveur restera la seule source de vérité)
+└── wallet-store.tsx         # Store branché sur l'API (le serveur est la seule source de vérité)
 ```
+
+## Parcours utilisateur branché sur l'API
+
+- **Inscription** : formulaire → `POST /v1/auth/register` → OTP (démo `123456`) → compte activé niveau 1, portefeuille créé, **récompense d'inscription de 20 ʙ** attribuée par le moteur de règles (`signup.completed`).
+- **Connexion** : téléphone + PIN → JWT access/refresh ; rafraîchissement automatique du jeton sur 401.
+- **Transfert** : recherche du destinataire (`GET /v1/wallet/recipients`, avertissement « nouveau destinataire » §14.3) → montant → résumé → **PIN vérifié côté serveur** → reçu ; clé d'idempotence générée par le client.
+- **Paiement QR** : paiement mixte (30 % max en Boyia) réglé par un vrai transfert de type `payment` vers le portefeuille du commerçant.
+- **Historique** : contreparties résolues par l'API, statut « Contrepassée » affiché après une contrepassation admin.
 
 ## Évolution prévue
 
-Ce dépôt a vocation à devenir le monorepo `boyia-platform` (§49) : `apps/api` (NestJS, registre à double entrée), `apps/admin`, `apps/mobile` (Flutter), packages partagés (`ui`, `types`, `validation`, `localization`). Le store client actuel sera remplacé par l'API — **aucun solde ne sera jamais calculé côté client** (règle 8).
+Ce dépôt a vocation à devenir le monorepo `boyia-platform` (§49) : `apps/api` (NestJS, registre à double entrée), `apps/admin`, `apps/mobile` (Flutter), packages partagés (`ui`, `types`, `validation`, `localization`). Modules suivants : défis, formations, marketplace, notifications (§31).
 
 ---
 

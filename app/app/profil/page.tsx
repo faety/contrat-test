@@ -1,21 +1,23 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useI18n, type Locale } from "@/lib/i18n";
-import { demoUser } from "@/lib/demo-data";
-import { formatDate } from "@/lib/format";
+import { demoGamification } from "@/lib/demo-data";
+import { useWallet } from "@/lib/wallet-store";
 import { Badge, Card } from "@/components/ui";
 import { useTheme, type ThemePreference } from "@/components/theme";
 
 export default function ProfilePage() {
   const { t, locale, setLocale } = useI18n();
+  const { session, logout } = useWallet();
+  const router = useRouter();
   const [theme, setTheme] = useTheme();
   const [copied, setCopied] = useState(false);
 
   async function copyReferral() {
     try {
-      await navigator.clipboard.writeText(demoUser.referralCode);
+      await navigator.clipboard.writeText(demoGamification.referralCode);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -48,13 +50,10 @@ export default function ProfilePage() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-lg font-bold">
-            {demoUser.firstName} {demoUser.lastName}
+            {session?.firstName} {session?.lastName}
           </p>
           <p className="text-sm text-ink-500 dark:text-ink-400">
-            {demoUser.username} · {demoUser.phoneMasked}
-          </p>
-          <p className="mt-1 text-xs text-ink-400 dark:text-ink-500">
-            {t("profile.memberSince")} {formatDate(demoUser.memberSince, locale)}
+            {session?.username}
           </p>
         </div>
       </Card>
@@ -62,7 +61,10 @@ export default function ProfilePage() {
       {/* Vérification */}
       <Card className="space-y-2">
         <p className="text-sm font-semibold">{t("profile.verification")}</p>
-        <Badge tone="green">✓ {t("profile.verification.level1")}</Badge>
+        <Badge tone="green">
+          ✓ {t("profile.verification.levelLabel")} {session?.verificationLevel ?? 1} —{" "}
+          {t("profile.verification.level1")}
+        </Badge>
         <button
           type="button"
           className="mt-1 block text-sm font-semibold text-brand-600 dark:text-brand-400"
@@ -75,7 +77,7 @@ export default function ProfilePage() {
       <section>
         <h2 className="mb-3 font-bold">{t("profile.badges")}</h2>
         <div className="grid grid-cols-4 gap-3">
-          {demoUser.badges.map((badge) => (
+          {demoGamification.badges.map((badge) => (
             <Card key={badge.id} className="!p-3 text-center">
               <span className="text-2xl" aria-hidden>
                 {badge.emoji}
@@ -98,7 +100,7 @@ export default function ProfilePage() {
           className="flex min-h-12 w-full items-center justify-between rounded-2xl bg-white/15 px-4 font-mono font-bold hover:bg-white/25"
         >
           <span>
-            {t("profile.referral.code")} : {demoUser.referralCode}
+            {t("profile.referral.code")} : {demoGamification.referralCode}
           </span>
           <span className="text-sm">{copied ? `✅ ${t("receive.copied")}` : "📋"}</span>
         </button>
@@ -192,12 +194,16 @@ export default function ProfilePage() {
         </Card>
       </section>
 
-      <Link
-        href="/"
-        className="flex min-h-12 items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+      <button
+        type="button"
+        onClick={() => {
+          logout();
+          router.replace("/connexion");
+        }}
+        className="flex min-h-12 w-full items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
       >
         {t("profile.logout")}
-      </Link>
+      </button>
 
       <p className="pb-2 text-center text-xs text-ink-400 dark:text-ink-500">
         {t("common.demo")}

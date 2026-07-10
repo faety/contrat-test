@@ -11,7 +11,7 @@ export type TransactionType =
   | "payment"
   | "refund";
 
-export type TransactionStatus = "completed" | "pending" | "failed";
+export type TransactionStatus = "completed" | "pending" | "failed" | "reversed";
 
 export interface Transaction {
   id: string;
@@ -24,7 +24,8 @@ export interface Transaction {
   counterparty: string;
   note?: string;
   dateIso: string;
-  balanceAfter: number;
+  /** Fourni par le serveur lorsqu'il est disponible. */
+  balanceAfter?: number;
 }
 
 export interface DemoUser {
@@ -43,20 +44,12 @@ export interface DemoUser {
   badges: { id: string; emoji: string; fr: string; en: string }[];
 }
 
+/** Soldes par catégorie (§6.5) — servis par l'API. */
 export interface Balances {
   available: number;
   pending: number;
   promotional: number;
   blocked: number;
-}
-
-export interface Recipient {
-  id: string;
-  name: string;
-  username: string;
-  phoneMasked: string;
-  emoji: string;
-  isNew: boolean;
 }
 
 export interface Offer {
@@ -101,18 +94,23 @@ export interface Course {
   certificate: boolean;
 }
 
-export const demoUser: DemoUser = {
-  publicId: "usr_awa2026demo",
-  firstName: "Awa",
-  lastName: "Kouassi",
-  username: "@awa.kouassi",
-  phoneMasked: "+225 07 •• •• •• 42",
+/**
+ * Profil de gamification de démonstration (niveau, XP, badges) : ces
+ * fonctionnalités n'ont pas encore d'API — l'identité réelle vient de la
+ * session.
+ */
+export const demoGamification: DemoUser = {
+  publicId: "usr_demo",
+  firstName: "—",
+  lastName: "—",
+  username: "—",
+  phoneMasked: "—",
   levelFr: "Exploratrice",
   levelEn: "Explorer",
   xp: 340,
   xpNextLevel: 500,
   streakDays: 5,
-  referralCode: "AWA-2026",
+  referralCode: "BOYIA-2026",
   memberSince: "2026-03-12",
   badges: [
     { id: "b1", emoji: "🎓", fr: "Première formation", en: "First course" },
@@ -122,153 +120,11 @@ export const demoUser: DemoUser = {
   ],
 };
 
-export const initialBalances: Balances = {
-  available: 1_250,
-  pending: 75,
-  promotional: 100,
-  blocked: 0,
-};
-
-export const initialTransactions: Transaction[] = [
-  {
-    id: "tx_009",
-    reference: "BY-2026-070801",
-    type: "reward",
-    status: "pending",
-    amount: 75,
-    fee: 0,
-    counterparty: "Défi entrepreneur junior",
-    note: "Validation en cours",
-    dateIso: "2026-07-08T17:45:00Z",
-    balanceAfter: 1_250,
-  },
-  {
-    id: "tx_008",
-    reference: "BY-2026-070702",
-    type: "payment",
-    status: "completed",
-    amount: -180,
-    fee: 0,
-    counterparty: "Boyia Market",
-    note: "Fournitures scolaires",
-    dateIso: "2026-07-07T11:20:00Z",
-    balanceAfter: 1_250,
-  },
-  {
-    id: "tx_007",
-    reference: "BY-2026-070601",
-    type: "reward",
-    status: "completed",
-    amount: 15,
-    fee: 0,
-    counterparty: "Quiz — Gérer son budget",
-    dateIso: "2026-07-06T15:02:00Z",
-    balanceAfter: 1_430,
-  },
-  {
-    id: "tx_006",
-    reference: "BY-2026-070501",
-    type: "transfer_in",
-    status: "completed",
-    amount: 200,
-    fee: 0,
-    counterparty: "Christ Aaron",
-    note: "Merci pour le coup de main !",
-    dateIso: "2026-07-05T09:34:00Z",
-    balanceAfter: 1_415,
-  },
-  {
-    id: "tx_005",
-    reference: "BY-2026-070301",
-    type: "transfer_out",
-    status: "completed",
-    amount: -100,
-    fee: 0,
-    counterparty: "Fatou Diabaté",
-    note: "Billet atelier couture",
-    dateIso: "2026-07-03T18:10:00Z",
-    balanceAfter: 1_215,
-  },
-  {
-    id: "tx_004",
-    reference: "BY-2026-070201",
-    type: "reward",
-    status: "completed",
-    amount: 50,
-    fee: 0,
-    counterparty: "Formation — Bases de l'entrepreneuriat",
-    dateIso: "2026-07-02T14:00:00Z",
-    balanceAfter: 1_315,
-  },
-  {
-    id: "tx_003",
-    reference: "BY-2026-063001",
-    type: "refund",
-    status: "completed",
-    amount: 40,
-    fee: 0,
-    counterparty: "Chez Tantie Délices",
-    note: "Commande annulée",
-    dateIso: "2026-06-30T12:45:00Z",
-    balanceAfter: 1_265,
-  },
-  {
-    id: "tx_002",
-    reference: "BY-2026-062801",
-    type: "reward",
-    status: "completed",
-    amount: 25,
-    fee: 0,
-    counterparty: "Parrainage — Mariam T.",
-    dateIso: "2026-06-28T10:15:00Z",
-    balanceAfter: 1_225,
-  },
-  {
-    id: "tx_001",
-    reference: "BY-2026-062501",
-    type: "reward",
-    status: "completed",
-    amount: 20,
-    fee: 0,
-    counterparty: "Inscription complétée",
-    dateIso: "2026-06-25T08:00:00Z",
-    balanceAfter: 1_200,
-  },
-];
-
-export const demoRecipients: Recipient[] = [
-  {
-    id: "rcp_1",
-    name: "Christ Aaron",
-    username: "@christ.aaron",
-    phoneMasked: "+225 05 •• •• •• 18",
-    emoji: "🧑🏾‍💼",
-    isNew: false,
-  },
-  {
-    id: "rcp_2",
-    name: "Fatou Diabaté",
-    username: "@fatou.d",
-    phoneMasked: "+225 01 •• •• •• 77",
-    emoji: "👩🏾‍🎓",
-    isNew: false,
-  },
-  {
-    id: "rcp_3",
-    name: "Mariam Touré",
-    username: "@mariam.t",
-    phoneMasked: "+225 07 •• •• •• 03",
-    emoji: "👩🏾",
-    isNew: true,
-  },
-  {
-    id: "rcp_4",
-    name: "Yao Kobenan",
-    username: "@yao.k",
-    phoneMasked: "+225 05 •• •• •• 91",
-    emoji: "🧑🏿‍🔧",
-    isNew: true,
-  },
+/** Suggestions de destinataires de démo (comptes seedés côté API). */
+export const demoSuggestions = [
+  { name: "Christ Aaron", identifier: "@christ.aaron", emoji: "🧑🏾‍💼" },
+  { name: "Michèle Koffi", identifier: "@michele.koffi", emoji: "👩🏾" },
+  { name: "Boyia Market", identifier: "@boyia.market", emoji: "🛒" },
 ];
 
 export const demoOffers: Offer[] = [

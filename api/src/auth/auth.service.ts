@@ -8,7 +8,8 @@ import { JwtService } from "@nestjs/jwt";
 import { DataSource } from "typeorm";
 import * as argon2 from "argon2";
 import { randomBytes, randomInt } from "node:crypto";
-import { LedgerAccount, OtpCode, User, Wallet } from "../entities";
+import { LedgerAccount, OtpCode, RewardRule, User, Wallet } from "../entities";
+import { TransactionsService } from "../ledger/transactions.service";
 import { config } from "../config";
 
 export interface JwtPayload {
@@ -47,6 +48,7 @@ export class AuthService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly jwt: JwtService,
+    private readonly transactions: TransactionsService,
   ) {}
 
   /** Inscription par téléphone (§9.1) : crée le compte en attente + envoie un OTP. */
@@ -123,8 +125,33 @@ export class AuthService {
       user.status = "active";
       user.verificationLevel = Math.max(user.verificationLevel, 1);
       await this.dataSource.manager.save(user);
+      await this.applySignupReward(user);
     }
     return this.buildTokens(user);
+  }
+
+  /** Moteur de règles (§16) : récompense « inscription complétée » si active et budgétée. */
+  private async applySignupReward(user: User): Promise<void> {
+    const rule = await this.dataSource.manager.findOneBy(RewardRule, {
+      trigger: "signup.completed",
+      status: "active",
+    });
+    if (!rule) return;
+    if (rule.budget > 0 && rule.spentAmount + rule.rewardAmount > rule.budget) return;
+    const wallet = await this.dataSource.manager.findOneBy(Wallet, {
+      ownerType: "user",
+      ownerId: user.id,
+    });
+    if (!wallet) return;
+    await this.transactions.grant({
+      receiverWalletId: wallet.id,
+      amount: rule.rewardAmount,
+      reason: rule.name,
+      initiatedBy: `rule:${rule.trigger}`,
+      type: "reward",
+    });
+    rule.spentAmount += rule.rewardAmount;
+    await this.dataSource.manager.save(rule);
   }
 
   /** Connexion utilisateur : téléphone + PIN. */

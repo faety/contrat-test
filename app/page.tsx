@@ -61,7 +61,7 @@ export default function LandingPage() {
               {t("landing.hero.cta")}
             </Link>
             <Link
-              href="/app"
+              href="/connexion"
               className="inline-flex min-h-13 w-full items-center justify-center rounded-full bg-ink-100 px-8 text-base font-semibold text-ink-900 transition-colors hover:bg-ink-200 dark:bg-ink-800 dark:text-ink-100 dark:hover:bg-ink-700 sm:w-auto"
             >
               👀 Démo

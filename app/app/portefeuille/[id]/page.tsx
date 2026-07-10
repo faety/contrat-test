@@ -26,7 +26,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
       ? t("wallet.status.completed")
       : tx.status === "pending"
         ? t("wallet.status.pending")
-        : t("wallet.status.failed");
+        : tx.status === "reversed"
+          ? t("wallet.status.reversed")
+          : t("wallet.status.failed");
 
   return (
     <div className="space-y-6">
@@ -61,10 +63,12 @@ export default function ReceiptPage({ params }: { params: Promise<{ id: string }
             <dt className="text-ink-500 dark:text-ink-400">{t("wallet.fee")}</dt>
             <dd className="font-semibold tabular-nums">{formatBoyia(tx.fee)} ʙ</dd>
           </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-ink-500 dark:text-ink-400">{t("wallet.balanceAfter")}</dt>
-            <dd className="font-semibold tabular-nums">{formatBoyia(tx.balanceAfter)} ʙ</dd>
-          </div>
+          {tx.balanceAfter !== undefined ? (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-500 dark:text-ink-400">{t("wallet.balanceAfter")}</dt>
+              <dd className="font-semibold tabular-nums">{formatBoyia(tx.balanceAfter)} ʙ</dd>
+            </div>
+          ) : null}
           {tx.note ? (
             <div className="flex justify-between gap-4">
               <dt className="text-ink-500 dark:text-ink-400">Note</dt>

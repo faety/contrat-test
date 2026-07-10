@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, type ReactNode } from "react";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
+import { hasToken } from "@/lib/api";
 
 const tabs: { href: string; key: TranslationKey; icon: string; exact?: boolean }[] = [
   { href: "/app", key: "nav.home", icon: "🏠", exact: true },
@@ -15,7 +16,26 @@ const tabs: { href: string; key: TranslationKey; icon: string; exact?: boolean }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useI18n();
+  const [ready, setReady] = useState(false);
+
+  // Espace connecté : redirection vers la connexion si aucune session.
+  useEffect(() => {
+    if (!hasToken()) {
+      router.replace("/connexion");
+      return;
+    }
+    setReady(true);
+  }, [router, pathname]);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <span className="size-8 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-lg flex-col">

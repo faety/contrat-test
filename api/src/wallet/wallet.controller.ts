@@ -7,7 +7,17 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
+import {
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+} from "class-validator";
 import { WalletService } from "./wallet.service";
 import { CurrentAuth, JwtAuthGuard } from "../auth/guards";
 import type { JwtPayload } from "../auth/auth.service";
@@ -28,6 +38,15 @@ class TransferDto {
   @IsString()
   @MaxLength(120)
   note?: string;
+
+  /** Code PIN transactionnel, vérifié côté serveur (§9.4). */
+  @IsString()
+  @Matches(/^\d{4,6}$/)
+  pin: string;
+
+  @IsOptional()
+  @IsIn(["transfer", "payment"])
+  type?: "transfer" | "payment";
 }
 
 @Controller("v1/wallet")
@@ -45,6 +64,11 @@ export class WalletController {
     return this.wallet.getTransactions(auth.sub, limit ? Number.parseInt(limit, 10) : 50);
   }
 
+  @Get("recipients")
+  lookupRecipient(@CurrentAuth() auth: JwtPayload, @Query("query") query?: string) {
+    return this.wallet.lookupRecipient(auth.sub, query ?? "");
+  }
+
   @Post("transfers")
   transfer(
     @CurrentAuth() auth: JwtPayload,
@@ -56,8 +80,10 @@ export class WalletController {
       senderUserId: auth.sub,
       recipient: dto.recipient,
       amount: dto.amount,
+      pin: dto.pin,
       note: dto.note,
       idempotencyKey,
+      type: dto.type,
     });
   }
 }

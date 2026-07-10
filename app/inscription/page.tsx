@@ -1,36 +1,61 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useI18n } from "@/lib/i18n";
+import { apiPublic, saveSession, type AuthResult } from "@/lib/api";
 import { BackLink, BoyiaLogo, Button, Field, inputClasses } from "@/components/ui";
-
-const DEMO_OTP = "123456";
 
 export default function RegisterPage() {
   const { t } = useI18n();
-  const router = useRouter();
   const [step, setStep] = useState<"form" | "otp">("form");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [country, setCountry] = useState("CI");
   const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState("");
   const [otp, setOtp] = useState("");
-  const [otpError, setOtpError] = useState<string | undefined>();
+  const [demoOtpHint, setDemoOtpHint] = useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
-  function handleForm(event: FormEvent) {
+  async function handleForm(event: FormEvent) {
     event.preventDefault();
-    setStep("otp");
+    setLoading(true);
+    setError(undefined);
+    try {
+      const result = await apiPublic<{ publicId: string; demoOtp?: string }>(
+        "/v1/auth/register",
+        {
+          method: "POST",
+          body: { phoneNumber: phone, firstName, lastName, pin, country },
+        },
+      );
+      setDemoOtpHint(result.demoOtp);
+      setStep("otp");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleOtp(event: FormEvent) {
+  async function handleOtp(event: FormEvent) {
     event.preventDefault();
-    if (otp.trim() !== DEMO_OTP) {
-      setOtpError(t("auth.otp.error"));
-      return;
-    }
-    setOtpError(undefined);
     setLoading(true);
-    window.setTimeout(() => router.push("/app"), 600);
+    setError(undefined);
+    try {
+      const auth = await apiPublic<AuthResult>("/v1/auth/verify-otp", {
+        method: "POST",
+        body: { phoneNumber: phone, code: otp.trim() },
+      });
+      saveSession(auth);
+      // Navigation complète : les providers relisent la session au chargement.
+      window.location.assign("/app");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue.");
+      setLoading(false);
+    }
   }
 
   return (
@@ -46,14 +71,33 @@ export default function RegisterPage() {
           <form onSubmit={handleForm} className="mt-8 space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <Field label={t("auth.firstName")} htmlFor="firstName">
-                <input id="firstName" autoComplete="given-name" required className={inputClasses} />
+                <input
+                  id="firstName"
+                  autoComplete="given-name"
+                  required
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  className={inputClasses}
+                />
               </Field>
               <Field label={t("auth.lastName")} htmlFor="lastName">
-                <input id="lastName" autoComplete="family-name" required className={inputClasses} />
+                <input
+                  id="lastName"
+                  autoComplete="family-name"
+                  required
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  className={inputClasses}
+                />
               </Field>
             </div>
             <Field label={t("auth.country")} htmlFor="country">
-              <select id="country" className={inputClasses} defaultValue="CI">
+              <select
+                id="country"
+                className={inputClasses}
+                value={country}
+                onChange={(event) => setCountry(event.target.value)}
+              >
                 <option value="CI">🇨🇮 Côte d&apos;Ivoire</option>
                 <option value="SN">🇸🇳 Sénégal</option>
                 <option value="BF">🇧🇫 Burkina Faso</option>
@@ -75,17 +119,26 @@ export default function RegisterPage() {
                 className={inputClasses}
               />
             </Field>
-            <Field label={t("auth.birthDate")} htmlFor="birthDate">
-              <input id="birthDate" type="date" required className={inputClasses} />
-            </Field>
-            <Field label={t("auth.referral")} htmlFor="referral">
-              <input id="referral" placeholder="AWA-2026" className={inputClasses} />
+            <Field label={t("auth.pinCreate")} htmlFor="pin" error={error}>
+              <input
+                id="pin"
+                type="password"
+                inputMode="numeric"
+                autoComplete="new-password"
+                placeholder="••••"
+                required
+                minLength={4}
+                maxLength={6}
+                value={pin}
+                onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
+                className={inputClasses}
+              />
             </Field>
             <label className="flex items-start gap-3 text-sm text-ink-700 dark:text-ink-300">
               <input type="checkbox" required className="mt-1 size-4 accent-brand-600" />
               {t("auth.terms")}
             </label>
-            <Button type="submit" className="w-full">
+            <Button type="submit" loading={loading} className="w-full">
               {t("auth.register.submit")}
             </Button>
           </form>
@@ -104,11 +157,16 @@ export default function RegisterPage() {
           </span>
           <h1 className="mt-6 text-3xl font-black tracking-tight">{t("auth.otp.title")}</h1>
           <p className="mt-2 text-ink-600 dark:text-ink-300">
-            {t("auth.otp.subtitle")} <strong>{phone || "+225 ••"}</strong>
+            {t("auth.otp.subtitle")} <strong>{phone}</strong>
           </p>
 
           <form onSubmit={handleOtp} className="mt-8 space-y-5">
-            <Field label="OTP" htmlFor="otp" hint={t("auth.otp.hint")} error={otpError}>
+            <Field
+              label="OTP"
+              htmlFor="otp"
+              hint={demoOtpHint ? `${t("auth.otp.hint")} (${demoOtpHint})` : undefined}
+              error={error}
+            >
               <input
                 id="otp"
                 inputMode="numeric"

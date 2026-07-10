@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useWallet } from "@/lib/wallet-store";
-import { demoUser, demoChallenges, demoOffers } from "@/lib/demo-data";
+import { demoGamification, demoChallenges, demoOffers } from "@/lib/demo-data";
 import { boyiaToFcfa } from "@/lib/config";
 import { formatBoyia, formatFcfa } from "@/lib/format";
 import { Badge, Card } from "@/components/ui";
@@ -11,7 +11,8 @@ import { TransactionRow } from "@/components/transaction-list";
 
 export default function HomePage() {
   const { t, locale } = useI18n();
-  const { balances, transactions, hideBalance, toggleHideBalance } = useWallet();
+  const { session, balances, transactions, loading, error, hideBalance, toggleHideBalance } =
+    useWallet();
 
   const total = balances.available + balances.pending + balances.promotional;
   const activeChallenges = demoChallenges.filter((challenge) => challenge.joined);
@@ -36,11 +37,12 @@ export default function HomePage() {
           </span>
           <div>
             <p className="text-sm text-ink-500 dark:text-ink-400">{t("home.greeting")} 👋</p>
-            <p className="font-bold">{demoUser.firstName}</p>
+            <p className="font-bold">{session?.firstName ?? "…"}</p>
           </div>
         </div>
         <Badge tone="brand">
-          ⭐ {t("home.level")} · {locale === "fr" ? demoUser.levelFr : demoUser.levelEn}
+          ⭐ {t("home.level")} ·{" "}
+          {locale === "fr" ? demoGamification.levelFr : demoGamification.levelEn}
         </Badge>
       </header>
 
@@ -73,7 +75,7 @@ export default function HomePage() {
             </strong>
           </span>
           <span className="rounded-full bg-white/15 px-2.5 py-1">
-            🔥 {demoUser.streakDays} {t("home.streak")}
+            🔥 {demoGamification.streakDays} {t("home.streak")}
           </span>
         </div>
       </Card>
@@ -168,13 +170,25 @@ export default function HomePage() {
           </Link>
         </div>
         <Card className="!p-2">
-          <ul className="divide-y divide-ink-100 dark:divide-ink-800">
-            {transactions.slice(0, 4).map((tx) => (
-              <li key={tx.id}>
-                <TransactionRow tx={tx} />
-              </li>
-            ))}
-          </ul>
+          {error ? (
+            <p role="alert" className="px-3 py-6 text-center text-sm text-red-600 dark:text-red-400">
+              ⚠️ {error}
+            </p>
+          ) : loading && transactions.length === 0 ? (
+            <div className="space-y-3 p-3">
+              {[0, 1, 2].map((row) => (
+                <span key={row} className="skeleton block h-12 rounded-2xl bg-ink-100 dark:bg-ink-800" />
+              ))}
+            </div>
+          ) : (
+            <ul className="divide-y divide-ink-100 dark:divide-ink-800">
+              {transactions.slice(0, 4).map((tx) => (
+                <li key={tx.id}>
+                  <TransactionRow tx={tx} />
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
       </section>
 

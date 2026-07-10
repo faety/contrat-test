@@ -1,44 +1,56 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useWallet } from "@/lib/wallet-store";
-import { demoRecipients, type Recipient, type Transaction } from "@/lib/demo-data";
-import { BOYIA_CONFIG, boyiaToFcfa } from "@/lib/config";
+import { apiFetch, type ApiRecipient } from "@/lib/api";
+import { demoSuggestions, type Transaction } from "@/lib/demo-data";
+import { boyiaToFcfa } from "@/lib/config";
 import { formatBoyia, formatFcfa } from "@/lib/format";
 import { BackLink, Badge, Button, Card, Field, inputClasses } from "@/components/ui";
-
-const DEMO_PIN = "1234";
 
 type Step = "recipient" | "amount" | "confirm" | "success";
 
 export default function SendPage() {
   const { t } = useI18n();
-  const { balances, transfer } = useWallet();
+  const { balances, limits, transfer } = useWallet();
 
   const [step, setStep] = useState<Step>("recipient");
-  const [recipient, setRecipient] = useState<Recipient | null>(null);
-  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+  const [identifier, setIdentifier] = useState("");
+  const [recipient, setRecipient] = useState<ApiRecipient | null>(null);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | undefined>();
+  const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Transaction | null>(null);
 
   const parsedAmount = Number.parseInt(amount, 10);
   const amountValid = Number.isFinite(parsedAmount) && parsedAmount > 0;
 
-  const visibleRecipients = demoRecipients.filter(
-    (candidate) =>
-      candidate.name.toLowerCase().includes(search.toLowerCase()) ||
-      candidate.username.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  function goToAmount(selected: Recipient) {
-    setRecipient(selected);
+  async function lookup(target: string, event?: FormEvent) {
+    event?.preventDefault();
+    const trimmed = target.trim();
+    if (!trimmed) {
+      setError(t("send.error.recipient"));
+      return;
+    }
+    setBusy(true);
     setError(undefined);
-    setStep("amount");
+    try {
+      const found = await apiFetch<ApiRecipient>(
+        `/v1/wallet/recipients?query=${encodeURIComponent(trimmed)}`,
+      );
+      setRecipient(found);
+      setIdentifier(trimmed);
+      setStep("amount");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function goToConfirm() {
@@ -46,10 +58,8 @@ export default function SendPage() {
       setError(t("send.error.amount"));
       return;
     }
-    if (parsedAmount > BOYIA_CONFIG.transferLimitPerTx) {
-      setError(
-        `${t("send.error.limit")} (${formatBoyia(BOYIA_CONFIG.transferLimitPerTx)} ʙ).`,
-      );
+    if (parsedAmount > limits.perTransfer) {
+      setError(`${t("send.error.limit")} (${formatBoyia(limits.perTransfer)} ʙ).`);
       return;
     }
     if (parsedAmount > balances.available) {
@@ -60,29 +70,20 @@ export default function SendPage() {
     setStep("confirm");
   }
 
-  function confirm() {
-    if (pin !== DEMO_PIN) {
-      setError(t("send.pin.error"));
-      return;
-    }
-    if (!recipient) {
-      setError(t("send.error.recipient"));
-      return;
-    }
-    const outcome = transfer({
-      recipientName: recipient.name,
+  async function confirm() {
+    setBusy(true);
+    setError(undefined);
+    const outcome = await transfer({
+      recipient: identifier,
       amount: parsedAmount,
+      pin,
       note: note || undefined,
     });
+    setBusy(false);
     if (!outcome.ok) {
-      setError(
-        outcome.error === "insufficient"
-          ? t("send.error.insufficient")
-          : `${t("send.error.limit")} (${formatBoyia(BOYIA_CONFIG.transferLimitPerTx)} ʙ).`,
-      );
+      setError(outcome.error);
       return;
     }
-    setError(undefined);
     setResult(outcome.transaction);
     setStep("success");
   }
@@ -94,40 +95,48 @@ export default function SendPage() {
 
       {step === "recipient" ? (
         <div className="space-y-4">
-          <Field label={t("send.recipient")} htmlFor="search">
-            <input
-              id="search"
-              placeholder={t("send.recipient.placeholder")}
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className={inputClasses}
-            />
-          </Field>
+          <form onSubmit={(event) => lookup(query, event)} className="space-y-4">
+            <Field label={t("send.recipient")} htmlFor="search" error={error}>
+              <input
+                id="search"
+                placeholder={t("send.recipient.placeholder")}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className={inputClasses}
+              />
+            </Field>
+            <Button type="submit" loading={busy} className="w-full">
+              {t("send.lookup")}
+            </Button>
+          </form>
           <p className="text-sm font-semibold text-ink-500 dark:text-ink-400">
-            {t("send.recent")}
+            {t("send.suggestions")}
           </p>
           <Card className="!p-2">
             <ul className="divide-y divide-ink-100 dark:divide-ink-800">
-              {visibleRecipients.map((candidate) => (
-                <li key={candidate.id}>
+              {demoSuggestions.map((suggestion) => (
+                <li key={suggestion.identifier}>
                   <button
                     type="button"
-                    onClick={() => goToAmount(candidate)}
-                    className="flex min-h-16 w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors hover:bg-ink-100 dark:hover:bg-ink-800"
+                    disabled={busy}
+                    onClick={() => {
+                      setQuery(suggestion.identifier);
+                      void lookup(suggestion.identifier);
+                    }}
+                    className="flex min-h-14 w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors hover:bg-ink-100 dark:hover:bg-ink-800"
                   >
                     <span
-                      className="flex size-11 items-center justify-center rounded-full bg-ink-100 text-lg dark:bg-ink-800"
+                      className="flex size-10 items-center justify-center rounded-full bg-ink-100 text-lg dark:bg-ink-800"
                       aria-hidden
                     >
-                      {candidate.emoji}
+                      {suggestion.emoji}
                     </span>
                     <span className="flex-1">
-                      <span className="block text-sm font-semibold">{candidate.name}</span>
+                      <span className="block text-sm font-semibold">{suggestion.name}</span>
                       <span className="block text-xs text-ink-500 dark:text-ink-400">
-                        {candidate.username} · {candidate.phoneMasked}
+                        {suggestion.identifier}
                       </span>
                     </span>
-                    {candidate.isNew ? <Badge tone="amber">new</Badge> : null}
                   </button>
                 </li>
               ))}
@@ -143,12 +152,17 @@ export default function SendPage() {
               className="flex size-11 items-center justify-center rounded-full bg-ink-100 text-lg dark:bg-ink-800"
               aria-hidden
             >
-              {recipient.emoji}
+              {recipient.isMerchant ? "🏪" : "👤"}
             </span>
             <div className="flex-1">
-              <p className="text-sm font-semibold">{recipient.name}</p>
-              <p className="text-xs text-ink-500 dark:text-ink-400">{recipient.phoneMasked}</p>
+              <p className="text-sm font-semibold">
+                {recipient.firstName} {recipient.lastName}
+              </p>
+              <p className="text-xs text-ink-500 dark:text-ink-400">
+                {recipient.username} · {recipient.phoneMasked}
+              </p>
             </div>
+            {recipient.isMerchant ? <Badge tone="green">✓</Badge> : null}
           </Card>
           {recipient.isNew ? (
             <p className="rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
@@ -208,7 +222,7 @@ export default function SendPage() {
               <div className="flex justify-between">
                 <dt className="text-ink-500 dark:text-ink-400">{t("send.summary.to")}</dt>
                 <dd className="font-semibold">
-                  {recipient.emoji} {recipient.name}
+                  {recipient.firstName} {recipient.lastName} ({recipient.username})
                 </dd>
               </div>
               <div className="flex justify-between">
@@ -238,7 +252,7 @@ export default function SendPage() {
               id="pin"
               type="password"
               inputMode="numeric"
-              maxLength={4}
+              maxLength={6}
               placeholder="••••"
               value={pin}
               onChange={(event) => setPin(event.target.value)}
@@ -249,7 +263,7 @@ export default function SendPage() {
             <Button variant="secondary" onClick={() => setStep("amount")} className="flex-1">
               {t("common.back")}
             </Button>
-            <Button onClick={confirm} className="flex-1">
+            <Button onClick={confirm} loading={busy} className="flex-1">
               {t("send.confirm")}
             </Button>
           </div>
@@ -264,7 +278,10 @@ export default function SendPage() {
           <div>
             <h2 className="text-2xl font-black">{t("send.success.title")}</h2>
             <p className="mt-2 text-ink-600 dark:text-ink-300">
-              <strong>{recipient.name}</strong> {t("send.success.desc")}
+              <strong>
+                {recipient.firstName} {recipient.lastName}
+              </strong>{" "}
+              {t("send.success.desc")}
             </p>
             <p className="mt-4 text-4xl font-black tabular-nums">
               −{formatBoyia(parsedAmount)} ʙ

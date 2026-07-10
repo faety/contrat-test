@@ -1,21 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useI18n } from "@/lib/i18n";
+import { apiPublic, saveSession, type AuthResult } from "@/lib/api";
 import { BackLink, BoyiaLogo, Button, Field, inputClasses } from "@/components/ui";
 
 export default function LoginPage() {
   const { t } = useI18n();
-  const router = useRouter();
+  const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
-    // Démo : pas d'appel serveur, on entre directement dans l'app.
-    window.setTimeout(() => router.push("/app"), 600);
+    setError(undefined);
+    try {
+      const auth = await apiPublic<AuthResult>("/v1/auth/login", {
+        method: "POST",
+        body: { phoneNumber: phone, pin },
+      });
+      saveSession(auth);
+      // Navigation complète : les providers relisent la session au chargement.
+      window.location.assign("/app");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue.");
+      setLoading(false);
+    }
   }
 
   return (
@@ -33,12 +46,19 @@ export default function LoginPage() {
               type="tel"
               inputMode="tel"
               autoComplete="tel"
-              placeholder="+225 07 00 00 00 00"
+              placeholder="+225 07 00 00 00 42"
               required
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
               className={inputClasses}
             />
           </Field>
-          <Field label={t("auth.pin")} htmlFor="pin">
+          <Field
+            label={t("auth.pin")}
+            htmlFor="pin"
+            hint={t("auth.demo.credentials")}
+            error={error}
+          >
             <input
               id="pin"
               type="password"
@@ -46,6 +66,8 @@ export default function LoginPage() {
               autoComplete="current-password"
               placeholder="••••"
               required
+              value={pin}
+              onChange={(event) => setPin(event.target.value)}
               className={inputClasses}
             />
           </Field>

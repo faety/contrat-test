@@ -49,6 +49,10 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
           <span className="text-xs text-amber-600 dark:text-amber-400">
             {t("wallet.status.pending")}
           </span>
+        ) : tx.status === "reversed" ? (
+          <span className="text-xs text-ink-500 dark:text-ink-400">
+            {t("wallet.status.reversed")}
+          </span>
         ) : null}
       </span>
     </Link>

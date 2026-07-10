@@ -4,21 +4,21 @@ import Link from "next/link";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useWallet } from "@/lib/wallet-store";
-import { demoMerchant, type Transaction } from "@/lib/demo-data";
+import { demoMerchant } from "@/lib/demo-data";
+import type { Transaction } from "@/lib/demo-data";
 import { BOYIA_CONFIG, boyiaToFcfa } from "@/lib/config";
 import { formatBoyia, formatFcfa } from "@/lib/format";
 import { Badge, Button, Card, Field, inputClasses } from "@/components/ui";
-
-const DEMO_PIN = "1234";
 
 type Step = "idle" | "payment" | "success";
 
 export default function ScanPage() {
   const { t } = useI18n();
-  const { pay, balances } = useWallet();
+  const { transfer, balances } = useWallet();
   const [step, setStep] = useState<Step>("idle");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | undefined>();
+  const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Transaction | null>(null);
 
   // Paiement mixte (§15.3) : au plus 30 % du montant payable en Boyia.
@@ -30,21 +30,23 @@ export default function ScanPage() {
   );
   const remainingFcfa = amountFcfa - boyiaToFcfa(boyiaPart);
 
-  function confirm() {
-    if (pin !== DEMO_PIN) {
-      setError(t("send.pin.error"));
-      return;
-    }
-    const outcome = pay({
-      merchantName: demoMerchant.name,
-      amountBoyia: boyiaPart,
-      note: `QR · ${formatFcfa(amountFcfa)}`,
-    });
-    if (!outcome.ok) {
-      setError(t("send.error.insufficient"));
-      return;
-    }
+  async function confirm() {
+    setBusy(true);
     setError(undefined);
+    // Paiement mixte : la part Boyia est réglée par un vrai transfert vers
+    // le portefeuille du commerçant (type payment), PIN vérifié côté serveur.
+    const outcome = await transfer({
+      recipient: "@boyia.market",
+      amount: boyiaPart,
+      pin,
+      note: `QR · ${formatFcfa(amountFcfa)}`,
+      type: "payment",
+    });
+    setBusy(false);
+    if (!outcome.ok) {
+      setError(outcome.error);
+      return;
+    }
     setResult(outcome.transaction);
     setStep("success");
   }
@@ -119,7 +121,7 @@ export default function ScanPage() {
               id="pin"
               type="password"
               inputMode="numeric"
-              maxLength={4}
+              maxLength={6}
               placeholder="••••"
               value={pin}
               onChange={(event) => setPin(event.target.value)}
@@ -130,7 +132,7 @@ export default function ScanPage() {
             <Button variant="secondary" onClick={() => setStep("idle")} className="flex-1">
               {t("common.cancel")}
             </Button>
-            <Button onClick={confirm} className="flex-1">
+            <Button onClick={confirm} loading={busy} className="flex-1">
               {t("scan.pay.confirm")} {formatBoyia(boyiaPart)} ʙ
             </Button>
           </div>

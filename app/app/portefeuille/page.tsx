@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
 import { useWallet } from "@/lib/wallet-store";
-import { BOYIA_CONFIG, boyiaToFcfa } from "@/lib/config";
+import { boyiaToFcfa } from "@/lib/config";
 import { formatBoyia, formatFcfa } from "@/lib/format";
 import { BackLink, Card } from "@/components/ui";
 import { TransactionList } from "@/components/transaction-list";
@@ -36,7 +36,7 @@ function matchesFilter(tx: Transaction, filter: Filter): boolean {
 
 export default function WalletPage() {
   const { t } = useI18n();
-  const { balances, transactions } = useWallet();
+  const { balances, limits, transactions, error } = useWallet();
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = useMemo(
@@ -55,6 +55,12 @@ export default function WalletPage() {
     <div className="space-y-6">
       <BackLink href="/app" label={t("common.back")} />
       <h1 className="text-2xl font-black tracking-tight">{t("wallet.title")}</h1>
+
+      {error ? (
+        <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">
+          ⚠️ {error}
+        </p>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         {balanceCards.map((card) => (
@@ -75,11 +81,11 @@ export default function WalletPage() {
         <div className="mt-2 flex gap-4 text-sm text-ink-600 dark:text-ink-300">
           <span>
             {t("wallet.limits.perTx")} :{" "}
-            <strong>{formatBoyia(BOYIA_CONFIG.transferLimitPerTx)} ʙ</strong>
+            <strong>{formatBoyia(limits.perTransfer)} ʙ</strong>
           </span>
           <span>
             {t("wallet.limits.daily")} :{" "}
-            <strong>{formatBoyia(BOYIA_CONFIG.transferDailyLimit)} ʙ</strong>
+            <strong>{formatBoyia(limits.daily)} ʙ</strong>
           </span>
         </div>
       </Card>
