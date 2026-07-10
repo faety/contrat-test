@@ -32,7 +32,7 @@ export default function HomePage() {
   return (
     <div className="-mx-4 -mt-4">
       {/* En-tête indigo */}
-      <header className="bg-[#4238c8] px-4 pb-20 pt-4 text-white">
+      <header className="bg-brand-600 px-4 pb-20 pt-4 text-white">
         <div className="flex items-center justify-between">
           <Link
             href="/app/profil"
@@ -41,7 +41,7 @@ export default function HomePage() {
           >
             ⚙️
           </Link>
-          <span className="rounded-full bg-white px-3.5 py-1.5 text-sm font-bold text-[#4238c8] tabular-nums">
+          <span className="rounded-full bg-white px-3.5 py-1.5 text-sm font-bold text-brand-600 tabular-nums">
             💳 {hideBalance ? "••••" : formatFcfa(boyiaToFcfa(total))}
           </span>
         </div>
@@ -123,14 +123,14 @@ export default function HomePage() {
                   className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-ink-50 dark:hover:bg-ink-900"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[15px] font-bold text-[#4238c8] dark:text-indigo-300">
+                    <span className="block truncate text-[15px] font-bold text-brand-600 dark:text-brand-300">
                       {tx.type === "payment" ? `${t("wallet.type.payment")} ${tx.counterparty}` : tx.counterparty}
                     </span>
                     <span className="mt-0.5 block text-sm text-ink-500 dark:text-ink-400">
                       {t(transactionTypeKey(tx.type))} · {formatDateTime(tx.dateIso, locale)}
                     </span>
                   </span>
-                  <span className="text-[15px] font-bold tabular-nums text-[#2f2a96] dark:text-indigo-200">
+                  <span className="text-[15px] font-bold tabular-nums text-brand-800 dark:text-brand-200">
                     {tx.amount < 0 ? "−" : ""}
                     {formatBoyia(Math.abs(tx.amount))} ʙ
                   </span>
@@ -142,7 +142,7 @@ export default function HomePage() {
         <div className="px-4 py-4">
           <Link
             href="/app/portefeuille"
-            className="block text-center text-sm font-bold text-[#4238c8] dark:text-indigo-300"
+            className="block text-center text-sm font-bold text-brand-600 dark:text-brand-300"
           >
             {t("home.transactions.all")} →
           </Link>
