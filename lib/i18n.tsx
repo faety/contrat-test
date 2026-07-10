@@ -112,6 +112,14 @@ const dictionaries = {
     "home.offers.title": "Offres recommandées",
     "home.level": "Niveau",
     "home.streak": "jours de série",
+    "home.scan.cta": "Scanner",
+    "home.menu.transfer": "Transfert",
+    "home.menu.opportunities": "Opportunités",
+    "home.menu.shop": "Boutique",
+    "home.menu.card": "Carte",
+    "home.menu.gifts": "Cadeaux",
+    "home.menu.events": "Événements",
+    "home.menu.spending": "Dépenses",
 
     // Portefeuille
     "wallet.title": "Portefeuille",
@@ -370,6 +378,14 @@ const dictionaries = {
     "home.offers.title": "Recommended offers",
     "home.level": "Level",
     "home.streak": "day streak",
+    "home.scan.cta": "Scan",
+    "home.menu.transfer": "Transfer",
+    "home.menu.opportunities": "Opportunities",
+    "home.menu.shop": "Shop",
+    "home.menu.card": "Card",
+    "home.menu.gifts": "Gifts",
+    "home.menu.events": "Events",
+    "home.menu.spending": "Spending",
 
     // Wallet
     "wallet.title": "Wallet",
