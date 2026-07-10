@@ -7,7 +7,10 @@ export const config = {
   accessTokenTtl: "15m",
   refreshTokenTtl: "7d",
   dbDriver: (process.env.DB_DRIVER ?? "sqlite") as "sqlite" | "postgres",
-  dbPath: process.env.DB_PATH ?? "./data/boyia.sqlite",
+  // Sur Vercel (démo serverless), seul /tmp est inscriptible : base éphémère
+  // reseedée à chaque démarrage à froid.
+  dbPath:
+    process.env.DB_PATH ?? (process.env.VERCEL ? "/tmp/boyia.sqlite" : "./data/boyia.sqlite"),
   databaseUrl: process.env.DATABASE_URL,
   corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:3000",
   /** Valeur de référence interne : 1 Boyia = 10 FCFA (§6.4, configurable). */
