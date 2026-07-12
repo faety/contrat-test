@@ -19,12 +19,23 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
 
 ## Ce que fait l'application
 
-- **Catalogue de cours** gratuits et payants (prix en FCFA), recherche et filtres par catégorie, fiches cours complètes (programme, formateur, note, « ce que tu vas apprendre »).
+- **Catalogue centré sur 2 domaines : IA et Anglais** — 5 vrais cours :
+  - **Comprendre l'IA en 30 minutes** (gratuit) : vraies vidéos YouTube francophones bien ordonnées + fiches de synthèse ;
+  - **ChatGPT au travail**, **Claude au travail**, **Copilot au travail** (payants, 5 000 FCFA) : cours **entièrement rédigés**, pédagogiques et compréhensibles **sans vidéo** (emplacements vidéo réservés, à tourner plus tard), cible : employés et futurs employés, usage réel au quotidien ;
+  - **Anglais : bien démarrer** (gratuit) : grande leçon vidéo YouTube + fiches pratiques (se présenter, phrases utiles, messages).
+  Chaque leçon écrite contient un exemple concret et un exercice « À toi de jouer ».
 - **Inscription style Tally** : une question par écran (prénom → nom → numéro WhatsApp avec indicatif pays → e-mail), barre de progression, validation champ par champ, touche Entrée pour avancer, récapitulatif avant confirmation. Le compte n'est demandé **qu'au moment de s'inscrire à un cours** (zéro friction pour explorer).
 - **Paiement mobile money simulé** : choix de l'opérateur (Wave, Orange Money, MTN MoMo, Moov Money), numéro pré-rempli depuis le WhatsApp, écran d'attente « confirme avec ton code secret », reçu avec référence. *Mode démo : aucun argent réel ; en production, brancher un agrégateur (CinetPay, PayDunya, FedaPay…).*
 - **Espace d'apprentissage** : leçons par module, « marquer comme terminée », progression par cours.
 - **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire).
 - **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
+
+## Réglages avant le test grandeur nature
+
+- Dans `index.html`, en haut du script, l'objet `CONFIG` :
+  - `appUrl` : le lien partagé par « Inviter un ami sur WhatsApp » (par défaut, l'URL courante) ;
+  - `whatsappSupport` : ton numéro WhatsApp (ex. `2250700000000`, sans `+`) pour afficher « Aide & donner mon avis » dans Profil.
+- **Vidéos YouTube** : les identifiants proviennent d'une recherche récente — ouvre chaque leçon vidéo et vérifie que la vidéo te convient ; remplace l'identifiant dans `COURSES` sinon (4e élément de la leçon).
 
 ## Choix issus de la recherche
 
