@@ -1,0 +1,16 @@
+{
+  "name": "kalan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kalan — cours en ligne & communauté (mobile first), paiement Wave Côte d'Ivoire.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}

@@ -32,33 +32,56 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
 - **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire).
 - **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
 
-## Paiement réel avec Wave Côte d'Ivoire
+## Paiement réel avec Wave Côte d'Ivoire (déploiement Vercel + Neon)
 
-Architecture : `index.html` (front) + `server.js` (Node ≥ 18, **zéro dépendance**) qui sert
-l'app et parle à l'API Wave. La clé API ne quitte jamais le serveur ; le **montant est
-fixé côté serveur** (`PRICES` dans `server.js`, à garder en cohérence avec `COURSES`).
+**Architecture.** Front statique `index.html` + fonctions serverless dans `api/` + logique
+partagée dans `lib/` (`wave.js`, `store.js`, `handlers.js`). Le **même code** tourne en local
+(`server.js`) et sur Vercel (dossier `api/`). La clé API Wave ne quitte jamais le serveur ;
+le **montant est fixé côté serveur** (`PRICES` dans `lib/wave.js`, à garder en cohérence avec
+`COURSES` de `index.html`). Les commandes sont persistées dans **Neon (PostgreSQL)** en
+production, ou en mémoire en dev/démo.
 
-1. **Obtenir les accès Wave Business** : compte marchand sur business.wave.com → créer une
-   **clé API** (`wave_ci_prod_…`) → créer un **webhook** pointant vers
-   `https://TON-DOMAINE/api/wave/webhook` et noter le **secret**.
-2. **Déployer** (Render, Railway, VPS… — il faut une URL publique en HTTPS pour le webhook) :
-   ```bash
-   WAVE_API_KEY=wave_ci_prod_xxx \
-   WAVE_WEBHOOK_SECRET=xxx \
-   APP_URL=https://TON-DOMAINE \
-   node server.js
-   ```
-   Sans `WAVE_API_KEY`, le serveur démarre en mode démo (paiement simulé).
-3. **Circuit d'un paiement** : `POST /api/checkout` (crée la session Wave, `currency: XOF`,
-   `client_reference` = référence de commande) → redirection vers `wave_launch_url` →
-   l'utilisateur paie dans Wave → Wave appelle le webhook (`checkout.session.completed`,
-   signature `Wave-Signature` vérifiée en HMAC-SHA256 avec tolérance 5 min) → au retour,
-   le front sonde `GET /api/order?ref=…` (avec réconciliation directe auprès de Wave si le
-   webhook tarde) → accès au cours débloqué + reçu.
-4. **Commandes** : persistées dans `data/orders.json` (suffisant pour le test ; base de
-   données réelle recommandée ensuite).
-5. **Tester sans argent réel** : `node test-wave.js` (dans les fichiers de test) lance un
-   faux serveur Wave local et rejoue tout le circuit, y compris la signature du webhook.
+Fonctions : `api/health.js` · `api/checkout.js` · `api/order.js` · `api/wave/webhook.js`.
+Région Vercel `fra1` (Francfort, proche de Neon et de l'Afrique de l'Ouest) — voir `vercel.json`.
+
+### Déployer sur Vercel
+
+1. **Neon** : crée un projet Neon (région Frankfurt) et récupère la chaîne de connexion
+   (`postgresql://…?sslmode=require`). La table `orders` est créée automatiquement au premier
+   paiement (`CREATE TABLE IF NOT EXISTS`). ⚠️ Ne mets jamais cette chaîne dans le dépôt.
+2. **Wave Business** (business.wave.com) : crée une **clé API** (`wave_ci_prod_…`) et un
+   **webhook** vers `https://TON-DOMAINE/api/wave/webhook` ; note le **secret**.
+3. **Vercel** : relie le projet `contrat-test` au dépôt GitHub (branche de production), puis
+   ajoute les **variables d'environnement** (Settings → Environment Variables) :
+   | Variable | Valeur |
+   |---|---|
+   | `WAVE_API_KEY` | `wave_ci_prod_…` |
+   | `WAVE_WEBHOOK_SECRET` | secret du webhook Wave |
+   | `DATABASE_URL` | chaîne de connexion Neon |
+   | `APP_URL` | l'URL publique (ex. `https://contrat-test.vercel.app`) — optionnel, sinon déduite des en-têtes |
+   Redéploie. Sans `WAVE_API_KEY`, le site tourne en **mode démo** (paiement simulé) ;
+   sans `DATABASE_URL`, stockage en mémoire (non persistant — à éviter en prod).
+4. **Circuit d'un paiement** : `POST /api/checkout` (crée la session Wave, `currency: XOF`,
+   `client_reference` = référence de commande, montant serveur) → redirection vers
+   `wave_launch_url` → l'utilisateur paie dans Wave → Wave appelle le webhook
+   (`checkout.session.completed`, signature `Wave-Signature` vérifiée en HMAC-SHA256,
+   tolérance 5 min) qui marque la commande payée en base → au retour dans l'app, le front
+   sonde `GET /api/order?ref=…` (avec **réconciliation directe** auprès de Wave si le webhook
+   tarde) → accès au cours débloqué + reçu.
+
+### Alternative auto-hébergée (un seul process)
+
+`node server.js` sert l'app et les mêmes endpoints (Render, Railway, VPS…) :
+```bash
+WAVE_API_KEY=… WAVE_WEBHOOK_SECRET=… DATABASE_URL=… APP_URL=https://TON-DOMAINE node server.js
+```
+
+### Tester sans argent réel
+
+- `node test-wave.js` : faux serveur Wave local + parcours navigateur complet (checkout →
+  redirection → webhook **signé** → reçu → accès au cours). 9 vérifications.
+- `node test-store-neon.js` : valide la couche Neon (mapping des colonnes, `update`,
+  persistance) avec un driver simulé, sans vraie base.
 
 ## Réglages avant le test grandeur nature
 
