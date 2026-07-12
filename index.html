@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalan — Cours en ligne &amp; communauté</title>
+<meta name="description" content="Apprends des compétences pratiques, paie par mobile money, échange avec la communauté.">
+<style>
+:root{
+  --ground:#F7F5F0; --surface:#FFFFFF; --surface-2:#F0EDE6;
+  --ink:#201D19; --muted:#6E675C; --line:#E4DFD5;
+  --primary:#0C7A5B; --primary-deep:#085C45; --primary-soft:#E2F0EA;
+  --accent:#E8A020; --accent-soft:#FBEFD9;
+  --danger:#C24C3B; --ok:#0C7A5B;
+  --shadow:0 1px 2px rgba(32,29,25,.06),0 6px 18px rgba(32,29,25,.07);
+  --r:16px; --r-sm:10px;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ground:#121815; --surface:#1B2420; --surface-2:#222D28;
+    --ink:#F0EDE6; --muted:#9AA69D; --line:#2C3831;
+    --primary:#3BBE92; --primary-deep:#2FA57D; --primary-soft:#1E332B;
+    --accent:#F0B24A; --accent-soft:#33291A;
+    --danger:#E0705E; --ok:#3BBE92;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#121815; --surface:#1B2420; --surface-2:#222D28;
+  --ink:#F0EDE6; --muted:#9AA69D; --line:#2C3831;
+  --primary:#3BBE92; --primary-deep:#2FA57D; --primary-soft:#1E332B;
+  --accent:#F0B24A; --accent-soft:#33291A;
+  --danger:#E0705E; --ok:#3BBE92;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
+}
+:root[data-theme="light"]{
+  --ground:#F7F5F0; --surface:#FFFFFF; --surface-2:#F0EDE6;
+  --ink:#201D19; --muted:#6E675C; --line:#E4DFD5;
+  --primary:#0C7A5B; --primary-deep:#085C45; --primary-soft:#E2F0EA;
+  --accent:#E8A020; --accent-soft:#FBEFD9;
+  --danger:#C24C3B; --ok:#0C7A5B;
+  --shadow:0 1px 2px rgba(32,29,25,.06),0 6px 18px rgba(32,29,25,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans); background:var(--ground); color:var(--ink);
+  min-height:100dvh; line-height:1.5; font-size:16px;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* ---- App shell ---- */
+#shell{max-width:448px;margin:0 auto;min-height:100dvh;position:relative;background:var(--ground);display:flex;flex-direction:column}
+@media (min-width:520px){
+  body{background:color-mix(in srgb,var(--ground) 60%, var(--surface-2))}
+  #shell{border-left:1px solid var(--line);border-right:1px solid var(--line);min-height:100vh}
+}
+#main{flex:1;padding-bottom:84px}
+.screen{animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---- Bottom nav ---- */
+#tabbar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:448px;
+  background:var(--surface);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(4,1fr);z-index:40;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;color:var(--muted);font-size:11.5px;font-weight:600;min-height:56px}
+.tab svg{width:23px;height:23px}
+.tab.on{color:var(--primary)}
+.tab .dot{position:absolute;display:none}
+
+/* ---- Headers ---- */
+.apphead{display:flex;align-items:center;gap:12px;padding:18px 18px 6px}
+.brand{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:-.02em}
+.brand em{font-style:normal;color:var(--primary)}
+.subhead{display:flex;align-items:center;gap:10px;padding:14px 14px 10px;position:sticky;top:0;background:var(--ground);z-index:20}
+.subhead h1{font-size:18px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--line);flex:none}
+.iconbtn svg{width:20px;height:20px}
+.tagline{color:var(--muted);font-size:14px;padding:0 18px 4px}
+
+/* ---- Common ---- */
+.px{padding-left:14px;padding-right:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  background:var(--primary);color:#fff;font-weight:700;font-size:16px;
+  padding:15px 18px;border-radius:14px;transition:transform .06s ease;
+}
+:root[data-theme="dark"] .btn{color:#0E1512}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn{color:#0E1512} }
+.btn:active{transform:scale(.98)}
+.btn svg{width:19px;height:19px;flex:none}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.soft{background:var(--primary-soft);color:var(--primary)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.chiprow{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none}
+.chiprow::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 15px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--muted)}
+.chip.on{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.pill.free{background:var(--primary-soft);color:var(--primary)}
+.pill.paid{background:var(--accent-soft);color:#9A6A0E}
+:root[data-theme="dark"] .pill.paid{color:var(--accent)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .pill.paid{color:var(--accent)} }
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.hr{height:1px;background:var(--line);border:0}
+
+/* ---- Search ---- */
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:8px 14px 0}
+.search svg{width:19px;height:19px;color:var(--muted);flex:none}
+.search input{border:0;background:none;flex:1;font-size:15.5px;min-width:0}
+.search input:focus{outline:none}
+.search input::placeholder{color:var(--muted)}
+
+/* ---- Course cards ---- */
+.courselist{display:flex;flex-direction:column;gap:14px;padding:12px 14px 24px}
+.ccard{display:block;text-align:left;overflow:hidden;border-radius:var(--r)}
+.cover{height:118px;position:relative;display:flex;align-items:flex-end;padding:12px}
+.cover .init{
+  position:absolute;top:10px;right:14px;font-family:var(--serif);font-weight:700;
+  font-size:64px;line-height:1;color:rgba(255,255,255,.28);user-select:none;
+}
+.cover .pill{background:rgba(255,255,255,.92);color:#201D19}
+.cbody{padding:13px 15px 15px;display:flex;flex-direction:column;gap:6px}
+.ctitle{font-size:16.5px;font-weight:700;line-height:1.3;text-wrap:balance}
+.cmeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:13px;color:var(--muted)}
+.cmeta .star{color:var(--accent);display:inline-flex;align-items:center;gap:3px;font-weight:700}
+.cmeta svg{width:13px;height:13px}
+.cprice{font-weight:800;font-size:15px}
+.cprice.free{color:var(--primary)}
+
+/* ---- Course detail ---- */
+.hero{height:170px;display:flex;align-items:flex-end;padding:16px;position:relative}
+.hero .init{position:absolute;top:16px;right:20px;font-family:var(--serif);font-weight:700;font-size:96px;line-height:1;color:rgba(255,255,255,.25)}
+.dtitle{font-family:var(--serif);font-size:25px;font-weight:700;line-height:1.22;text-wrap:balance;padding:16px 18px 4px}
+.instr{display:flex;align-items:center;gap:10px;padding:8px 18px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:none}
+.statrow{display:flex;gap:8px;padding:12px 14px}
+.stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:15px}
+.stat span{font-size:11.5px;color:var(--muted)}
+.sect{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:18px 18px 8px}
+.learnlist{display:flex;flex-direction:column;gap:9px;padding:0 18px}
+.learnlist li{display:flex;gap:10px;list-style:none;font-size:14.5px}
+.learnlist svg{width:18px;height:18px;color:var(--primary);flex:none;margin-top:2px}
+.modules{display:flex;flex-direction:column;gap:10px;padding:4px 14px 20px}
+.module{overflow:hidden}
+.mhead{display:flex;align-items:center;gap:10px;padding:13px 15px;font-weight:700;font-size:14.5px}
+.mhead .n{width:26px;height:26px;border-radius:8px;background:var(--surface-2);display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--muted);flex:none}
+.lesson{display:flex;align-items:center;gap:11px;padding:12px 15px;border-top:1px solid var(--line);width:100%;text-align:left;font-size:14.5px}
+.lesson svg{width:19px;height:19px;color:var(--muted);flex:none}
+.lesson.done svg{color:var(--primary)}
+.lesson .dur{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.ctabar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:448px;z-index:41;
+  background:var(--surface);border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:14px;
+}
+.ctabar .p{flex:none}
+.ctabar .p b{font-size:19px}
+.ctabar .p span{display:block;font-size:12px;color:var(--muted)}
+
+/* ---- Overlay flows (Tally / paiement) ---- */
+.flow{
+  position:fixed;inset:0;z-index:60;background:var(--ground);
+  display:flex;flex-direction:column;max-width:448px;margin:0 auto;
+  animation:slideUp .26s cubic-bezier(.32,.72,.35,1);
+}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.progress{height:4px;background:var(--surface-2)}
+.progress i{display:block;height:100%;background:var(--primary);border-radius:0 2px 2px 0;transition:width .3s ease}
+.flowhead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
+.flowbody{flex:1;overflow-y:auto;padding:8px 22px 20px;display:flex;flex-direction:column}
+.flowbody.center{justify-content:center}
+.qnum{color:var(--primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.qnum svg{width:15px;height:15px}
+.qlabel{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.25;text-wrap:balance}
+.qhelp{color:var(--muted);font-size:14.5px;margin-top:8px}
+.qinput{
+  margin-top:22px;width:100%;border:0;border-bottom:2px solid var(--line);background:none;
+  font-size:24px;padding:6px 2px 10px;border-radius:0;
+}
+.qinput:focus{outline:none;border-bottom-color:var(--primary)}
+.qinput::placeholder{color:color-mix(in srgb,var(--muted) 55%,transparent)}
+.phonerow{display:flex;gap:10px;margin-top:22px;align-items:flex-end}
+.phonerow select{
+  border:0;border-bottom:2px solid var(--line);background:none;font-size:20px;padding:6px 0 10px;max-width:118px;border-radius:0;
+}
+.phonerow input{margin-top:0;flex:1}
+.qerr{color:var(--danger);font-size:14px;margin-top:10px;min-height:21px}
+.flowfoot{padding:10px 22px calc(16px + env(safe-area-inset-bottom))}
+.okrow{display:flex;align-items:center;gap:12px}
+.okrow .hint{font-size:12.5px;color:var(--muted)}
+.recap{margin-top:20px;display:flex;flex-direction:column}
+.recap .row{display:flex;justify-content:space-between;gap:12px;padding:13px 2px;border-bottom:1px solid var(--line);font-size:15px}
+.recap .row span{color:var(--muted)}
+.recap .row b{text-align:right;word-break:break-word}
+
+/* ---- Paiement ---- */
+.ops{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.op{display:flex;align-items:center;gap:13px;padding:14px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);text-align:left;width:100%}
+.op.on{border-color:var(--primary);background:var(--primary-soft)}
+.oplogo{width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex:none}
+.op b{display:block;font-size:15px}
+.op span{font-size:12.5px;color:var(--muted)}
+.op .radio{margin-left:auto;width:21px;height:21px;border-radius:50%;border:2px solid var(--line);flex:none}
+.op.on .radio{border-color:var(--primary);background:radial-gradient(circle,var(--primary) 45%,transparent 48%)}
+.paywait{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:20px 0}
+.spinner{width:52px;height:52px;border-radius:50%;border:4px solid var(--surface-2);border-top-color:var(--primary);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ussd{font-variant-numeric:tabular-nums;background:var(--surface-2);border-radius:10px;padding:8px 14px;font-weight:700;letter-spacing:.04em}
+.bigcheck{width:76px;height:76px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;margin:0 auto}
+.bigcheck svg{width:38px;height:38px}
+.receipt{margin-top:22px}
+.receipt .row{display:flex;justify-content:space-between;padding:11px 16px;border-bottom:1px dashed var(--line);font-size:14px}
+.receipt .row:last-child{border-bottom:0}
+.receipt .row span{color:var(--muted)}
+.demonote{font-size:12.5px;color:var(--muted);text-align:center;margin-top:14px;padding:0 10px}
+
+/* ---- Communauté ---- */
+.compose{display:flex;gap:11px;margin:10px 14px 0;padding:13px}
+.compose .fake{flex:1;display:flex;align-items:center;color:var(--muted);font-size:14.5px;background:var(--surface-2);border-radius:999px;padding:0 16px;min-height:40px}
+.feed{display:flex;flex-direction:column;gap:12px;padding:12px 14px 24px}
+.post{padding:14px 15px}
+.phead{display:flex;align-items:center;gap:10px}
+.phead .who b{display:block;font-size:14.5px}
+.phead .who span{font-size:12px;color:var(--muted)}
+.pcat{margin-left:auto;font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:3px 9px;border-radius:999px;flex:none}
+.ptext{margin-top:10px;font-size:14.8px;white-space:pre-line;word-break:break-word}
+.pacts{display:flex;gap:6px;margin-top:11px}
+.pact{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);padding:7px 12px;border-radius:999px;background:var(--surface-2)}
+.pact svg{width:16px;height:16px}
+.pact.liked{color:var(--danger);background:color-mix(in srgb,var(--danger) 12%,transparent)}
+.leader{margin:10px 14px 0;padding:4px 0}
+.leadrow{display:flex;align-items:center;gap:11px;padding:10px 15px;border-bottom:1px solid var(--line)}
+.leadrow:last-child{border-bottom:0}
+.leadrow .rank{width:22px;font-weight:800;color:var(--muted);font-size:14px;text-align:center;flex:none}
+.leadrow .rank.top{color:var(--accent)}
+.leadrow b{flex:1;font-size:14.5px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leadrow .pts{font-size:13px;font-weight:700;color:var(--primary)}
+.comments{display:flex;flex-direction:column;gap:12px;padding:14px}
+.comment{display:flex;gap:10px}
+.comment .bub{background:var(--surface-2);border-radius:4px 14px 14px 14px;padding:9px 13px;font-size:14px;flex:1}
+.comment .bub b{display:block;font-size:12.5px;margin-bottom:2px}
+.comment .bub span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.cbar{display:flex;gap:9px;padding:10px 14px calc(12px + env(safe-area-inset-bottom));position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:448px;background:var(--surface);border-top:1px solid var(--line);z-index:41}
+.cbar input{flex:1;border:1px solid var(--line);background:var(--ground);border-radius:999px;padding:11px 16px;font-size:14.5px;min-width:0}
+.cbar button{flex:none;width:46px;height:46px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center}
+.cbar button svg{width:20px;height:20px}
+.composer{padding:14px;display:flex;flex-direction:column;gap:12px}
+.composer textarea{width:100%;min-height:130px;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:13px 15px;font-size:15px;resize:vertical}
+.catpick{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---- Mes cours ---- */
+.mccard{display:flex;gap:13px;padding:13px;align-items:center;text-align:left;width:100%}
+.mccard .thumb{width:62px;height:62px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:26px;color:rgba(255,255,255,.85)}
+.mccard .inf{flex:1;min-width:0}
+.mccard .inf b{display:block;font-size:14.5px;line-height:1.3}
+.pbar{height:6px;background:var(--surface-2);border-radius:3px;margin-top:8px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--primary);border-radius:3px}
+.mccard .pct{font-size:12px;color:var(--muted);margin-top:5px;display:block}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:56px 30px;color:var(--muted)}
+.empty svg{width:44px;height:44px;opacity:.5}
+.empty b{color:var(--ink);font-size:16px}
+
+/* ---- Leçon ---- */
+.lplayer{margin:12px 14px 0;border-radius:var(--r);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:#fff;position:relative;overflow:hidden}
+.lplayer .playbtn{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.22);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.5)}
+.lplayer .playbtn svg{width:26px;height:26px;margin-left:3px}
+.lcontent{padding:16px 18px;font-size:15.5px;display:flex;flex-direction:column;gap:13px}
+.lcontent h2{font-family:var(--serif);font-size:21px;line-height:1.25;text-wrap:balance}
+
+/* ---- Profil ---- */
+.pcard{margin:12px 14px 0;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.pcard .avatar{width:66px;height:66px;font-size:24px;margin-bottom:6px}
+.pcard h2{font-size:19px}
+.pstats{display:flex;gap:8px;margin:12px 14px 0}
+.prow{display:flex;align-items:center;gap:13px;padding:15px 16px;border-bottom:1px solid var(--line);width:100%;text-align:left;font-size:15px}
+.prow:last-child{border-bottom:0}
+.prow svg{width:20px;height:20px;color:var(--muted);flex:none}
+.prow .val{margin-left:auto;color:var(--muted);font-size:13.5px}
+.prow.danger,.prow.danger svg{color:var(--danger)}
+
+/* ---- Toast ---- */
+#toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--ink);color:var(--ground);padding:11px 20px;border-radius:999px;
+  font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s ease;z-index:80;
+  max-width:86vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="shell">
+  <main id="main"></main>
+  <nav id="tabbar" aria-label="Navigation principale"></nav>
+</div>
+<div id="overlay"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ================= Icônes (Feather, MIT) ================= */
+const I = {
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  circle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>',
+  checkc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.2 2.3 2.3 4.7-4.8"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  heartf:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+  zap:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  arrowr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+  enter:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  award:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+};
+
+/* ================= Données de démonstration ================= */
+const GRADS = [
+  'linear-gradient(135deg,#0C7A5B,#1FA37E)',
+  'linear-gradient(135deg,#B4560F,#E8A020)',
+  'linear-gradient(135deg,#254A87,#3E7CB9)',
+  'linear-gradient(135deg,#6B2D5C,#A34A8C)',
+  'linear-gradient(135deg,#155E63,#2D9596)',
+  'linear-gradient(135deg,#7A3B0C,#B4560F)'
+];
+
+const COURSES = [
+  {id:'mkt', title:'Marketing digital pour petits business', cat:'Business', price:5000, g:0,
+   instr:'Aïcha Diallo', instrRole:'Consultante marketing, Abidjan', rating:4.8, students:1240, dur:'4 h 30',
+   desc:"Attire des clients avec ton téléphone : réseaux sociaux, contenu qui vend et publicité à petit budget, avec des exemples 100 % locaux.",
+   learn:["Créer une page pro qui inspire confiance","Publier du contenu qui attire des clients","Lancer une pub Facebook/Instagram à 2 000 FCFA","Mesurer ce qui marche et arrêter ce qui ne marche pas"],
+   modules:[
+     {t:'Les bases du marketing digital', l:[['Pourquoi ton business doit être en ligne','6 min'],['Choisir la bonne plateforme (Facebook, TikTok, WhatsApp)','9 min'],['Créer un profil professionnel crédible','8 min']]},
+     {t:'Créer du contenu qui vend', l:[['La règle des 3 types de publication','10 min'],['Photos produits avec un simple téléphone','12 min'],['Écrire des légendes qui font acheter','9 min'],['Le calendrier de publication simple','7 min']]},
+     {t:'Publicité à petit budget', l:[['Ta première pub à 2 000 FCFA','11 min'],['Cibler les bonnes personnes','9 min'],['Lire les résultats et ajuster','8 min']]},
+   ]},
+  {id:'wab', title:'WhatsApp Business : vendre plus chaque jour', cat:'Vente', price:0, g:1,
+   instr:'Moussa Traoré', instrRole:'Formateur e-commerce, Bamako', rating:4.9, students:3480, dur:'2 h 15',
+   desc:"Transforme WhatsApp en boutique : catalogue, réponses automatiques, statuts qui vendent et suivi client simple.",
+   learn:["Configurer WhatsApp Business et ton catalogue","Répondre vite avec les messages automatiques","Utiliser les statuts pour vendre sans spammer","Organiser tes clients avec les étiquettes"],
+   modules:[
+     {t:'Installer et configurer', l:[['WhatsApp Business vs WhatsApp normal','5 min'],['Créer ton profil boutique','7 min'],['Monter ton catalogue produits','10 min']]},
+     {t:'Vendre au quotidien', l:[['Le statut qui attire les commandes','8 min'],['Messages d\'accueil et réponses rapides','9 min'],['Relancer un client sans le fâcher','7 min']]},
+     {t:'Organiser et grandir', l:[['Étiquettes : commandes, payés, livrés','6 min'],['Les listes de diffusion bien utilisées','8 min']]},
+   ]},
+  {id:'biz', title:'Créer son business en ligne de zéro', cat:'Business', price:10000, g:2,
+   instr:'Fatou Ndiaye', instrRole:'Entrepreneure, Dakar', rating:4.7, students:860, dur:'6 h',
+   desc:"De l'idée au premier client payant : trouver une idée rentable, tester sans se ruiner, vendre et encaisser par mobile money.",
+   learn:["Trouver une idée adaptée à ton marché","Tester ton offre en 7 jours","Fixer un prix rentable","Encaisser par mobile money et livrer"],
+   modules:[
+     {t:'Trouver la bonne idée', l:[['Les 4 familles de business en ligne','9 min'],['Étudier la demande autour de toi','11 min'],['Choisir : produit ou service ?','8 min']]},
+     {t:'Tester avant d\'investir', l:[['L\'offre minimum viable','10 min'],['Tes 10 premiers prospects','12 min'],['Le test à moins de 5 000 FCFA','9 min']]},
+     {t:'Vendre et encaisser', l:[['Fixer ton prix sans complexe','8 min'],['Encaisser : Wave, OM, MoMo','7 min'],['Livrer et fidéliser','10 min']]},
+   ]},
+  {id:'cnv', title:'Canva : créer des visuels professionnels', cat:'Design', price:0, g:3,
+   instr:'Yao Kouadio', instrRole:'Designer indépendant, Abidjan', rating:4.6, students:2150, dur:'3 h',
+   desc:"Crée des affiches, flyers et publications dignes d'une agence, gratuitement, depuis ton téléphone ou ton ordinateur.",
+   learn:["Maîtriser Canva gratuit sur mobile","Créer une affiche qui attire l'œil","Garder un style cohérent (couleurs, polices)","Exporter au bon format pour chaque réseau"],
+   modules:[
+     {t:'Premiers pas', l:[['Tour de l\'application','6 min'],['Modèles : bien choisir, bien modifier','9 min']]},
+     {t:'Créer tes visuels', l:[['Affiche promo étape par étape','12 min'],['Les règles simples du design','10 min'],['Couleurs et polices de ta marque','8 min']]},
+     {t:'Publier comme un pro', l:[['Formats : statut, post, story, flyer','7 min'],['Erreurs de débutant à éviter','6 min']]},
+   ]},
+  {id:'mmo', title:'Bien gérer son argent avec le mobile money', cat:'Finances', price:3000, g:4,
+   instr:'Aminata Koné', instrRole:'Conseillère en microfinance', rating:4.8, students:1590, dur:'2 h 45',
+   desc:"Budget, épargne et sécurité : reprends le contrôle de ton argent avec les outils que tu utilises déjà tous les jours.",
+   learn:["Faire un budget simple qui tient","Épargner automatiquement chaque semaine","Éviter les arnaques mobile money","Séparer argent du business et argent perso"],
+   modules:[
+     {t:'Ton argent en clair', l:[['Où part ton argent chaque mois','8 min'],['Le budget 50/30/20 adapté','10 min']]},
+     {t:'Épargner avec le mobile money', l:[['Coffres et sous-comptes','9 min'],['La méthode des 500 FCFA par jour','7 min'],['Préparer une dépense importante','8 min']]},
+     {t:'Sécurité et bonnes pratiques', l:[['Reconnaître les arnaques courantes','9 min'],['Protéger son code secret','5 min'],['Business et perso : séparer les caisses','8 min']]},
+   ]},
+  {id:'ang', title:'Anglais pratique pour entrepreneurs', cat:'Langues', price:7500, g:5,
+   instr:'Kofi Mensah', instrRole:'Professeur d\'anglais, Accra', rating:4.5, students:640, dur:'5 h',
+   desc:"L'anglais utile pour négocier, vendre et répondre à des clients étrangers — sans grammaire inutile, que des situations réelles.",
+   learn:["Te présenter et présenter ton business","Négocier prix et délais en anglais","Écrire des messages pro (WhatsApp, e-mail)","Comprendre un client au téléphone"],
+   modules:[
+     {t:'Les bases utiles', l:[['Se présenter en 30 secondes','8 min'],['Ton business en une phrase','9 min'],['Les 50 mots du commerce','11 min']]},
+     {t:'Vendre en anglais', l:[['Répondre à une demande de prix','10 min'],['Négocier poliment mais fermement','12 min'],['Conclure et remercier','7 min']]},
+     {t:'À l\'écrit', l:[['Messages WhatsApp professionnels','8 min'],['Un e-mail simple et correct','9 min']]},
+   ]},
+];
+
+const CATS = ['Tout','Business','Vente','Design','Finances','Langues'];
+const COMMU_CATS = ['Général','Entraide','Victoires','Annonces'];
+
+const OPERATORS = [
+  {id:'wave', name:'Wave', col:'#1DC8FF', note:'Sans frais supplémentaires', tag:'W'},
+  {id:'om', name:'Orange Money', col:'#F16E00', note:'Confirmation par code #144#', tag:'OM'},
+  {id:'momo', name:'MTN MoMo', col:'#FFCB05', note:'Confirmation par code *133#', tag:'MoMo', dark:true},
+  {id:'moov', name:'Moov Money', col:'#0066B3', note:'Confirmation par code *155#', tag:'MM'},
+];
+
+const H = 3600e3, D = 24*H;
+const SEED_POSTS = [
+  {id:'p1', by:'Aïcha Diallo', role:'Formatrice', cat:'Annonces', at: 2*H,
+   text:"Bienvenue à tous les nouveaux ! 🎉 Présentez-vous en commentaire : votre prénom, votre ville et ce que vous voulez apprendre. On se retrouve dans les cours !",
+   likes:34, comments:[
+     {by:'Moussa Traoré', text:'Bienvenue à tous ! N\'hésitez pas à poser vos questions dans Entraide.', at:2*H-600e3},
+     {by:'Mariam Coulibaly', text:'Mariam, de Bouaké. Je veux lancer ma boutique de pagnes en ligne !', at:H},
+   ]},
+  {id:'p2', by:'Ibrahim Sow', role:'Apprenant', cat:'Victoires', at: 5*H,
+   text:"Première vente faite grâce au cours WhatsApp Business ! 🙏 Un client a commandé 3 paires de chaussures via mon catalogue. Merci Moussa pour le module sur les statuts, ça marche vraiment.",
+   likes:52, comments:[
+     {by:'Moussa Traoré', text:'Bravo Ibrahim ! Prochaine étape : les étiquettes pour suivre tes commandes.', at:4*H},
+     {by:'Awa Kouassi', text:'Félicitations 👏 ça motive !', at:3*H},
+   ]},
+  {id:'p3', by:'Mariam Coulibaly', role:'Apprenante', cat:'Entraide', at: 9*H,
+   text:"Question : pour la pub Facebook à 2 000 FCFA, vous payez comment ? Ma carte ne passe pas. Il y a une astuce avec le mobile money ?",
+   likes:11, comments:[
+     {by:'Yao Kouadio', text:'Regarde la leçon 1 du module 3 : Aïcha montre l\'option de paiement local.', at:8*H},
+     {by:'Aïcha Diallo', text:'Oui ! Et si ça bloque, écris-moi ici, on fera un tuto ensemble.', at:7*H},
+     {by:'Mariam Coulibaly', text:'Merci beaucoup, je regarde ça ce soir 🙏', at:6*H},
+   ]},
+  {id:'p4', by:'Awa Kouassi', role:'Apprenante', cat:'Général', at: D,
+   text:"Astuce du jour : je bloque 30 minutes chaque matin avant d'ouvrir la boutique pour suivre une leçon. En 2 semaines j'ai fini le cours Canva. La régularité > la motivation.",
+   likes:28, comments:[
+     {by:'Kofi Mensah', text:'Exactement la bonne méthode. Petit pas chaque jour !', at:20*H},
+   ]},
+  {id:'p5', by:'Yao Kouadio', role:'Formateur', cat:'Annonces', at: 2*D,
+   text:"Nouveau dans le cours Canva : un module « Publier comme un pro » avec les bons formats pour chaque réseau. C'est inclus, allez-y !",
+   likes:19, comments:[]},
+  {id:'p6', by:'Kofi Mensah', role:'Formateur', cat:'Entraide', at: 3*D,
+   text:"Défi de la semaine (anglais) : présentez votre business en UNE phrase en anglais, en commentaire. Je corrige tout le monde 💪",
+   likes:23, comments:[
+     {by:'Ibrahim Sow', text:'I sell quality shoes for men in Dakar, delivery everywhere.', at:2.5*D},
+     {by:'Kofi Mensah', text:'Très bien Ibrahim ! Petite amélioration : « I sell quality men\'s shoes… »', at:2.2*D},
+   ]},
+  {id:'p7', by:'Aminata Koné', role:'Formatrice', cat:'Général', at: 4*D,
+   text:"Rappel important : aucun formateur ne vous demandera jamais votre code secret mobile money. Si quelqu'un le fait, c'est une arnaque — signalez-le.",
+   likes:41, comments:[]},
+];
+
+const LEADERS = [
+  {name:'Ibrahim Sow', pts:340},{name:'Awa Kouassi', pts:285},{name:'Mariam Coulibaly', pts:210},
+  {name:'Sekou Camara', pts:180},{name:'Fatim Ouattara', pts:145},
+];
+
+const PREFIXES = [
+  ['+225','Côte d\'Ivoire'],['+221','Sénégal'],['+223','Mali'],['+226','Burkina Faso'],
+  ['+229','Bénin'],['+228','Togo'],['+224','Guinée'],['+227','Niger'],
+  ['+237','Cameroun'],['+233','Ghana'],['+243','RD Congo'],['+241','Gabon'],
+];
+
+const LESSON_BODY = [
+  "Dans cette leçon, on va droit au but : tu découvres la méthode, tu vois un exemple réel, puis tu passes à l'action avec un exercice simple.",
+  "Prends de quoi noter (le bloc-notes de ton téléphone suffit). L'objectif n'est pas de tout retenir, mais d'appliquer une chose concrète dès aujourd'hui.",
+  "💡 Conseil : si un point n'est pas clair, pose ta question dans l'espace Entraide de la communauté — un formateur ou un autre apprenant te répondra vite."
+];
+
+/* ================= État ================= */
+const KEY = 'kalan-v1';
+function baseState(){
+  return {
+    user:null,               // {prenom, nom, whatsapp, email}
+    enrolled:{},             // courseId -> {at, paid, op, ref}
+    done:{},                 // courseId -> {lessonKey:true}
+    points:0,
+    likes:{},                // postId -> true
+    posts:null,              // copie mutable des posts (init au 1er chargement)
+    theme:null,              // null=auto | 'light' | 'dark'
+  };
+}
+let S = baseState();
+try{
+  const raw = localStorage.getItem(KEY);
+  if(raw){ S = Object.assign(baseState(), JSON.parse(raw)); }
+}catch(e){}
+if(!S.posts){ S.posts = SEED_POSTS.map(p=>({...p, at: Date.now()-p.at, comments:p.comments.map(c=>({...c, at: Date.now()-c.at}))})); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function applyTheme(){ if(S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme; }
+applyTheme();
+
+/* Navigation */
+let V = {tab:'cours', screen:'catalog', p:{}};
+let filters = {cat:'Tout', q:'', commu:'Tout'};
+function go(tab, screen, p={}){ V={tab,screen,p}; render(); window.scrollTo(0,0); }
+
+/* ================= Utilitaires ================= */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fcfa = n => n===0 ? 'Gratuit' : n.toLocaleString('fr-FR').replace(/ /g,' ')+' FCFA';
+const initials = n => n.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+function ago(t){
+  const s = Math.max(1,(Date.now()-t)/1000);
+  if(s<60) return 'à l\'instant';
+  if(s<3600) return `il y a ${Math.floor(s/60)} min`;
+  if(s<86400) return `il y a ${Math.floor(s/3600)} h`;
+  if(s<7*86400) return `il y a ${Math.floor(s/86400)} j`;
+  return new Date(t).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+}
+let toastT;
+function toast(msg){
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'), 2400);
+}
+function addPoints(n, why){ S.points += n; save(); toast(`+${n} points — ${why}`); }
+function courseById(id){ return COURSES.find(c=>c.id===id); }
+function lessonCount(c){ return c.modules.reduce((a,m)=>a+m.l.length,0); }
+function doneCount(c){ return Object.keys(S.done[c.id]||{}).length; }
+function courseProgress(c){ return Math.round(100*doneCount(c)/lessonCount(c)); }
+
+/* ================= Rendu : barre d'onglets ================= */
+function renderTabs(){
+  const tabs = [
+    ['cours','Cours',I.book],['commu','Communauté',I.users],
+    ['mescours','Mes cours',I.play],['profil','Profil',I.user]
+  ];
+  $('#tabbar').innerHTML = tabs.map(([id,label,ic])=>
+    `<button class="tab ${V.tab===id?'on':''}" onclick="App.tab('${id}')" aria-label="${label}" ${V.tab===id?'aria-current="page"':''}>${ic}<span>${label}</span></button>`
+  ).join('');
+}
+
+/* ================= Écrans : Cours ================= */
+function courseCard(c){
+  const enr = S.enrolled[c.id];
+  return `<button class="card ccard" onclick="App.openCourse('${c.id}')">
+    <div class="cover" style="background:${GRADS[c.g]}">
+      <span class="init">${esc(c.title[0])}</span>
+      <span class="pill ${c.price?'paid':'free'}">${c.price?fcfa(c.price):'Gratuit'}</span>
+    </div>
+    <div class="cbody">
+      <div class="ctitle">${esc(c.title)}</div>
+      <div class="cmeta">
+        <span>${esc(c.instr)}</span>
+        <span class="star">${I.star}${c.rating}</span>
+        <span class="num">${c.students.toLocaleString('fr-FR')} inscrits</span>
+      </div>
+      ${enr?`<div class="pbar"><i style="width:${courseProgress(c)}%"></i></div><span class="muted" style="font-size:12px">Inscrit · ${courseProgress(c)} % terminé</span>`:''}
+    </div>
+  </button>`;
+}
+
+function screenCatalog(){
+  const list = COURSES.filter(c=>
+    (filters.cat==='Tout'||c.cat===filters.cat) &&
+    (filters.q==='' || (c.title+' '+c.instr+' '+c.desc).toLowerCase().includes(filters.q.toLowerCase()))
+  );
+  return `<div class="screen">
+    <header class="apphead">
+      <div style="flex:1">
+        <div class="brand">Ka<em>lan</em></div>
+        <div class="tagline">Apprends une compétence utile, à ton rythme.</div>
+      </div>
+      ${S.user?`<button class="avatar" style="width:42px;height:42px" onclick="App.tab('profil')" aria-label="Profil">${initials(S.user.prenom+' '+S.user.nom)}</button>`:''}
+    </header>
+    <div class="search">
+      ${I.search}
+      <input type="search" placeholder="Chercher un cours…" value="${esc(filters.q)}"
+        oninput="App.search(this.value)" aria-label="Chercher un cours">
+    </div>
+    <div class="chiprow" role="tablist">
+      ${CATS.map(c=>`<button class="chip ${filters.cat===c?'on':''}" onclick="App.cat('${c}')">${c}</button>`).join('')}
+    </div>
+    <div class="courselist">
+      ${list.length ? list.map(courseCard).join('') : `<div class="empty">${I.search}<b>Aucun cours trouvé</b><span>Essaie un autre mot-clé ou une autre catégorie.</span></div>`}
+    </div>
+  </div>`;
+}
+
+function screenCourse(){
+  const c = courseById(V.p.id); if(!c) return screenCatalog();
+  const enr = S.enrolled[c.id];
+  let li = 0;
+  return `<div class="screen" style="padding-bottom:96px">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('cours')" aria-label="Retour">${I.back}</button>
+      <h1>${esc(c.cat)}</h1>
+    </div>
+    <div class="hero" style="background:${GRADS[c.g]};border-radius:var(--r);margin:0 14px">
+      <span class="init">${esc(c.title[0])}</span>
+      <span class="pill" style="background:rgba(255,255,255,.92);color:#201D19">${c.price?fcfa(c.price):'Gratuit'}</span>
+    </div>
+    <h1 class="dtitle">${esc(c.title)}</h1>
+    <div class="instr">
+      <span class="avatar">${initials(c.instr)}</span>
+      <div><b style="font-size:14.5px">${esc(c.instr)}</b><div class="muted" style="font-size:12.5px">${esc(c.instrRole)}</div></div>
+    </div>
+    <div class="statrow">
+      <div class="stat"><b>${c.rating} ★</b><span>note</span></div>
+      <div class="stat"><b class="num">${c.students.toLocaleString('fr-FR')}</b><span>inscrits</span></div>
+      <div class="stat"><b>${c.dur}</b><span>de contenu</span></div>
+      <div class="stat"><b class="num">${lessonCount(c)}</b><span>leçons</span></div>
+    </div>
+    <p class="muted" style="padding:6px 18px;font-size:14.8px">${esc(c.desc)}</p>
+    <div class="sect">Ce que tu vas apprendre</div>
+    <ul class="learnlist">${c.learn.map(l=>`<li>${I.checkc}<span>${esc(l)}</span></li>`).join('')}</ul>
+    <div class="sect">Programme · ${lessonCount(c)} leçons</div>
+    <div class="modules">
+      ${c.modules.map((m,mi)=>`<div class="card module">
+        <div class="mhead"><span class="n">${mi+1}</span>${esc(m.t)}</div>
+        ${m.l.map((l)=>{
+          const k = 'l'+(li++);
+          const done = S.done[c.id] && S.done[c.id][k];
+          return `<button class="lesson ${done?'done':''}" onclick="App.openLesson('${c.id}','${k}')">
+            ${done?I.checkc:(enr?I.play:I.circle)}<span>${esc(l[0])}</span><span class="dur num">${l[1]}</span>
+          </button>`;
+        }).join('')}
+      </div>`).join('')}
+    </div>
+    <div class="ctabar">
+      <div class="p"><b class="num">${c.price?fcfa(c.price):'Gratuit'}</b><span>${c.price?'paiement mobile money':'accès complet'}</span></div>
+      ${enr
+        ? `<button class="btn" onclick="App.openLearn('${c.id}')">Continuer ${I.arrowr}</button>`
+        : `<button class="btn" onclick="App.enroll('${c.id}')">${c.price?'S\'inscrire au cours':'S\'inscrire gratuitement'}</button>`}
+    </div>
+  </div>`;
+}
+
+/* ================= Écran : lecture leçon ================= */
+function lessonByKey(c, key){
+  let li=0;
+  for(const m of c.modules) for(const l of m.l){ if('l'+li===key) return {l, m, idx:li}; li++; }
+  return null;
+}
+function screenLesson(){
+  const c = courseById(V.p.id); if(!c) return screenCatalog();
+  const found = lessonByKey(c, V.p.k); if(!found) return screenCourse();
+  const done = S.done[c.id] && S.done[c.id][V.p.k];
+  const total = lessonCount(c);
+  const nextKey = found.idx+1<total ? 'l'+(found.idx+1) : null;
+  return `<div class="screen" style="padding-bottom:20px">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.openLearn('${c.id}')" aria-label="Retour au cours">${I.back}</button>
+      <h1>Leçon ${found.idx+1} / ${total}</h1>
+    </div>
+    <div class="lplayer" style="background:${GRADS[c.g]}">
+      <button class="playbtn" onclick="App.toast('Vidéo de démonstration — le contenu réel sera hébergé ici.')" aria-label="Lire la vidéo">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+      </button>
+    </div>
+    <div class="lcontent">
+      <h2>${esc(found.l[0])}</h2>
+      <div class="muted" style="display:flex;align-items:center;gap:6px;font-size:13px">${I.clock} ${found.l[1]} · Module « ${esc(found.m.t)} »</div>
+      ${LESSON_BODY.map(p=>`<p>${esc(p)}</p>`).join('')}
+      ${done
+        ? `<button class="btn soft" disabled>${I.check} Leçon terminée</button>`
+        : `<button class="btn" onclick="App.completeLesson('${c.id}','${V.p.k}')">${I.check} Marquer comme terminée</button>`}
+      ${nextKey?`<button class="btn ghost" onclick="App.openLesson('${c.id}','${nextKey}')">Leçon suivante ${I.arrowr}</button>`:''}
+    </div>
+  </div>`;
+}
+
+function screenLearn(){
+  const c = courseById(V.p.id); if(!c) return screenCatalog();
+  const pct = courseProgress(c);
+  let li=0;
+  return `<div class="screen">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('mescours')" aria-label="Retour">${I.back}</button>
+      <h1>${esc(c.title)}</h1>
+    </div>
+    <div class="px" style="padding-top:6px">
+      <div class="card" style="padding:15px 16px">
+        <b style="font-size:14px">${pct===100?'Cours terminé, bravo ! 🎓':'Ta progression'}</b>
+        <div class="pbar" style="margin-top:9px"><i style="width:${pct}%"></i></div>
+        <span class="muted" style="font-size:12.5px;margin-top:6px;display:block">${doneCount(c)} / ${lessonCount(c)} leçons · ${pct} %</span>
+      </div>
+    </div>
+    <div class="modules" style="padding-top:14px">
+      ${c.modules.map((m,mi)=>`<div class="card module">
+        <div class="mhead"><span class="n">${mi+1}</span>${esc(m.t)}</div>
+        ${m.l.map(l=>{
+          const k='l'+(li++);
+          const done = S.done[c.id] && S.done[c.id][k];
+          return `<button class="lesson ${done?'done':''}" onclick="App.openLesson('${c.id}','${k}')">
+            ${done?I.checkc:I.play}<span>${esc(l[0])}</span><span class="dur num">${l[1]}</span></button>`;
+        }).join('')}
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ================= Écran : Mes cours ================= */
+function screenMyCourses(){
+  const mine = COURSES.filter(c=>S.enrolled[c.id]);
+  return `<div class="screen">
+    <header class="apphead"><div class="brand" style="font-size:22px">Mes cours</div></header>
+    ${mine.length===0
+      ? `<div class="empty">${I.book}<b>Aucun cours pour l'instant</b><span>Inscris-toi à un cours gratuit ou payant pour commencer à apprendre.</span>
+         <button class="btn" style="width:auto;padding:12px 22px" onclick="App.tab('cours')">Voir les cours</button></div>`
+      : `<div class="courselist">${mine.map(c=>{
+          const pct = courseProgress(c);
+          return `<button class="card mccard" onclick="App.openLearn('${c.id}')">
+            <span class="thumb" style="background:${GRADS[c.g]}">${esc(c.title[0])}</span>
+            <span class="inf"><b>${esc(c.title)}</b>
+              <span class="pbar"><i style="width:${pct}%"></i></span>
+              <span class="pct">${pct===100?'Terminé 🎓':pct+' % · '+esc(c.instr)}</span>
+            </span>
+          </button>`;}).join('')}</div>`}
+  </div>`;
+}
+
+/* ================= Écrans : Communauté ================= */
+function postCard(p, detail){
+  const liked = S.likes[p.id];
+  const openAttr = detail?'':`onclick="App.openPost('${p.id}')" role="button" tabindex="0"`;
+  return `<article class="card post" ${openAttr}>
+    <div class="phead">
+      <span class="avatar">${initials(p.by)}</span>
+      <div class="who"><b>${esc(p.by)}</b><span>${esc(p.role)} · ${ago(p.at)}</span></div>
+      <span class="pcat">${esc(p.cat)}</span>
+    </div>
+    <p class="ptext">${esc(p.text)}</p>
+    <div class="pacts">
+      <button class="pact ${liked?'liked':''}" onclick="event.stopPropagation();App.like('${p.id}')" aria-label="J'aime">
+        ${liked?I.heartf:I.heart}<span class="num">${p.likes}</span>
+      </button>
+      <button class="pact" onclick="event.stopPropagation();App.openPost('${p.id}')" aria-label="Commentaires">
+        ${I.msg}<span class="num">${p.comments.length}</span>
+      </button>
+    </div>
+  </article>`;
+}
+
+function screenFeed(){
+  const list = S.posts.filter(p=>filters.commu==='Tout'||p.cat===filters.commu)
+                      .slice().sort((a,b)=>b.at-a.at);
+  const me = S.user ? initials(S.user.prenom+' '+S.user.nom) : '?';
+  return `<div class="screen">
+    <header class="apphead">
+      <div style="flex:1"><div class="brand" style="font-size:22px">Communauté</div>
+      <div class="tagline" style="padding:0">${(1240).toLocaleString('fr-FR')} membres · entraide et victoires</div></div>
+      <button class="iconbtn" onclick="App.goLeader()" aria-label="Classement" title="Classement">${I.award}</button>
+    </header>
+    <button class="card compose" onclick="App.compose()">
+      <span class="avatar">${me}</span>
+      <span class="fake">Partage une question ou une victoire…</span>
+    </button>
+    <div class="chiprow">
+      ${['Tout',...COMMU_CATS].map(c=>`<button class="chip ${filters.commu===c?'on':''}" onclick="App.commuCat('${c}')">${c}</button>`).join('')}
+    </div>
+    <div class="feed">${list.map(p=>postCard(p,false)).join('')||`<div class="empty">${I.msg}<b>Rien ici pour l'instant</b><span>Sois la première personne à publier dans cette catégorie.</span></div>`}</div>
+  </div>`;
+}
+
+function screenPost(){
+  const p = S.posts.find(x=>x.id===V.p.id); if(!p) return screenFeed();
+  return `<div class="screen" style="padding-bottom:90px">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('commu')" aria-label="Retour">${I.back}</button>
+      <h1>Publication</h1>
+    </div>
+    <div class="px">${postCard(p,true)}</div>
+    <div class="sect">Commentaires · ${p.comments.length}</div>
+    <div class="comments">
+      ${p.comments.slice().sort((a,b)=>a.at-b.at).map(c=>`<div class="comment">
+        <span class="avatar" style="width:32px;height:32px;font-size:12px">${initials(c.by)}</span>
+        <div class="bub"><b>${esc(c.by)}</b>${esc(c.text)}<span>${ago(c.at)}</span></div>
+      </div>`).join('')||`<p class="muted px" style="font-size:14px">Pas encore de commentaire — lance la discussion.</p>`}
+    </div>
+    <div class="cbar">
+      <input id="cinput" type="text" placeholder="Écrire un commentaire…" maxlength="500"
+        onkeydown="if(event.key==='Enter')App.comment('${p.id}')" aria-label="Écrire un commentaire">
+      <button onclick="App.comment('${p.id}')" aria-label="Envoyer">${I.send}</button>
+    </div>
+  </div>`;
+}
+
+function screenLeader(){
+  const rows = LEADERS.slice();
+  if(S.user){ rows.push({name:S.user.prenom+' '+S.user.nom+' (toi)', pts:S.points, me:true}); }
+  rows.sort((a,b)=>b.pts-a.pts);
+  return `<div class="screen">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('commu')" aria-label="Retour">${I.back}</button>
+      <h1>Classement de la semaine</h1>
+    </div>
+    <p class="muted px" style="font-size:13.5px;padding-top:2px">Gagne des points en terminant des leçons (+10), en publiant (+5) et en commentant (+2).</p>
+    <div class="card leader">
+      ${rows.map((r,i)=>`<div class="leadrow" ${r.me?'style="background:var(--primary-soft);border-radius:12px"':''}>
+        <span class="rank ${i<3?'top':''}">${i+1}</span>
+        <span class="avatar" style="width:34px;height:34px;font-size:12.5px">${initials(r.name)}</span>
+        <b>${esc(r.name)}</b><span class="pts num">${r.pts} pts</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function screenCompose(){
+  return `<div class="screen">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('commu')" aria-label="Annuler">${I.x}</button>
+      <h1>Nouvelle publication</h1>
+    </div>
+    <div class="composer">
+      <div class="catpick">
+        ${COMMU_CATS.map((c,i)=>`<button class="chip ${i===0?'on':''}" data-cat="${c}" onclick="App.pickCat(this)">${c}</button>`).join('')}
+      </div>
+      <textarea id="ptext" maxlength="1000" placeholder="Pose une question, partage une victoire ou une astuce…"></textarea>
+      <button class="btn" onclick="App.publish()">Publier</button>
+    </div>
+  </div>`;
+}
+
+/* ================= Écran : Profil ================= */
+function screenProfile(){
+  const u = S.user;
+  const nCours = Object.keys(S.enrolled).length;
+  const nDone = COURSES.filter(c=>S.enrolled[c.id]&&courseProgress(c)===100).length;
+  return `<div class="screen">
+    <header class="apphead"><div class="brand" style="font-size:22px">Profil</div></header>
+    ${u ? `
+    <div class="card pcard">
+      <span class="avatar">${initials(u.prenom+' '+u.nom)}</span>
+      <h2>${esc(u.prenom)} ${esc(u.nom)}</h2>
+      <span class="muted" style="font-size:13.5px">Membre de la communauté Kalan</span>
+    </div>
+    <div class="pstats">
+      <div class="stat"><b class="num" style="color:var(--accent)">${S.points}</b><span>points</span></div>
+      <div class="stat"><b class="num">${nCours}</b><span>cours suivis</span></div>
+      <div class="stat"><b class="num">${nDone}</b><span>terminés</span></div>
+    </div>
+    <div class="sect">Mes informations</div>
+    <div class="card" style="margin:0 14px">
+      <div class="prow">${I.phone}<span>WhatsApp</span><span class="val num">${esc(u.whatsapp)}</span></div>
+      <div class="prow">${I.mail}<span>E-mail</span><span class="val">${esc(u.email)}</span></div>
+    </div>`
+    : `
+    <div class="card pcard">
+      <span class="avatar">?</span>
+      <h2>Pas encore de compte</h2>
+      <span class="muted" style="font-size:13.5px;max-width:260px">Inscris-toi en moins d'une minute pour rejoindre les cours et la communauté.</span>
+      <button class="btn" style="margin-top:14px" onclick="App.enrollGeneric()">Créer mon compte</button>
+    </div>`}
+    <div class="sect">Application</div>
+    <div class="card" style="margin:0 14px">
+      <button class="prow" onclick="App.toggleTheme()">${I.moon}<span>Thème</span><span class="val">${S.theme==null?'Automatique':S.theme==='dark'?'Sombre':'Clair'}</span></button>
+      <div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>
+      <button class="prow danger" onclick="App.reset()">${I.trash}<span>Réinitialiser la démo</span></button>
+    </div>
+    <p class="demonote" style="margin:18px 0 26px">Kalan — démo fonctionnelle. Les paiements sont simulés ; en production ils passeraient par un agrégateur mobile money (CinetPay, PayDunya, FedaPay…).</p>
+  </div>`;
+}
+
+/* ================= Flux plein écran : inscription (style Tally) ================= */
+let flow = null; // {type:'enroll'|'pay', courseId, step, data, ctx}
+
+function enrollSteps(){
+  return [
+    {key:'prenom', label:'Ton prénom ?', help:'Comme on t\'appelle tous les jours.', ph:'Ex. Awa', type:'text',
+     valid:v=>v.trim().length>=2||'Entre au moins 2 lettres.'},
+    {key:'nom', label:d=>`Enchanté ${d.prenom} ! Ton nom de famille ?`, help:'Il apparaîtra sur ton certificat.', ph:'Ex. Kouassi', type:'text',
+     valid:v=>v.trim().length>=2||'Entre au moins 2 lettres.'},
+    {key:'whatsapp', label:'Ton numéro WhatsApp ?', help:'Pour recevoir tes accès et les rappels de cours. Jamais de spam.', ph:'07 00 00 00 00', type:'phone',
+     valid:v=>v.replace(/\D/g,'').length>=8||'Ce numéro semble trop court.'},
+    {key:'email', label:'Ton adresse e-mail ?', help:'Pour retrouver ton compte et recevoir ton reçu.', ph:'awa@exemple.com', type:'email',
+     valid:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())||'Vérifie le format de l\'adresse (ex. nom@gmail.com).'},
+  ];
+}
+
+function renderFlow(){
+  const ov = $('#overlay');
+  if(!flow){ ov.innerHTML=''; document.body.style.overflow=''; return; }
+  document.body.style.overflow='hidden';
+  const c = flow.courseId ? courseById(flow.courseId) : null;
+
+  /* ---- Inscription ---- */
+  if(flow.type==='enroll'){
+    const steps = enrollSteps();
+    const total = steps.length+1; // + récap
+    const pct = Math.round(100*(flow.step)/total);
+    let inner;
+    if(flow.step < steps.length){
+      const st = steps[flow.step];
+      const label = typeof st.label==='function'?st.label(flow.data):st.label;
+      const val = flow.data[st.key]||'';
+      let input;
+      if(st.type==='phone'){
+        input = `<div class="phonerow">
+          <select id="fprefix" aria-label="Indicatif pays">${PREFIXES.map(p=>`<option value="${p[0]}" ${(flow.data.prefix||'+225')===p[0]?'selected':''}>${p[0]}</option>`).join('')}</select>
+          <input id="finput" class="qinput" type="tel" inputmode="tel" placeholder="${st.ph}" value="${esc(val)}" autocomplete="tel" enterkeyhint="next">
+        </div>`;
+      } else {
+        input = `<input id="finput" class="qinput" type="${st.type}" placeholder="${st.ph}" value="${esc(val)}"
+          autocomplete="${st.key==='email'?'email':st.key==='prenom'?'given-name':'family-name'}" enterkeyhint="next">`;
+      }
+      inner = `
+        <div class="qnum">${flow.step+1} ${I.arrowr}</div>
+        <h2 class="qlabel">${esc(label)}</h2>
+        <p class="qhelp">${esc(st.help)}</p>
+        ${input}
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>`;
+    } else {
+      const d = flow.data;
+      inner = `
+        <div class="qnum">${I.checkc} Dernière étape</div>
+        <h2 class="qlabel">Tout est bon ?</h2>
+        <p class="qhelp">${c?`Tu t'inscris à « ${esc(c.title)} »${c.price?` — ${fcfa(c.price)}`:' — gratuit'}.`:'Vérifie tes informations avant de créer ton compte.'}</p>
+        <div class="recap">
+          <div class="row"><span>Prénom</span><b>${esc(d.prenom)}</b></div>
+          <div class="row"><span>Nom</span><b>${esc(d.nom)}</b></div>
+          <div class="row"><span>WhatsApp</span><b class="num">${esc((d.prefix||'+225')+' '+d.whatsapp)}</b></div>
+          <div class="row"><span>E-mail</span><b>${esc(d.email)}</b></div>
+        </div>`;
+    }
+    ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true" aria-label="Inscription">
+      <div class="progress"><i style="width:${pct}%"></i></div>
+      <div class="flowhead">
+        <button class="iconbtn" onclick="${flow.step>0?'App.flowBack()':'App.flowClose()'}" aria-label="${flow.step>0?'Précédent':'Fermer'}">${flow.step>0?I.back:I.x}</button>
+        <span class="muted" style="font-size:13px">${c?esc(c.title):'Créer mon compte'}</span>
+        <span style="width:42px"></span>
+      </div>
+      <div class="flowbody center">${inner}</div>
+      <div class="flowfoot">
+        <div class="okrow">
+          <button class="btn" style="flex:1" onclick="App.flowNext()">
+            ${flow.step<steps.length?'OK':'Confirmer mon inscription'} ${flow.step<steps.length?I.check:''}
+          </button>
+          ${flow.step<steps.length?`<span class="hint">appuie sur <b>Entrée ${'↵'}</b></span>`:''}
+        </div>
+      </div>
+    </div>`;
+    const inp = $('#finput');
+    if(inp){
+      inp.focus();
+      inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); App.flowNext(); } });
+    }
+    return;
+  }
+
+  /* ---- Paiement mobile money ---- */
+  if(flow.type==='pay'){
+    const steps = ['op','confirm','wait','done'];
+    const pct = Math.round(100*(steps.indexOf(flow.step)+1)/steps.length);
+    let inner='', foot='';
+    if(flow.step==='op'){
+      inner = `
+        <h2 class="qlabel">Comment veux-tu payer ?</h2>
+        <p class="qhelp">Inscription à « ${esc(c.title)} » — <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b></p>
+        <div class="ops">
+          ${OPERATORS.map(o=>`<button class="op ${flow.data.op===o.id?'on':''}" onclick="App.payPick('${o.id}')">
+            <span class="oplogo" style="background:${o.col};${o.dark?'color:#201D19':''}">${o.tag}</span>
+            <span><b>${o.name}</b><span>${o.note}</span></span>
+            <span class="radio"></span>
+          </button>`).join('')}
+        </div>`;
+      foot = `<button class="btn" ${flow.data.op?'':'disabled'} onclick="App.payNext()">Continuer ${I.arrowr}</button>`;
+    }
+    if(flow.step==='confirm'){
+      const o = OPERATORS.find(x=>x.id===flow.data.op);
+      inner = `
+        <h2 class="qlabel">Ton numéro ${esc(o.name)} ?</h2>
+        <p class="qhelp">Tu recevras une demande de paiement à confirmer avec ton code secret. Ne partage jamais ce code.</p>
+        <div class="phonerow">
+          <select id="fprefix" aria-label="Indicatif pays">${PREFIXES.map(p=>`<option value="${p[0]}" ${(flow.data.prefix||'+225')===p[0]?'selected':''}>${p[0]}</option>`).join('')}</select>
+          <input id="finput" class="qinput" type="tel" inputmode="tel" value="${esc(flow.data.phone||'')}" placeholder="07 00 00 00 00" enterkeyhint="go">
+        </div>
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>
+        <div class="recap"><div class="row"><span>Montant à payer</span><b class="num">${fcfa(c.price)}</b></div></div>`;
+      foot = `<button class="btn" onclick="App.paySend()">Payer ${fcfa(c.price)}</button>`;
+    }
+    if(flow.step==='wait'){
+      const o = OPERATORS.find(x=>x.id===flow.data.op);
+      inner = `<div class="paywait">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2 class="qlabel" style="font-size:21px">Demande envoyée à ${esc(o.name)}</h2>
+        <p class="qhelp">Compose ton code secret sur ton téléphone pour valider le paiement de <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b>.</p>
+        <span class="ussd num">${esc((flow.data.prefix||'+225')+' '+flow.data.phone)}</span>
+        <p class="demonote">Mode démo : la confirmation est automatique dans quelques secondes.</p>
+      </div>`;
+      foot = '';
+    }
+    if(flow.step==='done'){
+      const o = OPERATORS.find(x=>x.id===flow.data.op);
+      inner = `
+        <div class="bigcheck">${I.check}</div>
+        <h2 class="qlabel" style="text-align:center;margin-top:16px">Paiement confirmé 🎉</h2>
+        <p class="qhelp" style="text-align:center">Tu as maintenant accès complet au cours.</p>
+        <div class="card receipt">
+          <div class="row"><span>Cours</span><b style="text-align:right;max-width:60%">${esc(c.title)}</b></div>
+          <div class="row"><span>Montant</span><b class="num">${fcfa(c.price)}</b></div>
+          <div class="row"><span>Opérateur</span><b>${o.name}</b></div>
+          <div class="row"><span>Numéro</span><b class="num">${esc((flow.data.prefix||'+225')+' '+flow.data.phone)}</b></div>
+          <div class="row"><span>Référence</span><b class="num">${flow.data.ref}</b></div>
+          <div class="row"><span>Date</span><b>${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</b></div>
+        </div>
+        <p class="demonote">Reçu de démonstration — aucun argent réel n'a été débité.</p>`;
+      foot = `<button class="btn" onclick="App.payDone()">Commencer le cours ${I.arrowr}</button>`;
+    }
+    ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true" aria-label="Paiement">
+      <div class="progress"><i style="width:${pct}%"></i></div>
+      <div class="flowhead">
+        <button class="iconbtn" onclick="App.flowClose()" aria-label="Fermer" ${flow.step==='wait'?'disabled style="opacity:.3"':''}>${I.x}</button>
+        <span class="muted" style="font-size:13px">Paiement sécurisé · mobile money</span>
+        <span style="width:42px"></span>
+      </div>
+      <div class="flowbody center">${inner}</div>
+      ${foot?`<div class="flowfoot">${foot}</div>`:''}
+    </div>`;
+    const inp = $('#finput');
+    if(inp){ inp.focus(); inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); App.paySend(); } }); }
+  }
+
+  /* ---- Succès inscription (cours gratuit / compte) ---- */
+  if(flow.type==='welcome'){
+    ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true">
+      <div class="flowhead"><span></span><span></span><button class="iconbtn" onclick="App.flowClose()" aria-label="Fermer">${I.x}</button></div>
+      <div class="flowbody center" style="text-align:center;align-items:center">
+        <div class="bigcheck">${I.check}</div>
+        <h2 class="qlabel" style="margin-top:18px">Bienvenue ${esc(S.user.prenom)} ! 🎉</h2>
+        <p class="qhelp" style="max-width:290px;margin:10px auto 0">
+          ${c?`Ton inscription à « ${esc(c.title)} » est confirmée. Bon apprentissage !`:'Ton compte est créé. Rejoins un cours et présente-toi à la communauté !'}
+        </p>
+      </div>
+      <div class="flowfoot">
+        <button class="btn" onclick="App.welcomeGo()">${c?'Commencer le cours':'Découvrir les cours'} ${I.arrowr}</button>
+      </div>
+    </div>`;
+  }
+}
+
+/* ================= Actions ================= */
+const App = {
+  tab(t){ filters.q=''; go(t, {cours:'catalog',commu:'feed',mescours:'my',profil:'profil'}[t]); },
+  search(q){ filters.q=q; const list=$('#main'); V.screen='catalog';
+    // re-render en conservant le focus de la recherche
+    render(); const inp=document.querySelector('.search input'); if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);} },
+  cat(c){ filters.cat=c; render(); },
+  commuCat(c){ filters.commu=c; render(); },
+  openCourse(id){ go('cours','course',{id}); },
+  openLearn(id){ if(!S.enrolled[id]){ this.openCourse(id); return; } go('mescours','learn',{id}); },
+  openLesson(cid,k){
+    if(!S.enrolled[cid]){ this.enroll(cid); return; }
+    go('mescours','lesson',{id:cid,k});
+  },
+  toast(m){ toast(m); },
+
+  /* --- Inscription / enrôlement --- */
+  enroll(cid){
+    const c = courseById(cid);
+    if(S.user){
+      if(c.price>0){ flow={type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix||'+225', phone:S.user.whatsapp}}; }
+      else { this.finishEnroll(cid,null); return; }
+    } else {
+      flow={type:'enroll', courseId:cid, step:0, data:{}};
+    }
+    renderFlow();
+  },
+  enrollGeneric(){ flow={type:'enroll', courseId:null, step:0, data:{}, ctx:'account'}; renderFlow(); },
+  flowClose(){ if(flow&&flow.step==='wait') return; flow=null; renderFlow(); render(); },
+  flowBack(){ if(flow.step>0){ this.flowSaveInput(); flow.step--; flow.err=null; renderFlow(); } },
+  flowSaveInput(){
+    const steps = enrollSteps();
+    if(flow.step<steps.length){
+      const inp=$('#finput'); if(inp) flow.data[steps[flow.step].key]=inp.value;
+      const pre=$('#fprefix'); if(pre) flow.data.prefix=pre.value;
+    }
+  },
+  flowNext(){
+    const steps = enrollSteps();
+    if(flow.step<steps.length){
+      const st = steps[flow.step];
+      const inp = $('#finput'); const v = inp?inp.value:'';
+      const pre = $('#fprefix'); if(pre) flow.data.prefix = pre.value;
+      const ok = st.valid(v);
+      if(ok!==true){ flow.err=ok; $('#ferr').textContent=ok; inp&&inp.focus(); return; }
+      flow.data[st.key] = st.type==='phone' ? v.replace(/\D/g,'').replace(/^0+/,'') || v.replace(/\D/g,'') : v.trim();
+      flow.err=null; flow.step++;
+      renderFlow();
+    } else {
+      // Confirmation du récapitulatif → création du compte
+      S.user = {prenom:flow.data.prenom, nom:flow.data.nom, whatsapp:flow.data.whatsapp, email:flow.data.email, prefix:flow.data.prefix||'+225'};
+      S.points += 20; save();
+      const cid = flow.courseId;
+      if(cid && courseById(cid).price>0){
+        flow = {type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix, phone:S.user.whatsapp}};
+        renderFlow();
+      } else if(cid){
+        this.finishEnroll(cid,null);
+      } else {
+        flow = {type:'welcome', courseId:null}; renderFlow(); render();
+      }
+    }
+  },
+  finishEnroll(cid, pay){
+    S.enrolled[cid] = {at:Date.now(), paid:!!pay, op:pay?pay.op:null, ref:pay?pay.ref:null};
+    if(!S.done[cid]) S.done[cid]={};
+    save();
+    flow = {type:'welcome', courseId:cid}; renderFlow(); render();
+  },
+  welcomeGo(){
+    const cid = flow.courseId; flow=null; renderFlow();
+    if(cid) this.openLearn(cid); else this.tab('cours');
+  },
+
+  /* --- Paiement --- */
+  payPick(op){ flow.data.op=op; renderFlow(); },
+  payNext(){ if(!flow.data.op) return; flow.step='confirm'; flow.err=null; renderFlow(); },
+  paySend(){
+    const inp=$('#finput'), pre=$('#fprefix');
+    const v = inp?inp.value:'';
+    if(v.replace(/\D/g,'').length<8){ flow.err='Ce numéro semble trop court.'; $('#ferr').textContent=flow.err; return; }
+    flow.data.phone = v.replace(/\D/g,''); if(pre) flow.data.prefix=pre.value;
+    flow.step='wait'; flow.err=null; renderFlow();
+    setTimeout(()=>{
+      if(!flow||flow.type!=='pay') return;
+      flow.data.ref = 'KL-'+Date.now().toString(36).toUpperCase().slice(-7);
+      flow.step='done'; renderFlow();
+    }, 2800);
+  },
+  payDone(){
+    const cid=flow.courseId, pay={op:OPERATORS.find(o=>o.id===flow.data.op).name, ref:flow.data.ref};
+    S.enrolled[cid]={at:Date.now(), paid:true, op:pay.op, ref:pay.ref};
+    if(!S.done[cid]) S.done[cid]={};
+    save(); flow=null; renderFlow();
+    toast('Inscription confirmée 🎉');
+    this.openLearn(cid);
+  },
+
+  /* --- Apprentissage --- */
+  completeLesson(cid,k){
+    if(!S.done[cid]) S.done[cid]={};
+    if(!S.done[cid][k]){
+      S.done[cid][k]=true; save();
+      addPoints(10,'leçon terminée');
+      const c=courseById(cid);
+      if(courseProgress(c)===100) setTimeout(()=>toast('🎓 Cours terminé, félicitations !'), 1200);
+    }
+    render();
+  },
+
+  /* --- Communauté --- */
+  like(pid){
+    const p=S.posts.find(x=>x.id===pid); if(!p) return;
+    if(S.likes[pid]){ delete S.likes[pid]; p.likes--; } else { S.likes[pid]=true; p.likes++; }
+    save(); render();
+  },
+  openPost(pid){ go('commu','post',{id:pid}); },
+  goLeader(){ go('commu','leader'); },
+  compose(){
+    if(!S.user){ toast('Crée ton compte pour publier'); this.enrollGeneric(); return; }
+    go('commu','compose');
+  },
+  pickCat(el){ document.querySelectorAll('.catpick .chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); },
+  publish(){
+    const txt = $('#ptext').value.trim();
+    if(txt.length<3){ toast('Écris ton message avant de publier'); return; }
+    const cat = document.querySelector('.catpick .chip.on').dataset.cat;
+    S.posts.push({id:'u'+Date.now(), by:S.user.prenom+' '+S.user.nom, role:'Apprenant·e', cat, at:Date.now(), text:txt, likes:0, comments:[]});
+    save(); addPoints(5,'publication');
+    filters.commu='Tout';
+    go('commu','feed');
+  },
+  comment(pid){
+    if(!S.user){ toast('Crée ton compte pour commenter'); this.enrollGeneric(); return; }
+    const inp=$('#cinput'); const txt=inp.value.trim();
+    if(!txt) return;
+    const p=S.posts.find(x=>x.id===pid);
+    p.comments.push({by:S.user.prenom+' '+S.user.nom, text:txt, at:Date.now()});
+    save(); addPoints(2,'commentaire');
+    render();
+  },
+
+  /* --- Profil --- */
+  toggleTheme(){
+    S.theme = S.theme==null ? 'dark' : S.theme==='dark' ? 'light' : null;
+    save(); applyTheme(); render();
+  },
+  reset(){
+    if(!confirm('Réinitialiser la démo ? Ton compte, tes cours et tes publications locales seront effacés.')) return;
+    localStorage.removeItem(KEY);
+    location.reload();
+  },
+};
+window.App = App;
+
+/* ================= Rendu principal ================= */
+function render(){
+  const screens = {
+    catalog:screenCatalog, course:screenCourse, learn:screenLearn, lesson:screenLesson,
+    feed:screenFeed, post:screenPost, leader:screenLeader, compose:screenCompose,
+    my:screenMyCourses, profil:screenProfile,
+  };
+  $('#main').innerHTML = (screens[V.screen]||screenCatalog)();
+  renderTabs();
+}
+render();
+</script>
+</body>
+</html>

@@ -1,117 +1,52 @@
-# Boyia App — Application Web
+# Kalan — cours en ligne & communauté (mobile first)
 
-> **Boyia — Apprends, entreprends et sois récompensé.**
+> **Kalan** signifie « apprendre » en bambara.
 
-Application web responsive de la plateforme **Boyia App**, super-application communautaire, éducative et commerciale fondée sur la **Boyia Currency**, une unité numérique interne en circuit fermé (comparable à des points de fidélité évolués — ni banque, ni cryptomonnaie, ni monnaie ayant cours légal).
+Webapp mobile first de cours en ligne, **testable immédiatement** : un seul fichier `index.html`, sans installation, sans base de données, sans compte tiers.
 
-Le dépôt contient deux applications :
-
-- **`/` (racine)** — l'application web Next.js : **parcours utilisateur branché sur l'API** (inscription OTP, connexion, portefeuille, transferts avec PIN, paiement QR) et **interface d'administration** (`/admin`). Les contenus de gamification (défis, formations, offres) restent des données de démonstration (§53) en attendant leurs modules API.
-- **`api/`** — le backend **NestJS** : authentification OTP + JWT, portefeuilles, **registre comptable à double entrée**, transactions idempotentes avec machine à états, règles de récompense, journal d'audit. SQLite en démo, PostgreSQL en production (mêmes entités TypeORM).
-
-## Fonctionnalités
-
-- **Landing page publique** : présentation, offres publiques, avertissement réglementaire (§37)
-- **Inscription / connexion** : parcours téléphone + OTP simulé (code démo `123456`)
-- **Navigation à 5 onglets** (§11) : Accueil · Découvrir · Scanner · Activités · Profil
-- **Accueil** (§12) : solde total masquable, valeur indicative en FCFA, actions rapides, récompenses en attente, dernières transactions, défis, offres recommandées
-- **Portefeuille** (§13) : 4 catégories de soldes (disponible, en attente, promotionnel, bloqué), limites du compte, historique filtrable, **reçu numérique** avec QR de vérification
-- **Transfert** (§14) : destinataire → montant → résumé → **PIN transactionnel** (démo `1234`) → reçu ; contrôle des limites et du solde, avertissement nouveau destinataire
-- **Paiement QR** (§15) : simulation d'un paiement **mixte** (30 % max en Boyia) chez un commerçant vérifié
-- **Défis & gamification** (§17) : progression, XP, niveaux, badges
-- **Formations** (§18) : microlearning avec récompenses et certificats
-- **Découvrir** (§20) : offres et coupons des partenaires par catégorie
-- **Profil** : niveau de vérification, badges, parrainage, langue, thème, supervision parentale
-- **i18n FR/EN** (§21 des règles), **mode clair/sombre**, **PWA manifest**, mobile-first, accessible (zones tactiles ≥ 44 px, aria, contrastes)
-
-## Valeur de référence
-
-`100 Boyia = 1 000 FCFA` (configurable dans `lib/config.ts` — §6.4). Les fonctions réglementées (achat de Boyia, retrait, Mobile Money…) sont désactivées par **feature flags** (§37).
-
-## Démarrage
+## Tester tout de suite
 
 ```bash
-# 1. Backend (port 4000) — base SQLite créée et peuplée automatiquement
-cd api && npm install && npm run dev
+# Option 1 : ouvrir directement le fichier
+# double-clique sur index.html (ou glisse-le dans un navigateur)
 
-# 2. Web + admin (port 3000)
-npm install && npm run dev
+# Option 2 : petit serveur local
+python3 -m http.server 8080
+# puis ouvre http://localhost:8080 (idéalement en mode mobile des DevTools)
 ```
 
-- Application : http://localhost:3000 · Administration : http://localhost:3000/admin
-- Documentation OpenAPI : http://localhost:4000/docs
-- Connexion admin (démo, fictive) : `admin@boyia.ci` / `Boyia!Admin2026`
-- Utilisatrice de démo : `+2250700000042` / PIN `1234` (Awa Kouassi) — ou crée un compte : l'OTP de démo est `123456` et la règle « Inscription complétée » crédite 20 ʙ automatiquement
+Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bouton « Réinitialiser la démo » dans Profil).
 
-```bash
-npm run typecheck && npm run build   # web
-cd api && npm run test               # tests financiers (registre, idempotence, états)
-```
+## Ce que fait l'application
 
-## Backend — garanties financières
+- **Catalogue de cours** gratuits et payants (prix en FCFA), recherche et filtres par catégorie, fiches cours complètes (programme, formateur, note, « ce que tu vas apprendre »).
+- **Inscription style Tally** : une question par écran (prénom → nom → numéro WhatsApp avec indicatif pays → e-mail), barre de progression, validation champ par champ, touche Entrée pour avancer, récapitulatif avant confirmation. Le compte n'est demandé **qu'au moment de s'inscrire à un cours** (zéro friction pour explorer).
+- **Paiement mobile money simulé** : choix de l'opérateur (Wave, Orange Money, MTN MoMo, Moov Money), numéro pré-rempli depuis le WhatsApp, écran d'attente « confirme avec ton code secret », reçu avec référence. *Mode démo : aucun argent réel ; en production, brancher un agrégateur (CinetPay, PayDunya, FedaPay…).*
+- **Espace d'apprentissage** : leçons par module, « marquer comme terminée », progression par cours.
+- **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire).
+- **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
 
-- **Double entrée (§7)** : chaque opération crée une écriture débit/crédit équilibrée ; la somme globale du registre vaut toujours zéro (vérifiée en continu sur le tableau de bord admin).
-- **Soldes calculés, jamais stockés** comme source de vérité (règle 8) ; montants confirmés côté serveur uniquement (règle 9, §35.4).
-- **Idempotence (règle 11)** : l'en-tête `Idempotency-Key` sur `POST /v1/wallet/transfers` garantit qu'une requête répétée ne crée pas de double transaction (contrainte unique en base).
-- **Machine à états stricte (§33)** : transitions contrôlées ; `COMPLETED` n'est jamais supprimé, seulement `REVERSED` par contrepassation.
-- **Audit (règle 18)** : chaque action administrative (attribution, blocage, contrepassation, règles) est journalisée avec acteur, entité, détails et IP.
-- **Sécurité** : PIN et mots de passe hachés **Argon2id**, JWT courts + refresh, garde de rôles sur chaque endpoint, validation stricte (`class-validator`, whitelist), CORS restreint, OTP à tentatives limitées.
-- **Tests financiers (§42)** : 9 tests Jest couvrent équilibre du journal, double dépense, idempotence, échec sans effet sur les soldes, contrepassation, transitions interdites, concurrence et limites.
+## Choix issus de la recherche
 
-## Interface d'administration (`/admin`)
+- **Tally / Typeform** : le format « une question à la fois » avec progression visible améliore le taux de complétion des formulaires — appliqué à l'inscription.
+- **Skool** : cours + communauté + gamification légère au même endroit, interface volontairement minimale — appliqué à la structure à 4 onglets (Cours · Communauté · Mes cours · Profil).
+- **Mobile money** : rail de paiement principal en Afrique de l'Ouest ; le parcours reproduit les codes connus des utilisateurs (choix opérateur → numéro → confirmation par code secret → reçu).
 
-- **Tableau de bord (§25.1)** : utilisateurs, Boyia émis/en circulation, volume, état d'équilibre du registre, fonctions réglementées (feature flags §37), dernières transactions.
-- **Utilisateurs (§25.2)** : recherche, blocage/réactivation, **attribution de Boyia** avec motif obligatoire.
-- **Transactions (§25.3)** : liste, **contrepassation** avec motif (jamais de suppression).
-- **Règles de récompense (§16)** : création sans modifier le code, pause/activation, suivi de budget.
-- **Journal d'audit** : trace immuable de toutes les actions administratives.
+## Design
 
-## Structure
+- Palette « papier & kola » : fond `#F7F5F0`, vert kola `#0C7A5B`, accent ambre `#E8A020` ; thème sombre complet dérivé des mêmes tokens.
+- Typographie : serif système (Iowan/Palatino/Georgia) pour la marque et les titres, sans-serif système pour l'interface — aucun chargement de police externe.
+- Zones tactiles ≥ 44 px, `aria-label` sur les contrôles, respect de `prefers-reduced-motion`, chiffres tabulaires pour les montants.
 
-```
-app/
-├── page.tsx                 # Landing publique
-├── connexion/  inscription/ # Authentification (démo)
-└── app/                     # Espace connecté
-    ├── page.tsx             # Accueil
-    ├── portefeuille/        # Soldes, historique, reçus
-    ├── envoyer/  recevoir/  # Transferts
-    ├── scanner/             # Paiement QR
-    ├── decouvrir/           # Offres partenaires
-    ├── activites/           # Défis & formations
-    └── profil/              # Profil & paramètres
-├── admin/                   # Interface d'administration (API réelle)
-│   ├── connexion/           # Connexion admin (e-mail + mot de passe)
-│   ├── utilisateurs/  transactions/  regles/  audit/
-api/                         # Backend NestJS
-├── src/
-│   ├── entities.ts          # Modèle de données (§32)
-│   ├── ledger/              # Registre double entrée + transactions (+ tests)
-│   ├── auth/                # OTP, JWT, Argon2id, gardes de rôles
-│   ├── wallet/              # Soldes et transferts utilisateur
-│   ├── admin/               # Endpoints d'administration (§25, §34)
-│   ├── audit/               # Journal d'audit
-│   └── seed.ts              # Données de démonstration fictives
-components/                  # Design system (Button, Card, Badge, QR…)
-lib/
-├── config.ts                # Valeur de référence, limites, feature flags
-├── i18n.tsx                 # Dictionnaires FR/EN
-├── demo-data.ts             # Données fictives (§53)
-└── wallet-store.tsx         # Store branché sur l'API (le serveur est la seule source de vérité)
-```
+## Vers la production
 
-## Parcours utilisateur branché sur l'API
+Ce prototype valide le parcours. Pour la mise en production, il faudra :
 
-- **Inscription** : formulaire → `POST /v1/auth/register` → OTP (démo `123456`) → compte activé niveau 1, portefeuille créé, **récompense d'inscription de 20 ʙ** attribuée par le moteur de règles (`signup.completed`).
-- **Connexion** : téléphone + PIN → JWT access/refresh ; rafraîchissement automatique du jeton sur 401.
-- **Transfert** : recherche du destinataire (`GET /v1/wallet/recipients`, avertissement « nouveau destinataire » §14.3) → montant → résumé → **PIN vérifié côté serveur** → reçu ; clé d'idempotence générée par le client.
-- **Paiement QR** : paiement mixte (30 % max en Boyia) réglé par un vrai transfert de type `payment` vers le portefeuille du commerçant.
-- **Historique** : contreparties résolues par l'API, statut « Contrepassée » affiché après une contrepassation admin.
-
-## Évolution prévue
-
-Ce dépôt a vocation à devenir le monorepo `boyia-platform` (§49) : `apps/api` (NestJS, registre à double entrée), `apps/admin`, `apps/mobile` (Flutter), packages partagés (`ui`, `types`, `validation`, `localization`). Modules suivants : défis, formations, marketplace, notifications (§31).
+1. un backend (comptes, cours, paiements) — par ex. Next.js + Postgres ou Supabase ;
+2. un agrégateur mobile money (CinetPay, PayDunya, FedaPay, Paystack) avec webhooks de confirmation ;
+3. l'hébergement des vidéos (Mux, Cloudflare Stream, YouTube non répertorié) ;
+4. les notifications WhatsApp (API WhatsApp Business) pour les accès et rappels.
 
 ---
 
-⚠️ **Données 100 % fictives.** Cette démo ne collecte, ne stocke et n'envoie aucune donnée personnelle réelle.
+⚠️ **Démo 100 % fictive** : personnes, cours, paiements et messages sont des données de démonstration ; rien n'est collecté ni envoyé.
