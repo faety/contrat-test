@@ -216,6 +216,8 @@ input,select,textarea{font:inherit;color:inherit}
 .op span{font-size:12.5px;color:var(--muted)}
 .op .radio{margin-left:auto;width:21px;height:21px;border-radius:50%;border:2px solid var(--line);flex:none}
 .op.on .radio{border-color:var(--primary);background:radial-gradient(circle,var(--primary) 45%,transparent 48%)}
+.op.soon{opacity:.45}
+.op.soon .radio{visibility:hidden}
 .paywait{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:20px 0}
 .spinner{width:52px;height:52px;border-radius:50%;border:4px solid var(--surface-2);border-top-color:var(--primary);animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -868,12 +870,23 @@ Dans 30 jours, tu sauras te présenter, demander un prix, remercier et écrire u
 const CATS = ['Tout','IA','Anglais'];
 const COMMU_CATS = ['Général','Entraide','Victoires','Annonces'];
 
+/* Test réel : Côte d'Ivoire uniquement, via Wave (API Checkout officielle).
+   Les autres opérateurs sont affichés « Bientôt disponible ». */
 const OPERATORS = [
-  {id:'wave', name:'Wave', col:'#1DC8FF', note:'Sans frais supplémentaires', tag:'W'},
-  {id:'om', name:'Orange Money', col:'#F16E00', note:'Confirmation par code #144#', tag:'OM'},
-  {id:'momo', name:'MTN MoMo', col:'#FFCB05', note:'Confirmation par code *133#', tag:'MoMo', dark:true},
-  {id:'moov', name:'Moov Money', col:'#0066B3', note:'Confirmation par code *155#', tag:'MM'},
+  {id:'wave', name:'Wave', col:'#1DC8FF', note:"Paiement sécurisé dans l'app Wave", tag:'W'},
+  {id:'om', name:'Orange Money', col:'#F16E00', note:'Bientôt disponible', tag:'OM', soon:true},
+  {id:'momo', name:'MTN MoMo', col:'#FFCB05', note:'Bientôt disponible', tag:'MoMo', dark:true, soon:true},
+  {id:'moov', name:'Moov Money', col:'#0066B3', note:'Bientôt disponible', tag:'MM', soon:true},
 ];
+
+/* Mode paiement : 'live' si le serveur (server.js) répond avec une clé Wave configurée,
+   sinon 'demo' (simulation locale — fichier ouvert directement ou lien de démonstration). */
+const API = { mode:'demo' };
+if(/^https?:$/.test(location.protocol)){
+  fetch('/api/health',{cache:'no-store'}).then(r=>r.json()).then(j=>{
+    if(j && j.ok && !j.demo){ API.mode='live'; if(flow && flow.type==='pay' && flow.step==='op') renderFlow(); }
+  }).catch(()=>{});
+}
 
 const H = 3600e3, D = 24*H;
 const SEED_POSTS = [
@@ -1422,21 +1435,49 @@ function renderFlow(){
 
   /* ---- Paiement mobile money ---- */
   if(flow.type==='pay'){
-    const steps = ['op','confirm','wait','done'];
-    const pct = Math.round(100*(steps.indexOf(flow.step)+1)/steps.length);
+    const STEP_POS = {op:1, confirm:2, redirect:2, wait:3, poll:3, failed:3, done:4};
+    const pct = Math.round(100*(STEP_POS[flow.step]||1)/4);
     let inner='', foot='';
     if(flow.step==='op'){
       inner = `
         <h2 class="qlabel">Comment veux-tu payer ?</h2>
         <p class="qhelp">Inscription à « ${esc(c.title)} » — <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b></p>
         <div class="ops">
-          ${OPERATORS.map(o=>`<button class="op ${flow.data.op===o.id?'on':''}" onclick="App.payPick('${o.id}')">
+          ${OPERATORS.map(o=>`<button class="op ${flow.data.op===o.id?'on':''} ${o.soon?'soon':''}" onclick="App.payPick('${o.id}')" ${o.soon?'aria-disabled="true"':''}>
             <span class="oplogo" style="background:${o.col};${o.dark?'color:#201D19':''}">${o.tag}</span>
             <span><b>${o.name}</b><span>${o.note}</span></span>
             <span class="radio"></span>
           </button>`).join('')}
-        </div>`;
-      foot = `<button class="btn" ${flow.data.op?'':'disabled'} onclick="App.payNext()">Continuer ${I.arrowr}</button>`;
+        </div>
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>`;
+      foot = `<button class="btn" ${flow.data.op?'':'disabled'} onclick="App.payNext()">${API.mode==='live'?'Payer avec Wave':'Continuer'} ${I.arrowr}</button>`;
+    }
+    if(flow.step==='redirect'){
+      inner = `<div class="paywait">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2 class="qlabel" style="font-size:21px">Ouverture de Wave…</h2>
+        <p class="qhelp">Tu vas être redirigé vers Wave pour payer <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b> en toute sécurité. Reviens ici après le paiement.</p>
+      </div>`;
+      foot = '';
+    }
+    if(flow.step==='poll'){
+      inner = `<div class="paywait">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2 class="qlabel" style="font-size:21px">Confirmation du paiement…</h2>
+        <p class="qhelp">On vérifie ton paiement Wave. Cela prend en général quelques secondes.</p>
+        <span class="ussd num">${esc(flow.data.ref||'')}</span>
+      </div>`;
+      foot = '';
+    }
+    if(flow.step==='failed'){
+      inner = `
+        <div class="bigcheck" style="background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--danger)">${I.x}</div>
+        <h2 class="qlabel" style="text-align:center;margin-top:16px">Paiement non confirmé</h2>
+        <p class="qhelp" style="text-align:center">${flow.data.timeout
+          ? "On n'a pas encore reçu la confirmation de Wave. Si tu as bien payé, réouvre l'app dans une minute : ton accès sera activé automatiquement."
+          : "Le paiement a été annulé ou n'a pas abouti. Aucun montant n'a été débité. Tu peux réessayer quand tu veux."}</p>`;
+      foot = `<button class="btn" onclick="App.payWaveStart()">Réessayer le paiement</button>
+        <button class="btn ghost" style="margin-top:9px" onclick="App.flowClose(true)">Plus tard</button>`;
     }
     if(flow.step==='confirm'){
       const o = OPERATORS.find(x=>x.id===flow.data.op);
@@ -1472,18 +1513,19 @@ function renderFlow(){
           <div class="row"><span>Cours</span><b style="text-align:right;max-width:60%">${esc(c.title)}</b></div>
           <div class="row"><span>Montant</span><b class="num">${fcfa(c.price)}</b></div>
           <div class="row"><span>Opérateur</span><b>${o.name}</b></div>
-          <div class="row"><span>Numéro</span><b class="num">${esc((flow.data.prefix||'+225')+' '+flow.data.phone)}</b></div>
+          ${flow.data.phone?`<div class="row"><span>Numéro</span><b class="num">${esc((flow.data.prefix||'+225')+' '+flow.data.phone)}</b></div>`:''}
           <div class="row"><span>Référence</span><b class="num">${flow.data.ref}</b></div>
+          ${flow.data.txn?`<div class="row"><span>Transaction Wave</span><b class="num">${esc(flow.data.txn)}</b></div>`:''}
           <div class="row"><span>Date</span><b>${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</b></div>
         </div>
-        <p class="demonote">Reçu de démonstration — aucun argent réel n'a été débité.</p>`;
+        <p class="demonote">${API.mode==='live'?'Reçu Kalan — paiement Wave confirmé. Garde cette référence.':'Reçu de démonstration — aucun argent réel n\'a été débité.'}</p>`;
       foot = `<button class="btn" onclick="App.payDone()">Commencer le cours ${I.arrowr}</button>`;
     }
     ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true" aria-label="Paiement">
       <div class="progress"><i style="width:${pct}%"></i></div>
       <div class="flowhead">
-        <button class="iconbtn" onclick="App.flowClose()" aria-label="Fermer" ${flow.step==='wait'?'disabled style="opacity:.3"':''}>${I.x}</button>
-        <span class="muted" style="font-size:13px">Paiement sécurisé · mobile money</span>
+        <button class="iconbtn" onclick="App.flowClose()" aria-label="Fermer" ${(flow.step==='wait'||flow.step==='redirect')?'disabled style="opacity:.3"':''}>${I.x}</button>
+        <span class="muted" style="font-size:13px">${API.mode==='live'?'Paiement sécurisé · Wave':'Paiement sécurisé · mobile money'}</span>
         <span style="width:42px"></span>
       </div>
       <div class="flowbody center">${inner}</div>
@@ -1539,7 +1581,11 @@ const App = {
     renderFlow();
   },
   enrollGeneric(){ flow={type:'enroll', courseId:null, step:0, data:{}, ctx:'account'}; renderFlow(); },
-  flowClose(){ if(flow&&flow.step==='wait') return; flow=null; renderFlow(); render(); },
+  flowClose(giveUp){
+    if(flow && (flow.step==='wait' || flow.step==='redirect')) return;
+    if(flow && flow.type==='pay' && (giveUp || flow.step==='failed')){ delete S.pendingOrder; save(); }
+    flow=null; renderFlow(); render();
+  },
   flowBack(){ if(flow.step>0){ this.flowSaveInput(); flow.step--; flow.err=null; renderFlow(); } },
   flowSaveInput(){
     const steps = enrollSteps();
@@ -1586,8 +1632,58 @@ const App = {
   },
 
   /* --- Paiement --- */
-  payPick(op){ flow.data.op=op; renderFlow(); },
-  payNext(){ if(!flow.data.op) return; flow.step='confirm'; flow.err=null; renderFlow(); },
+  payPick(op){
+    const o = OPERATORS.find(x=>x.id===op);
+    if(o && o.soon){ toast('Bientôt disponible — pour ce test, paie avec Wave 🌊'); return; }
+    flow.data.op=op; renderFlow();
+  },
+  payNext(){
+    if(!flow.data.op) return;
+    if(API.mode==='live'){ this.payWaveStart(); return; }
+    flow.step='confirm'; flow.err=null; renderFlow();
+  },
+  /* Paiement réel : crée la session Wave côté serveur puis redirige vers l'app Wave */
+  async payWaveStart(){
+    const c = courseById(flow.courseId);
+    flow.step='redirect'; flow.err=null; renderFlow();
+    try{
+      const r = await fetch('/api/checkout', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({courseId:c.id, prenom:S.user.prenom, nom:S.user.nom,
+          whatsapp:(S.user.prefix||'+225')+S.user.whatsapp, email:S.user.email})});
+      const j = await r.json();
+      if(!r.ok || !j.wave_launch_url) throw new Error(j.message||'checkout');
+      S.pendingOrder = {ref:j.ref, courseId:c.id, at:Date.now()}; save();
+      location.href = j.wave_launch_url;
+    }catch(e){
+      flow.step='op'; flow.err='Connexion au paiement impossible. Vérifie ta connexion internet et réessaie.';
+      renderFlow();
+    }
+  },
+  /* Au retour de Wave : on interroge le serveur jusqu'à confirmation (webhook ou réconciliation) */
+  async pollOrder(){
+    const ref = flow && flow.data && flow.data.ref; if(!ref) return;
+    for(let i=0;i<45;i++){
+      if(!flow || flow.type!=='pay' || flow.data.ref!==ref) return;
+      try{
+        const r = await fetch('/api/order?ref='+encodeURIComponent(ref), {cache:'no-store'});
+        if(r.status===404) break;
+        if(r.ok){
+          const j = await r.json();
+          if(j.status==='paid'){
+            const cid = j.courseId || flow.courseId;
+            S.enrolled[cid] = {at:Date.now(), paid:true, op:'Wave', ref:j.ref};
+            if(!S.done[cid]) S.done[cid]={};
+            delete S.pendingOrder; save();
+            flow.courseId=cid; flow.data.ref=j.ref; flow.data.txn=j.transactionId; flow.step='done';
+            renderFlow(); render(); return;
+          }
+          if(j.status==='failed'){ flow.step='failed'; renderFlow(); return; }
+        }
+      }catch(e){}
+      await new Promise(rs=>setTimeout(rs, 2000));
+    }
+    if(flow && flow.type==='pay' && flow.data.ref===ref){ flow.data.timeout=true; flow.step='failed'; renderFlow(); }
+  },
   paySend(){
     const inp=$('#finput'), pre=$('#fprefix');
     const v = inp?inp.value:'';
@@ -1681,6 +1777,21 @@ function render(){
   renderTabs();
 }
 render();
+
+/* Retour d'un paiement Wave : si une commande est en attente, on reprend le parcours
+   (écran de confirmation + sondage du serveur). success_url/error_url ramènent ici
+   avec ?wave=success|error&ref=… */
+(function resumeWavePayment(){
+  const qs = new URLSearchParams(location.search);
+  const ret = qs.get('wave');
+  if(ret) history.replaceState(null, '', location.pathname);
+  if(!S.pendingOrder || !S.user) return;
+  flow = {type:'pay', courseId:S.pendingOrder.courseId,
+          step: ret==='error' ? 'failed' : 'poll',
+          data:{op:'wave', ref:S.pendingOrder.ref}};
+  renderFlow();
+  if(flow.step==='poll') App.pollOrder();
+})();
 </script>
 </body>
 </html>
