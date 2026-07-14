@@ -106,7 +106,7 @@ input,select,textarea{font:inherit;color:inherit}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn{color:#0E1512} }
 .btn:active{transform:scale(.98)}
 .btn svg{width:19px;height:19px;flex:none}
-.btn.ghost{background:var(--surface);color:var(--primary-deep);border:1.5px solid color-mix(in srgb,var(--primary) 45%,var(--line))}
+.btn.ghost{background:var(--primary-soft);color:var(--primary-deep);border:1.5px solid var(--primary)}
 .btn.soft{background:color-mix(in srgb,var(--primary) 14%,var(--surface));color:var(--primary-deep);border:1.5px solid color-mix(in srgb,var(--primary) 34%,transparent);font-weight:700}
 .btn.soft[disabled]{opacity:.6}
 .btn[disabled]{opacity:.45;pointer-events:none}
@@ -229,7 +229,11 @@ input,select,textarea{font:inherit;color:inherit}
 .coupon input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;font-size:15px;text-transform:uppercase;letter-spacing:.06em}
 .coupon input::placeholder{text-transform:none;letter-spacing:normal;color:var(--muted)}
 /* ---- Admin ---- */
-.adminwrap{padding:0 14px 24px;display:flex;flex-direction:column;gap:12px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 4px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px;display:flex;flex-direction:column;gap:3px;box-shadow:var(--shadow)}
+.k-val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.k-lab{font-size:12px;color:var(--muted)}
+.adminwrap{padding:4px 14px 24px;display:flex;flex-direction:column;gap:12px}
 .cpn{display:flex;align-items:center;gap:10px;padding:13px 14px}
 .cpn .c-code{font-weight:800;font-size:15px;letter-spacing:.04em}
 .cpn .c-sum{font-size:12.5px;color:var(--muted)}
@@ -1052,7 +1056,7 @@ async function couponResolve(courseId, code){
   const r = couponCompute(base, c);
   return {valid:true, code:c.code, original:base, amount:r.amount, free:r.free, summary:couponSummary(c)};
 }
-let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'' };
+let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'', tab:'dash', stats:null, recent:null };
 async function adminApi(method, body){
   const r = await fetch('/api/admin/coupons', {method, headers:{'Content-Type':'application/json','x-admin-key':ADMIN.key},
     body: body?JSON.stringify(body):undefined});
@@ -1437,7 +1441,7 @@ function screenProfile(){
 
 /* ================= Écran : Espace admin (coupons) ================= */
 function screenAdmin(){
-  const back = `<div class="subhead"><button class="iconbtn" onclick="App.tab('profil')" aria-label="Retour">${I.back}</button><h1>Espace admin — coupons</h1></div>`;
+  const back = `<div class="subhead"><button class="iconbtn" onclick="App.tab('profil')" aria-label="Retour">${I.back}</button><h1>Espace admin</h1></div>`;
   // Connexion requise en mode réel
   if(API.mode==='live' && !ADMIN.key){
     return `<div class="screen">${back}
@@ -1453,51 +1457,95 @@ function screenAdmin(){
   }
   if(ADMIN.err && !ADMIN.list){
     return `<div class="screen">${back}<div class="empty">${I.shield}<b>${esc(ADMIN.err)}</b>
-      <span>Ajoute la variable d'environnement <code>ADMIN_PASSWORD</code> sur Vercel pour activer la gestion des coupons en ligne.</span></div></div>`;
+      <span>Ajoute la variable d'environnement <code>ADMIN_PASSWORD</code> sur Vercel pour activer l'espace admin en ligne.</span></div></div>`;
   }
-  const list = ADMIN.list || [];
-  const badge = API.mode==='live' ? '' : `<p class="muted px" style="font-size:12.5px;padding-top:2px">Mode démo — les coupons sont enregistrés sur cet appareil. En ligne, ils seront partagés et sécurisés.</p>`;
-  return `<div class="screen">${back}
-    ${badge}
-    <div class="sect">Coupons (${list.length})</div>
-    <div class="adminwrap">
-      <div class="card">
-        ${list.length? list.map(c=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
-          <div class="grow"><div class="c-code">${esc(c.code)} ${c.active?'':'<span class="muted" style="font-weight:500;font-size:12px">(inactif)</span>'}</div>
-            <div class="c-sum">${esc(couponSummary(c))}${c.label?` · ${esc(c.label)}`:''}</div>
-            <div class="c-uses">${(c.uses||0)} utilisation${(c.uses||0)>1?'s':''}</div></div>
-          <button class="tgl ${c.active?'on':''}" onclick="App.adminToggle('${esc(c.code)}')" aria-label="Activer/désactiver"><i></i></button>
-          <button class="del" onclick="App.adminDelete('${esc(c.code)}')" aria-label="Supprimer">${I.trash}</button>
-        </div>`).join('') : `<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Aucun coupon pour l'instant.</div>`}
-      </div>
-
-      <div class="card" style="padding:15px">
-        <b style="font-size:14.5px">Nouveau coupon</b>
-        <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
-          <label class="afield">Code
-            <input id="a_code" type="text" placeholder="Ex. CADEAU200" style="text-transform:uppercase">
-          </label>
-          <div class="arow">
-            <label class="afield">Type
-              <select id="a_type" onchange="App.adminTypeHint()">
-                <option value="fixed">Prix fixe (FCFA)</option>
-                <option value="percent">Réduction (%)</option>
-                <option value="amount">Réduction (FCFA)</option>
-              </select>
-            </label>
-            <label class="afield">Valeur
-              <input id="a_value" type="number" inputmode="numeric" placeholder="200">
-            </label>
-          </div>
-          <label class="afield">Libellé (optionnel)
-            <input id="a_label" type="text" placeholder="Ex. Promo lancement">
-          </label>
-          <button class="btn" onclick="App.adminSave()">Enregistrer le coupon</button>
-        </div>
-      </div>
-      ${API.mode==='live'?`<button class="btn ghost" onclick="App.adminLogout()">Se déconnecter</button>`:''}
-    </div>
+  const tabs = `<div class="chiprow" style="padding-top:10px">
+    <button class="chip ${ADMIN.tab==='dash'?'on':''}" onclick="App.adminTab('dash')">Tableau de bord</button>
+    <button class="chip ${ADMIN.tab==='coupons'?'on':''}" onclick="App.adminTab('coupons')">Coupons</button>
   </div>`;
+
+  let panel;
+  if(ADMIN.tab==='coupons'){
+    const list = ADMIN.list || [];
+    panel = `
+      <div class="sect">Coupons (${list.length})</div>
+      <div class="adminwrap">
+        <div class="card">
+          ${list.length? list.map(c=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+            <div class="grow"><div class="c-code">${esc(c.code)} ${c.active?'':'<span class="muted" style="font-weight:500;font-size:12px">(inactif)</span>'}</div>
+              <div class="c-sum">${esc(couponSummary(c))}${c.label?` · ${esc(c.label)}`:''}</div>
+              <div class="c-uses">${(c.uses||0)} utilisation${(c.uses||0)>1?'s':''}</div></div>
+            <button class="tgl ${c.active?'on':''}" onclick="App.adminToggle('${esc(c.code)}')" aria-label="Activer/désactiver"><i></i></button>
+            <button class="del" onclick="App.adminDelete('${esc(c.code)}')" aria-label="Supprimer">${I.trash}</button>
+          </div>`).join('') : `<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Aucun coupon.</div>`}
+        </div>
+        <div class="card" style="padding:15px">
+          <b style="font-size:14.5px">Nouveau coupon</b>
+          <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
+            <label class="afield">Code<input id="a_code" type="text" placeholder="Ex. CADEAU200" style="text-transform:uppercase"></label>
+            <div class="arow">
+              <label class="afield">Type
+                <select id="a_type" onchange="App.adminTypeHint()">
+                  <option value="fixed">Prix fixe (FCFA)</option>
+                  <option value="percent">Réduction (%)</option>
+                  <option value="amount">Réduction (FCFA)</option>
+                </select>
+              </label>
+              <label class="afield">Valeur<input id="a_value" type="number" inputmode="numeric" placeholder="200"></label>
+            </div>
+            <label class="afield">Libellé (optionnel)<input id="a_label" type="text" placeholder="Ex. Promo lancement"></label>
+            <button class="btn" onclick="App.adminSave()">Enregistrer le coupon</button>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    // Tableau de bord
+    const s = ADMIN.stats;
+    if(API.mode!=='live'){
+      panel = `<div class="adminwrap"><div class="empty" style="padding:36px 24px">${I.shield}<b>Statistiques en ligne</b>
+        <span>Le tableau de bord (ventes, chiffre d'affaires, commandes) affiche les vraies données une fois l'app déployée. En mode démo local, il n'y a pas de commandes réelles.</span></div></div>`;
+    } else if(!s){
+      panel = `<div class="adminwrap"><div class="empty">${I.clock}<b>Chargement…</b></div></div>`;
+    } else {
+      const conv = s.total ? Math.round(100*s.paid/s.total) : 0;
+      const kpi = (label,val,accent)=>`<div class="kpi"><span class="k-val" ${accent?`style="color:var(--primary)"`:''}>${val}</span><span class="k-lab">${label}</span></div>`;
+      panel = `
+        <div class="kpis">
+          ${kpi('Chiffre d\'affaires', fcfa(s.revenue), true)}
+          ${kpi('Inscriptions payées', s.paid)}
+          ${kpi('Commandes', s.total)}
+          ${kpi('Taux de conversion', conv+' %')}
+        </div>
+        <div class="adminwrap">
+          <div class="sect" style="padding-left:0">Ventes par cours</div>
+          <div class="card">
+            ${s.byCourse.length? s.byCourse.map(x=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+              <div class="grow"><div class="c-code" style="font-size:14px">${esc(x.name)}</div>
+                <div class="c-sum">${x.count} inscription${x.count>1?'s':''}</div></div>
+              <b class="num" style="color:var(--primary)">${fcfa(x.revenue)}</b>
+            </div>`).join('') : `<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Aucune vente pour l'instant.</div>`}
+          </div>
+          <div class="sect" style="padding-left:0">Dernières commandes</div>
+          <div class="card">
+            ${(ADMIN.recent||[]).length? ADMIN.recent.map(o=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+              <div class="grow"><div class="c-code" style="font-size:13.5px">${o.buyer?esc((o.buyer.prenom||'')+' '+(o.buyer.nom||'')):esc(o.ref)}</div>
+                <div class="c-sum">${esc(o.name)}${o.coupon?` · <span style="color:var(--primary)">${esc(o.coupon)}</span>`:''}</div>
+                <div class="c-uses">${o.createdAt?ago(o.createdAt):''} · ${esc(o.ref)}</div></div>
+              <div style="text-align:right"><b class="num">${fcfa(o.amount)}</b><div>${ordPill(o.status)}</div></div>
+            </div>`).join('') : `<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Aucune commande.</div>`}
+          </div>
+          ${s.pending?`<p class="muted" style="font-size:12.5px;text-align:center">${s.pending} commande(s) en attente de confirmation.</p>`:''}
+        </div>`;
+    }
+  }
+  return `<div class="screen">${back}${tabs}${panel}
+    ${API.mode==='live'?`<div class="px" style="padding-bottom:24px"><button class="btn ghost" onclick="App.adminLogout()">Se déconnecter</button></div>`:''}
+  </div>`;
+}
+function ordPill(st){
+  if(st==='paid') return `<span class="pill free">payé</span>`;
+  if(st==='failed') return `<span class="pill" style="background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)">échoué</span>`;
+  return `<span class="pill paid">en attente</span>`;
 }
 
 /* ================= Flux plein écran : inscription (style Tally) ================= */
@@ -1957,14 +2005,17 @@ const App = {
 
   /* --- Espace admin (coupons) --- */
   openAdmin(){ ADMIN.err=''; if(flow){ flow=null; renderFlow(); } go('profil','admin'); this.adminLoad(); },
+  adminTab(t){ ADMIN.tab=t; render(); },
   async adminLoad(){
-    if(API.mode!=='live'){ ADMIN.list=demoCoupons(); ADMIN.err=''; render(); return; }
+    if(API.mode!=='live'){ ADMIN.list=demoCoupons(); ADMIN.stats=null; ADMIN.recent=null; ADMIN.err=''; render(); return; }
     if(!ADMIN.key){ render(); return; }
     try{
       const {status,json}=await adminApi('GET');
       if(status===200){ ADMIN.list=json.coupons||[]; ADMIN.err=''; }
-      else if(status===401){ ADMIN.key=''; try{localStorage.removeItem('boyia-admin-key')}catch(e){} ADMIN.err='Mot de passe incorrect.'; }
-      else { ADMIN.err=json.message||'Espace admin indisponible.'; }
+      else if(status===401){ ADMIN.key=''; try{localStorage.removeItem('boyia-admin-key')}catch(e){} ADMIN.err='Mot de passe incorrect.'; render(); return; }
+      else { ADMIN.err=json.message||'Espace admin indisponible.'; render(); return; }
+      const s=await fetch('/api/admin/stats',{headers:{'x-admin-key':ADMIN.key}});
+      if(s.ok){ const sj=await s.json(); ADMIN.stats=sj.stats; ADMIN.recent=sj.recent; }
     }catch(e){ ADMIN.err='Connexion impossible.'; }
     render();
   },
@@ -2049,8 +2100,8 @@ render();
   if(flow.step==='poll') App.pollOrder();
 })();
 
-/* Accès direct à l'espace admin via #admin */
-if(location.hash==='#admin') App.openAdmin();
+/* Accès direct à l'espace admin : /boyiaadmin ou #admin */
+if(location.pathname.replace(/\/+$/,'')==='/boyiaadmin' || location.hash==='#admin') App.openAdmin();
 window.addEventListener('hashchange', ()=>{ if(location.hash==='#admin') App.openAdmin(); });
 </script>
 </body>

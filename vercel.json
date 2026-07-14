@@ -7,5 +7,9 @@
   "functions": {
     "api/**/*.js": { "maxDuration": 15 }
   },
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/boyiaadmin", "destination": "/index.html" },
+    { "source": "/boyiaadmin/(.*)", "destination": "/index.html" }
+  ]
 }

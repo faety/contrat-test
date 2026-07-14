@@ -58,6 +58,10 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.couponPreview(input));
     }
 
+    if (req.method === 'GET' && url.pathname === '/api/admin/stats') {
+      return send(res, await H.adminStats(req.headers['x-admin-key'] || ''));
+    }
+
     if (url.pathname === '/api/admin/coupons' && (req.method === 'GET' || req.method === 'POST')) {
       let body = {};
       if (req.method === 'POST') {
@@ -67,7 +71,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.adminCoupons(req.method, body, req.headers['x-admin-key'] || ''));
     }
 
-    if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
+    if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.startsWith('/boyiaadmin'))) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
       return res.end(fs.readFileSync(INDEX));
     }
