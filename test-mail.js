@@ -4,6 +4,8 @@
 */
 'use strict';
 process.env.NOTIFY_EMAIL = 'admin@test.local';
+process.env.RESEND_API_KEY = 're_test_123';
+process.env.MAIL_FROM = 'contact@test.local';
 
 const assert = require('assert');
 const mail = require('./lib/mail');
@@ -89,6 +91,30 @@ const ok = (name) => console.log(`  ✓ ${++n}. ${name}`);
   const f2 = await H.afterPaid(fail);
   assert.ok(!f2.emailed);
   ok('panne SMTP : commande non marquée « emailed », renvoi possible plus tard');
+
+  /* 9. Chemin Resend (API HTTPS) : sans transport injecté, la clé RESEND_API_KEY
+        route l'envoi vers api.resend.com — fetch simulé ici. */
+  mail._setTransport(null);
+  const calls = [];
+  global.fetch = async (url, opts) => {
+    calls.push({ url, opts: JSON.parse(opts.body), auth: opts.headers.Authorization });
+    return { ok: true, json: async () => ({ id: 'email_1' }) };
+  };
+  const r9 = await mail.send({ to: 'client@test.local', subject: 'Test Resend', html: '<p>ok</p>', text: 'ok' });
+  assert.strictEqual(r9.sent, true);
+  assert.strictEqual(calls.length, 1);
+  assert.strictEqual(calls[0].url, 'https://api.resend.com/emails');
+  assert.strictEqual(calls[0].auth, 'Bearer re_test_123');
+  assert.deepStrictEqual(calls[0].opts.to, ['client@test.local']);
+  assert.ok(calls[0].opts.from.includes('contact@test.local'));
+  ok('Resend : envoi via l\'API avec la clé, le bon expéditeur et le bon destinataire');
+
+  /* 10. Erreur API Resend → sent:false, raison remontée, pas d'exception */
+  global.fetch = async () => ({ ok: false, status: 422, json: async () => ({ message: 'domaine non vérifié' }) });
+  const r10 = await mail.send({ to: 'client@test.local', subject: 'x', html: 'x', text: 'x' });
+  assert.strictEqual(r10.sent, false);
+  assert.ok(/422/.test(r10.reason) && /domaine/.test(r10.reason));
+  ok('Resend : erreur API gérée proprement (sent:false + raison)');
 
   console.log(`\n${n}/${n} tests emails OK ✔`);
 })().catch(e => { console.error('✗ ÉCHEC :', e.message); process.exit(1); });

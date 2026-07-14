@@ -60,19 +60,16 @@ Région Vercel `fra1` (Francfort, proche de Neon et de l'Afrique de l'Ouest) —
    | `DATABASE_URL` | chaîne de connexion Neon |
    | `APP_URL` | l'URL publique (ex. `https://contrat-test.vercel.app`) — optionnel, sinon déduite des en-têtes |
    | `ADMIN_PASSWORD` | mot de passe de l'espace admin (`/boyiaadmin`) |
-   | `SMTP_HOST` | serveur d'envoi d'e-mails (ex. `smtp.hostinger.com`) |
-   | `SMTP_PORT` | `465` (SSL, défaut) ou `587` |
-   | `SMTP_USER` | boîte d'envoi (ex. `contact@boyiainstitute.com`) |
-   | `SMTP_PASS` | mot de passe de la boîte |
-   | `MAIL_FROM` | adresse d'expédition affichée — optionnel (défaut : `SMTP_USER`) |
+   | `RESEND_API_KEY` | clé API Resend (`re_…`) — fournisseur d'e-mails recommandé |
+   | `MAIL_FROM` | expéditeur vérifié chez Resend (ex. `contact@boyiainstitute.com`) |
    | `NOTIFY_EMAIL` | reçoit une notification à chaque vente — optionnel |
    Redéploie. Sans `WAVE_API_KEY`, le site tourne en **mode démo** (paiement simulé) ;
    sans `DATABASE_URL`, stockage en mémoire (non persistant — à éviter en prod) ;
-   sans `SMTP_*`, aucun e-mail n'est envoyé (le site fonctionne normalement).
+   sans configuration e-mail, aucun e-mail n'est envoyé (le site fonctionne normalement).
 
 ### E-mails transactionnels
 
-Trois e-mails automatiques (`lib/mail.js`, SMTP via nodemailer — Hostinger, Gmail, Brevo…) :
+Trois e-mails automatiques (`lib/mail.js`) :
 - **Reçu de paiement** au client dès que la commande passe en « payé » (webhook, réconciliation
   ou inscription gratuite par coupon). Envoyé **une seule fois** (colonne `emailed` en base) ;
   si le SMTP est en panne, le flag n'est pas posé et l'envoi sera retenté à la prochaine
@@ -80,6 +77,20 @@ Trois e-mails automatiques (`lib/mail.js`, SMTP via nodemailer — Hostinger, Gm
 - **Bienvenue** à la création de compte (`POST /api/welcome`, appelé par le front, non bloquant).
 - **Notification de vente** à `NOTIFY_EMAIL` (référence, cours, montant, coupon, contact client).
 `GET /api/health` expose `mail: true|false` pour vérifier la configuration.
+
+**Configurer Resend (recommandé, ~5 min)** :
+1. Crée un compte sur [resend.com](https://resend.com) (gratuit : 100 e-mails/jour, 3 000/mois).
+2. **Domains → Add Domain** : `boyiainstitute.com`, puis ajoute chez Cloudflare (DNS) les
+   enregistrements affichés (DKIM/SPF, en « DNS only ») et attends « Verified ».
+3. **API Keys → Create API Key** (permission *Sending access*) → copie `re_…`.
+4. Sur Vercel, ajoute `RESEND_API_KEY` et `MAIL_FROM=contact@boyiainstitute.com`
+   (n'importe quelle adresse du domaine vérifié), puis **Redeploy**.
+Avant la vérification du domaine, `MAIL_FROM` peut rester vide : l'envoi part de
+`onboarding@resend.dev` mais **uniquement vers l'adresse e-mail de ton compte Resend** (test).
+
+**Alternative SMTP** (Hostinger, Gmail, Brevo… — nodemailer) : `SMTP_HOST`, `SMTP_PORT`
+(465 défaut), `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` (défaut : `SMTP_USER`). Utilisée
+seulement si `RESEND_API_KEY` est absent.
 4. **Circuit d'un paiement** : `POST /api/checkout` (crée la session Wave, `currency: XOF`,
    `client_reference` = référence de commande, montant serveur) → redirection vers
    `wave_launch_url` → l'utilisateur paie dans Wave → Wave appelle le webhook
