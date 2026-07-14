@@ -224,6 +224,26 @@ input,select,textarea{font:inherit;color:inherit}
 .op.on .radio{border-color:var(--primary);background:radial-gradient(circle,var(--primary) 45%,transparent 48%)}
 .op.soon{opacity:.45}
 .op.soon .radio{visibility:hidden}
+.coupon{display:flex;gap:8px;margin-top:18px}
+.coupon input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;font-size:15px;text-transform:uppercase;letter-spacing:.06em}
+.coupon input::placeholder{text-transform:none;letter-spacing:normal;color:var(--muted)}
+/* ---- Admin ---- */
+.adminwrap{padding:0 14px 24px;display:flex;flex-direction:column;gap:12px}
+.cpn{display:flex;align-items:center;gap:10px;padding:13px 14px}
+.cpn .c-code{font-weight:800;font-size:15px;letter-spacing:.04em}
+.cpn .c-sum{font-size:12.5px;color:var(--muted)}
+.cpn .c-uses{font-size:11.5px;color:var(--muted)}
+.cpn .grow{flex:1;min-width:0}
+.tgl{width:44px;height:26px;border-radius:999px;background:var(--surface-2);position:relative;flex:none;border:1px solid var(--line)}
+.tgl.on{background:var(--primary);border-color:var(--primary)}
+.tgl i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .18s ease}
+.tgl.on i{transform:translateX(18px)}
+.cpn .del{color:var(--danger);width:34px;height:34px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cpn .del svg{width:17px;height:17px}
+.afield{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+.afield input,.afield select{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:11px 12px;font-size:15px;color:var(--ink);width:100%;min-width:0}
+.arow{display:flex;gap:8px}
+.arow .afield{flex:1;min-width:0}
 .paywait{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:20px 0}
 .spinner{width:52px;height:52px;border-radius:50%;border:4px solid var(--surface-2);border-top-color:var(--primary);animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -996,6 +1016,48 @@ function toast(msg){
   const el = $('#toast'); el.textContent = msg; el.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'), 2400);
 }
+
+/* ===== Coupons (client) : live via l'API, démo via localStorage ===== */
+const DEMO_COUPONS_KEY = 'boyia-coupons-v1';
+function demoCoupons(){
+  try{ const v=JSON.parse(localStorage.getItem(DEMO_COUPONS_KEY)); if(Array.isArray(v)) return v; }catch(e){}
+  return [{code:'CADEAU200', type:'fixed', value:200, active:true, label:'Test — prix fixe 200 F', uses:0}];
+}
+function saveDemoCoupons(list){ try{ localStorage.setItem(DEMO_COUPONS_KEY, JSON.stringify(list)); }catch(e){} }
+function couponCompute(base, c){
+  if(!c || !c.active) return {amount:base, free:false};
+  let a=base;
+  if(c.type==='percent') a=base*(1-c.value/100);
+  else if(c.type==='amount') a=base-c.value;
+  else if(c.type==='fixed') a=c.value;
+  a=Math.round(a);
+  if(!isFinite(a)||a<=0) return {amount:0, free:true};
+  return {amount:Math.max(100,a), free:false};
+}
+function couponSummary(c){
+  if(!c) return '';
+  if(c.type==='percent') return `-${c.value} %`;
+  if(c.type==='amount') return `-${fcfa(c.value)}`;
+  return `Prix fixe ${fcfa(c.value)}`;
+}
+async function couponResolve(courseId, code){
+  if(API.mode==='live'){
+    const r = await fetch('/api/coupon', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({courseId, code})});
+    return await r.json();
+  }
+  const base = courseById(courseId).price;
+  const c = demoCoupons().find(x=>x.code===String(code).toUpperCase());
+  if(!c || !c.active) return {valid:false, original:base};
+  const r = couponCompute(base, c);
+  return {valid:true, code:c.code, original:base, amount:r.amount, free:r.free, summary:couponSummary(c)};
+}
+let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'' };
+async function adminApi(method, body){
+  const r = await fetch('/api/admin/coupons', {method, headers:{'Content-Type':'application/json','x-admin-key':ADMIN.key},
+    body: body?JSON.stringify(body):undefined});
+  let json={}; try{ json=await r.json(); }catch(e){}
+  return {status:r.status, json};
+}
 function addPoints(n, why){ S.points += n; save(); toast(`+${n} points — ${why}`); }
 function courseById(id){ return COURSES.find(c=>c.id===id); }
 function lessonCount(c){ return c.modules.reduce((a,m)=>a+m.l.length,0); }
@@ -1365,9 +1427,75 @@ function screenProfile(){
       <div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>
       <button class="prow" onclick="App.invite()">${I.send}<span>Inviter un ami sur WhatsApp</span></button>
       ${CONFIG.whatsappSupport?`<a class="prow" style="text-decoration:none" href="https://wa.me/${CONFIG.whatsappSupport}?text=${encodeURIComponent('Bonjour, j\'utilise Boyia Institute et je voudrais…')}" target="_blank" rel="noopener">${I.msg}<span>Aide &amp; donner mon avis</span></a>`:''}
+      <button class="prow" onclick="App.openAdmin()">${I.shield}<span>Espace admin</span><span class="val">coupons</span></button>
       <button class="prow danger" onclick="App.reset()">${I.trash}<span>Réinitialiser la démo</span></button>
     </div>
     <p class="demonote" style="margin:18px 0 26px">Boyia Institute — démo fonctionnelle. En production, les paiements passent par Wave (Côte d'Ivoire).</p>
+  </div>`;
+}
+
+/* ================= Écran : Espace admin (coupons) ================= */
+function screenAdmin(){
+  const back = `<div class="subhead"><button class="iconbtn" onclick="App.tab('profil')" aria-label="Retour">${I.back}</button><h1>Espace admin — coupons</h1></div>`;
+  // Connexion requise en mode réel
+  if(API.mode==='live' && !ADMIN.key){
+    return `<div class="screen">${back}
+      <div class="px" style="padding-top:8px">
+        <div class="card" style="padding:18px 16px">
+          <b style="font-size:15px">Connexion admin</b>
+          <p class="muted" style="font-size:13.5px;margin:6px 0 14px">Entre le mot de passe admin (variable <code>ADMIN_PASSWORD</code>).</p>
+          <input id="adminkey" class="qinput" type="password" placeholder="Mot de passe" style="font-size:18px" onkeydown="if(event.key==='Enter')App.adminLogin()">
+          <p class="qerr">${ADMIN.err?esc(ADMIN.err):''}</p>
+          <button class="btn" onclick="App.adminLogin()">Se connecter ${I.arrowr}</button>
+        </div>
+      </div></div>`;
+  }
+  if(ADMIN.err && !ADMIN.list){
+    return `<div class="screen">${back}<div class="empty">${I.shield}<b>${esc(ADMIN.err)}</b>
+      <span>Ajoute la variable d'environnement <code>ADMIN_PASSWORD</code> sur Vercel pour activer la gestion des coupons en ligne.</span></div></div>`;
+  }
+  const list = ADMIN.list || [];
+  const badge = API.mode==='live' ? '' : `<p class="muted px" style="font-size:12.5px;padding-top:2px">Mode démo — les coupons sont enregistrés sur cet appareil. En ligne, ils seront partagés et sécurisés.</p>`;
+  return `<div class="screen">${back}
+    ${badge}
+    <div class="sect">Coupons (${list.length})</div>
+    <div class="adminwrap">
+      <div class="card">
+        ${list.length? list.map(c=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+          <div class="grow"><div class="c-code">${esc(c.code)} ${c.active?'':'<span class="muted" style="font-weight:500;font-size:12px">(inactif)</span>'}</div>
+            <div class="c-sum">${esc(couponSummary(c))}${c.label?` · ${esc(c.label)}`:''}</div>
+            <div class="c-uses">${(c.uses||0)} utilisation${(c.uses||0)>1?'s':''}</div></div>
+          <button class="tgl ${c.active?'on':''}" onclick="App.adminToggle('${esc(c.code)}')" aria-label="Activer/désactiver"><i></i></button>
+          <button class="del" onclick="App.adminDelete('${esc(c.code)}')" aria-label="Supprimer">${I.trash}</button>
+        </div>`).join('') : `<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Aucun coupon pour l'instant.</div>`}
+      </div>
+
+      <div class="card" style="padding:15px">
+        <b style="font-size:14.5px">Nouveau coupon</b>
+        <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
+          <label class="afield">Code
+            <input id="a_code" type="text" placeholder="Ex. CADEAU200" style="text-transform:uppercase">
+          </label>
+          <div class="arow">
+            <label class="afield">Type
+              <select id="a_type" onchange="App.adminTypeHint()">
+                <option value="fixed">Prix fixe (FCFA)</option>
+                <option value="percent">Réduction (%)</option>
+                <option value="amount">Réduction (FCFA)</option>
+              </select>
+            </label>
+            <label class="afield">Valeur
+              <input id="a_value" type="number" inputmode="numeric" placeholder="200">
+            </label>
+          </div>
+          <label class="afield">Libellé (optionnel)
+            <input id="a_label" type="text" placeholder="Ex. Promo lancement">
+          </label>
+          <button class="btn" onclick="App.adminSave()">Enregistrer le coupon</button>
+        </div>
+      </div>
+      ${API.mode==='live'?`<button class="btn ghost" onclick="App.adminLogout()">Se déconnecter</button>`:''}
+    </div>
   </div>`;
 }
 
@@ -1461,11 +1589,16 @@ function renderFlow(){
   if(flow.type==='pay'){
     const STEP_POS = {op:1, confirm:2, redirect:2, wait:3, poll:3, failed:3, done:4};
     const pct = Math.round(100*(STEP_POS[flow.step]||1)/4);
+    const amt = (flow.data.amount!=null ? flow.data.amount : c.price);
+    const hasCoupon = !!flow.data.coupon;
     let inner='', foot='';
     if(flow.step==='op'){
+      const priceLine = hasCoupon
+        ? `<b class="num" style="color:var(--primary)">${fcfa(amt)}</b> <s class="num" style="color:var(--muted);font-weight:500">${fcfa(c.price)}</s> <span class="pill free" style="vertical-align:middle">${esc(flow.data.coupon)}</span>`
+        : `<b class="num" style="color:var(--ink)">${fcfa(c.price)}</b>`;
       inner = `
         <h2 class="qlabel">Comment veux-tu payer ?</h2>
-        <p class="qhelp">Inscription à « ${esc(c.title)} » — <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b></p>
+        <p class="qhelp">Inscription à « ${esc(c.title)} » — ${priceLine}</p>
         <div class="ops">
           ${OPERATORS.map(o=>`<button class="op ${flow.data.op===o.id?'on':''} ${o.soon?'soon':''}" onclick="App.payPick('${o.id}')" ${o.soon?'aria-disabled="true"':''}>
             <span class="oplogo" style="background:${o.col};${o.dark?'color:#201D19':''}">${o.tag}</span>
@@ -1473,14 +1606,18 @@ function renderFlow(){
             <span class="radio"></span>
           </button>`).join('')}
         </div>
-        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>`;
+        <div class="coupon">
+          <input id="couponInput" type="text" placeholder="Code promo" value="${esc(flow.data.coupon||'')}" autocapitalize="characters" spellcheck="false" aria-label="Code promo" onkeydown="if(event.key==='Enter'){event.preventDefault();App.applyCoupon();}">
+          <button class="btn soft" style="width:auto;padding:12px 16px" onclick="App.applyCoupon()">Appliquer</button>
+        </div>
+        <p class="qerr" id="ferr" ${flow.couponOK?'style="color:var(--primary)"':''}>${flow.err?esc(flow.err):(flow.couponOK?esc(flow.couponOK):'')}</p>`;
       foot = `<button class="btn" ${flow.data.op?'':'disabled'} onclick="App.payNext()">${API.mode==='live'?'Payer avec Wave':'Continuer'} ${I.arrowr}</button>`;
     }
     if(flow.step==='redirect'){
       inner = `<div class="paywait">
         <div class="spinner" aria-hidden="true"></div>
         <h2 class="qlabel" style="font-size:21px">Ouverture de Wave…</h2>
-        <p class="qhelp">Tu vas être redirigé vers Wave pour payer <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b> en toute sécurité. Reviens ici après le paiement.</p>
+        <p class="qhelp">Tu vas être redirigé vers Wave pour payer <b class="num" style="color:var(--ink)">${fcfa(amt)}</b> en toute sécurité. Reviens ici après le paiement.</p>
       </div>`;
       foot = '';
     }
@@ -1513,15 +1650,15 @@ function renderFlow(){
           <input id="finput" class="qinput" type="tel" inputmode="tel" value="${esc(flow.data.phone||'')}" placeholder="07 00 00 00 00" enterkeyhint="go">
         </div>
         <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>
-        <div class="recap"><div class="row"><span>Montant à payer</span><b class="num">${fcfa(c.price)}</b></div></div>`;
-      foot = `<button class="btn" onclick="App.paySend()">Payer ${fcfa(c.price)}</button>`;
+        <div class="recap"><div class="row"><span>Montant à payer</span><b class="num">${fcfa(amt)}</b></div>${hasCoupon?`<div class="row"><span>Coupon</span><b>${esc(flow.data.coupon)}</b></div>`:''}</div>`;
+      foot = `<button class="btn" onclick="App.paySend()">Payer ${fcfa(amt)}</button>`;
     }
     if(flow.step==='wait'){
       const o = OPERATORS.find(x=>x.id===flow.data.op);
       inner = `<div class="paywait">
         <div class="spinner" aria-hidden="true"></div>
         <h2 class="qlabel" style="font-size:21px">Demande envoyée à ${esc(o.name)}</h2>
-        <p class="qhelp">Compose ton code secret sur ton téléphone pour valider le paiement de <b class="num" style="color:var(--ink)">${fcfa(c.price)}</b>.</p>
+        <p class="qhelp">Compose ton code secret sur ton téléphone pour valider le paiement de <b class="num" style="color:var(--ink)">${fcfa(amt)}</b>.</p>
         <span class="ussd num">${esc((flow.data.prefix||'+225')+' '+flow.data.phone)}</span>
         <p class="demonote">Mode démo : la confirmation est automatique dans quelques secondes.</p>
       </div>`;
@@ -1535,7 +1672,8 @@ function renderFlow(){
         <p class="qhelp" style="text-align:center">Tu as maintenant accès complet au cours.</p>
         <div class="card receipt">
           <div class="row"><span>Cours</span><b style="text-align:right;max-width:60%">${esc(c.title)}</b></div>
-          <div class="row"><span>Montant</span><b class="num">${fcfa(c.price)}</b></div>
+          <div class="row"><span>Montant</span><b class="num">${fcfa(amt)}</b></div>
+          ${hasCoupon?`<div class="row"><span>Coupon</span><b>${esc(flow.data.coupon)} <s class="num" style="font-weight:500;color:var(--muted)">${fcfa(c.price)}</s></b></div>`:''}
           <div class="row"><span>Opérateur</span><b>${o.name}</b></div>
           ${flow.data.phone?`<div class="row"><span>Numéro</span><b class="num">${esc((flow.data.prefix||'+225')+' '+flow.data.phone)}</b></div>`:''}
           <div class="row"><span>Référence</span><b class="num">${flow.data.ref}</b></div>
@@ -1664,7 +1802,26 @@ const App = {
   payNext(){
     if(!flow.data.op) return;
     if(API.mode==='live'){ this.payWaveStart(); return; }
+    if(flow.data.amount===0){ this.finishEnroll(flow.courseId, {op:'Coupon', ref:'KL-'+Date.now().toString(36).toUpperCase().slice(-7)}); return; }
     flow.step='confirm'; flow.err=null; renderFlow();
+  },
+  /* Applique un code promo (recalcul du prix). Live: /api/coupon ; démo: coupons locaux. */
+  async applyCoupon(){
+    const inp=$('#couponInput'); if(!inp) return;
+    const code=(inp.value||'').trim().toUpperCase();
+    flow.err=null; flow.couponOK=null;
+    if(!code){ delete flow.data.coupon; delete flow.data.amount; renderFlow(); return; }
+    const c=courseById(flow.courseId);
+    let res;
+    try{ res = await couponResolve(c.id, code); }catch(e){ res={valid:false}; }
+    if(res && res.valid){
+      flow.data.coupon=res.code; flow.data.amount=res.amount;
+      flow.couponOK = res.free ? 'Coupon appliqué : cours offert 🎁' : `Coupon appliqué : ${fcfa(res.amount)} (au lieu de ${fcfa(c.price)})`;
+    }else{
+      delete flow.data.coupon; delete flow.data.amount;
+      flow.err='Code promo invalide ou expiré.';
+    }
+    renderFlow();
   },
   /* Paiement réel : crée la session Wave côté serveur puis redirige vers l'app Wave */
   async payWaveStart(){
@@ -1672,9 +1829,14 @@ const App = {
     flow.step='redirect'; flow.err=null; renderFlow();
     try{
       const r = await fetch('/api/checkout', {method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({courseId:c.id, prenom:S.user.prenom, nom:S.user.nom,
+        body: JSON.stringify({courseId:c.id, code:flow.data.coupon||'', prenom:S.user.prenom, nom:S.user.nom,
           whatsapp:(S.user.prefix||'+225')+S.user.whatsapp, email:S.user.email})});
       const j = await r.json();
+      if(r.ok && j.free){  // coupon 100 % : inscription offerte sans Wave
+        S.enrolled[c.id]={at:Date.now(), paid:true, op:'Coupon', ref:j.ref};
+        if(!S.done[c.id]) S.done[c.id]={}; delete S.pendingOrder; save();
+        flow.data.ref=j.ref; flow.data.amount=0; flow.step='done'; renderFlow(); render(); return;
+      }
       if(!r.ok || !j.wave_launch_url) throw new Error(j.message||'checkout');
       S.pendingOrder = {ref:j.ref, courseId:c.id, at:Date.now()}; save();
       location.href = j.wave_launch_url;
@@ -1787,6 +1949,68 @@ const App = {
     localStorage.removeItem(KEY);
     location.reload();
   },
+
+  /* --- Espace admin (coupons) --- */
+  openAdmin(){ ADMIN.err=''; if(flow){ flow=null; renderFlow(); } go('profil','admin'); this.adminLoad(); },
+  async adminLoad(){
+    if(API.mode!=='live'){ ADMIN.list=demoCoupons(); ADMIN.err=''; render(); return; }
+    if(!ADMIN.key){ render(); return; }
+    try{
+      const {status,json}=await adminApi('GET');
+      if(status===200){ ADMIN.list=json.coupons||[]; ADMIN.err=''; }
+      else if(status===401){ ADMIN.key=''; try{localStorage.removeItem('boyia-admin-key')}catch(e){} ADMIN.err='Mot de passe incorrect.'; }
+      else { ADMIN.err=json.message||'Espace admin indisponible.'; }
+    }catch(e){ ADMIN.err='Connexion impossible.'; }
+    render();
+  },
+  adminLogin(){
+    const k=$('#adminkey'); if(!k||!k.value.trim()) return;
+    ADMIN.key=k.value.trim(); try{localStorage.setItem('boyia-admin-key',ADMIN.key)}catch(e){}
+    this.adminLoad();
+  },
+  adminLogout(){ ADMIN.key=''; ADMIN.list=null; try{localStorage.removeItem('boyia-admin-key')}catch(e){} render(); },
+  adminTypeHint(){ const t=$('#a_type'), v=$('#a_value'); if(t&&v) v.placeholder = t.value==='percent'?'50':'200'; },
+  async adminSave(){
+    const code=($('#a_code').value||'').trim().toUpperCase();
+    const type=$('#a_type').value;
+    const value=Math.round(Number($('#a_value').value));
+    const label=($('#a_label').value||'').trim();
+    if(!/^[A-Z0-9._-]{3,32}$/.test(code)){ toast('Code invalide (3–32 caractères).'); return; }
+    if(!isFinite(value)||value<0){ toast('Valeur invalide.'); return; }
+    if(type==='percent' && (value<1||value>100)){ toast('Le pourcentage doit être entre 1 et 100.'); return; }
+    const coupon={code,type,value,active:true,label};
+    if(API.mode==='live'){
+      const {status,json}=await adminApi('POST',{action:'save',coupon});
+      if(status===200){ ADMIN.list=json.coupons; toast('Coupon enregistré ✓'); }
+      else { toast(json.message||'Échec de l\'enregistrement.'); return; }
+    }else{
+      const list=demoCoupons().filter(c=>c.code!==code); list.unshift({...coupon,uses:0});
+      saveDemoCoupons(list); ADMIN.list=list; toast('Coupon enregistré ✓');
+    }
+    render();
+  },
+  async adminToggle(code){
+    const c=(ADMIN.list||[]).find(x=>x.code===code); if(!c) return;
+    const upd={...c,active:!c.active};
+    if(API.mode==='live'){
+      const {status,json}=await adminApi('POST',{action:'save',coupon:upd});
+      if(status===200) ADMIN.list=json.coupons; else { toast('Échec.'); return; }
+    }else{
+      const list=demoCoupons().map(x=>x.code===code?{...x,active:!x.active}:x);
+      saveDemoCoupons(list); ADMIN.list=list;
+    }
+    render();
+  },
+  async adminDelete(code){
+    if(!confirm('Supprimer le coupon '+code+' ?')) return;
+    if(API.mode==='live'){
+      const {status,json}=await adminApi('POST',{action:'delete',code});
+      if(status===200) ADMIN.list=json.coupons; else { toast('Échec.'); return; }
+    }else{
+      const list=demoCoupons().filter(x=>x.code!==code); saveDemoCoupons(list); ADMIN.list=list;
+    }
+    toast('Coupon supprimé'); render();
+  },
 };
 window.App = App;
 
@@ -1795,7 +2019,7 @@ function render(){
   const screens = {
     catalog:screenCatalog, course:screenCourse, learn:screenLearn, lesson:screenLesson,
     feed:screenFeed, post:screenPost, leader:screenLeader, compose:screenCompose,
-    my:screenMyCourses, profil:screenProfile,
+    my:screenMyCourses, profil:screenProfile, admin:screenAdmin,
   };
   $('#main').innerHTML = (screens[V.screen]||screenCatalog)();
   renderTabs();
@@ -1816,6 +2040,10 @@ render();
   renderFlow();
   if(flow.step==='poll') App.pollOrder();
 })();
+
+/* Accès direct à l'espace admin via #admin */
+if(location.hash==='#admin') App.openAdmin();
+window.addEventListener('hashchange', ()=>{ if(location.hash==='#admin') App.openAdmin(); });
 </script>
 </body>
 </html>

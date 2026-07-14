@@ -76,10 +76,25 @@ Région Vercel `fra1` (Francfort, proche de Neon et de l'Afrique de l'Ouest) —
 WAVE_API_KEY=… WAVE_WEBHOOK_SECRET=… DATABASE_URL=… APP_URL=https://TON-DOMAINE node server.js
 ```
 
+### Coupons & espace admin
+
+- **Coupon `CADEAU200`** pré-créé : fixe le prix à **200 FCFA** (parfait pour un vrai test de
+  paiement à petit coût). Saisis-le dans le champ « Code promo » de l'écran de paiement.
+- **Calcul du prix côté serveur** (`lib/coupons.js` + `checkout`) : le client ne peut jamais
+  imposer un montant ; le coupon est revérifié et appliqué par le serveur avant de créer la
+  session Wave. Un coupon à 100 % (ou prix fixe 0) inscrit gratuitement, sans Wave.
+- **Espace admin** (Profil → « Espace admin », ou `/#admin`) : créer/activer/supprimer des
+  coupons. Trois types : **prix fixe (FCFA)**, **réduction en %**, **réduction d'un montant**.
+  Protégé par la variable d'environnement **`ADMIN_PASSWORD`** (à définir sur Vercel). Sans
+  elle, l'espace admin en ligne est désactivé ; en mode démo il fonctionne en local.
+- Endpoints : `POST /api/coupon` (aperçu public) · `GET|POST /api/admin/coupons`
+  (en-tête `x-admin-key`). Table Neon `coupons` créée et pré-remplie automatiquement.
+
 ### Tester sans argent réel
 
 - `node test-wave.js` : faux serveur Wave local + parcours navigateur complet (checkout →
   redirection → webhook **signé** → reçu → accès au cours). 9 vérifications.
+- `node test-coupon.js` : valide les coupons (aperçu, checkout à montant serveur, admin).
 - `node test-store-neon.js` : valide la couche Neon (mapping des colonnes, `update`,
   persistance) avec un driver simulé, sans vraie base.
 

@@ -52,6 +52,21 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.order(url.searchParams.get('ref') || ''));
     }
 
+    if (req.method === 'POST' && url.pathname === '/api/coupon') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.couponPreview(input));
+    }
+
+    if (url.pathname === '/api/admin/coupons' && (req.method === 'GET' || req.method === 'POST')) {
+      let body = {};
+      if (req.method === 'POST') {
+        const raw = await H.readRawBody(req);
+        try { body = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      }
+      return send(res, await H.adminCoupons(req.method, body, req.headers['x-admin-key'] || ''));
+    }
+
     if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
       return res.end(fs.readFileSync(INDEX));
