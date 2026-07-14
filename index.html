@@ -377,7 +377,8 @@ const I = {
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
   award:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
-  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>'
 };
 
 /* ================= Données de démonstration ================= */
@@ -1112,6 +1113,13 @@ else if(S.posts.some(p=>/^p\d+$/.test(String(p.id)))){
   save();
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+/* Migration numéro : les comptes créés avant le passage au format international avaient
+   perdu leur « 0 » de tête. En Côte d'Ivoire (+225), les numéros font 10 chiffres et
+   commencent par 0 — on remet le 0 si un ancien numéro à 9 chiffres l'a perdu. */
+if(S.user && S.user.whatsapp){
+  const p=S.user.prefix||'+225', n=String(S.user.whatsapp).replace(/\D/g,'');
+  if(p==='+225' && n.length===9 && n[0]!=='0'){ S.user.whatsapp='0'+n; save(); }
+}
 function applyTheme(){ if(S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme; }
 applyTheme();
 
@@ -1125,6 +1133,9 @@ const $ = s=>document.querySelector(s);
 const esc = s=>String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fcfa = n => n===0 ? 'Gratuit' : n.toLocaleString('fr-FR').replace(/ /g,' ')+' FCFA';
 const initials = n => n.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+/* Numéro WhatsApp au format international : indicatif + numéro local (avec le 0 conservé).
+   Ex. +225 + 0576020058 -> +2250576020058. */
+function waFull(u){ if(!u) return ''; const p=(u.prefix||'+225'); const n=String(u.whatsapp||'').replace(/\D/g,''); return p+n; }
 function ago(t){
   const s = Math.max(1,(Date.now()-t)/1000);
   if(s<60) return 'à l\'instant';
@@ -1433,6 +1444,23 @@ function postCard(p, detail){
   </article>`;
 }
 
+/* Communauté réservée aux membres (compte créé / inscrit à un cours). */
+function screenCommuLocked(){
+  return `<div class="screen">
+    <header class="apphead">
+      <div style="flex:1"><div class="brand" style="font-size:22px">Communauté</div>
+      <div class="tagline" style="padding:0">Réservée aux membres</div></div>
+    </header>
+    <div class="empty" style="padding:44px 26px">
+      ${I.users}
+      <b>Rejoins la communauté</b>
+      <span>L'entraide, les victoires et les défis sont réservés aux membres. Crée ton compte gratuit (ou inscris-toi à un cours) pour y accéder et poser tes questions.</span>
+      <button class="btn" style="width:auto;padding:12px 22px;margin-top:8px" onclick="App.enrollGeneric()">Créer mon compte gratuit</button>
+      <button class="btn ghost" style="width:auto;padding:12px 22px;margin-top:10px" onclick="App.tab('cours')">Découvrir les cours</button>
+    </div>
+  </div>`;
+}
+
 function screenFeed(){
   const list = S.posts.filter(p=>filters.commu==='Tout'||p.cat===filters.commu)
                       .slice().sort((a,b)=>b.at-a.at);
@@ -1534,7 +1562,7 @@ function screenProfile(){
     </div>
     <div class="sect">Mes informations</div>
     <div class="card" style="margin:0 14px">
-      <div class="prow">${I.phone}<span>WhatsApp</span><span class="val num">${esc(u.whatsapp)}</span></div>
+      <div class="prow">${I.phone}<span>WhatsApp</span><span class="val num">${esc(waFull(u))}</span></div>
       <div class="prow">${I.mail}<span>E-mail</span><span class="val">${esc(u.email)}</span></div>
     </div>`
     : `
@@ -1550,8 +1578,10 @@ function screenProfile(){
       ${API.mode==='live'?'':`<div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>`}
       <button class="prow" onclick="App.invite()">${I.send}<span>Inviter un ami sur WhatsApp</span></button>
       ${CONFIG.whatsappSupport?`<a class="prow" style="text-decoration:none" href="https://wa.me/${CONFIG.whatsappSupport}?text=${encodeURIComponent('Bonjour, j\'utilise Boyia Institute et je voudrais…')}" target="_blank" rel="noopener">${I.msg}<span>Aide &amp; donner mon avis</span></a>`:''}
-      <button class="prow danger" onclick="App.reset()">${I.trash}<span>Effacer mes données sur cet appareil</span></button>
     </div>
+    ${u?`<div class="card" style="margin:14px 14px 0">
+      <button class="prow danger" onclick="App.logout()">${I.logout}<span>Se déconnecter</span></button>
+    </div>`:''}
     <p class="demonote" style="margin:18px 0 26px">Boyia Institute — paiements sécurisés via Wave (Côte d'Ivoire).</p>
   </div>`;
 }
@@ -1939,7 +1969,7 @@ const App = {
       const pre = $('#fprefix'); if(pre) flow.data.prefix = pre.value;
       const ok = st.valid(v);
       if(ok!==true){ flow.err=ok; $('#ferr').textContent=ok; inp&&inp.focus(); return; }
-      flow.data[st.key] = st.type==='phone' ? v.replace(/\D/g,'').replace(/^0+/,'') || v.replace(/\D/g,'') : v.trim();
+      flow.data[st.key] = st.type==='phone' ? v.replace(/\D/g,'') : v.trim();
       flow.err=null; flow.step++;
       renderFlow();
     } else {
@@ -2007,7 +2037,7 @@ const App = {
     try{
       const r = await fetch('/api/checkout', {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({courseId:c.id, code:flow.data.coupon||'', prenom:S.user.prenom, nom:S.user.nom,
-          whatsapp:(S.user.prefix||'+225')+S.user.whatsapp, email:S.user.email})});
+          whatsapp:waFull(S.user), email:S.user.email})});
       const j = await r.json();
       if(r.ok && j.free){  // coupon 100 % : inscription offerte sans Wave
         S.enrolled[c.id]={at:Date.now(), paid:true, op:'Coupon', ref:j.ref};
@@ -2112,10 +2142,10 @@ const App = {
     S.theme = S.theme==null ? 'dark' : S.theme==='dark' ? 'light' : null;
     save(); applyTheme(); render();
   },
-  reset(){
-    if(!confirm('Effacer tes données sur cet appareil ? Ton compte, ta progression et tes publications locales seront supprimés.')) return;
+  logout(){
+    if(!confirm('Te déconnecter de cet appareil ? Ton compte et ta progression enregistrés ici seront effacés. Un reçu de tes cours payés reste dans ta boîte e-mail.')) return;
     localStorage.removeItem(KEY);
-    location.reload();
+    location.href = location.pathname;   // repart propre (sans #admin ni paramètres)
   },
 
   /* --- Espace admin (coupons) --- */
@@ -2192,7 +2222,10 @@ function render(){
     feed:screenFeed, post:screenPost, leader:screenLeader, compose:screenCompose,
     my:screenMyCourses, profil:screenProfile, admin:screenAdmin,
   };
-  $('#main').innerHTML = (screens[V.screen]||screenCatalog)();
+  /* Communauté verrouillée tant que l'utilisateur n'a pas de compte. */
+  const commuScreens = {feed:1, post:1, leader:1, compose:1};
+  const fn = (commuScreens[V.screen] && !S.user) ? screenCommuLocked : (screens[V.screen]||screenCatalog);
+  $('#main').innerHTML = fn();
   renderTabs();
 }
 render();
