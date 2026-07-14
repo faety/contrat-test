@@ -138,6 +138,31 @@ const waveStub = http.createServer((req, res) => {
     ok('navigateur : inscription persistée après rechargement');
   } catch (e) { fail('persistance', e.message); }
 
+  /* --- Cas mobile réel : retour sur success_url PENDANT que la commande est encore
+         en attente (webhook pas encore reçu / autre navigateur type Safari, sans état
+         local). Le paiement se confirme ensuite côté serveur, et l'app doit afficher le
+         succès AU RETOUR DANS L'APP (événement focus/visibility) SANS rechargement. --- */
+  try {
+    const r = await fetch(`${APP_URL}/api/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseId: 'claude', prenom: 'Fanta', nom: 'Traore', whatsapp: '+2250700998877', email: 'fanta@test.com' }) });
+    const ref2 = (await r.json()).ref;
+    // Contexte neuf = navigateur différent (Safari) : aucun état local, seulement ?ref dans l'URL.
+    const ctx2 = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page2 = await ctx2.newPage();
+    const err2 = []; page2.on('pageerror', e => err2.push(e.message));
+    await page2.goto(`${APP_URL}/?wave=success&ref=${ref2}`);
+    await page2.waitForSelector('.paywait', { timeout: 8000 }); // écran « Confirmation du paiement… »
+    // La commande n'est pas encore payée : on ne doit pas déjà voir le reçu.
+    if (await page2.locator('.receipt').count() !== 0) throw new Error('reçu affiché avant confirmation');
+    // Le paiement se confirme maintenant côté serveur (Wave envoie le webhook signé).
+    await fetch(`http://127.0.0.1:${WAVE_PORT}/pay?ref=${ref2}`);
+    // Retour dans l'app : événements focus/visibility -> revérification immédiate.
+    await page2.evaluate(() => { document.dispatchEvent(new Event('visibilitychange')); window.dispatchEvent(new Event('focus')); });
+    await page2.waitForSelector('.receipt', { timeout: 8000 });
+    if (err2.length) throw new Error('JS: ' + err2.join(' | '));
+    ok('navigateur : retour pendant « en attente » → succès affiché au focus, sans rechargement');
+    await ctx2.close();
+  } catch (e) { fail('reprise au focus (cas mobile)', e.message); }
+
   console.log(errors.length ? 'ERREURS JS: ' + errors.join(' | ') : 'Aucune erreur JS navigateur.');
   await browser.close();
   srv.kill(); waveStub.close();

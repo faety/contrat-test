@@ -4,3 +4,7 @@ data/
 .vercel/
 .env
 .env.*
+
+# Captures d'écran de test
+shot-*.png
+*.png

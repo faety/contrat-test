@@ -1755,7 +1755,7 @@ function renderFlow(){
   if(flow.type==='pay'){
     const STEP_POS = {op:1, confirm:2, redirect:2, wait:3, poll:3, failed:3, done:4};
     const pct = Math.round(100*(STEP_POS[flow.step]||1)/4);
-    const amt = (flow.data.amount!=null ? flow.data.amount : c.price);
+    const amt = (flow.data.amount!=null ? flow.data.amount : (c ? c.price : 0));
     const hasCoupon = !!flow.data.coupon;
     let inner='', foot='';
     if(flow.step==='op'){
@@ -1783,7 +1783,7 @@ function renderFlow(){
       inner = `<div class="paywait">
         <div class="spinner" aria-hidden="true"></div>
         <h2 class="qlabel" style="font-size:21px">Ouverture de Wave…</h2>
-        <p class="qhelp">Tu vas être redirigé vers Wave pour payer <b class="num" style="color:var(--ink)">${fcfa(amt)}</b> en toute sécurité. Reviens ici après le paiement.</p>
+        <p class="qhelp">Tu vas payer <b class="num" style="color:var(--ink)">${fcfa(amt)}</b> en toute sécurité dans Wave. <b>Après le paiement, reviens sur cette page</b> — ton accès s'activera automatiquement.</p>
       </div>`;
       foot = '';
     }
@@ -1791,10 +1791,16 @@ function renderFlow(){
       inner = `<div class="paywait">
         <div class="spinner" aria-hidden="true"></div>
         <h2 class="qlabel" style="font-size:21px">Confirmation du paiement…</h2>
-        <p class="qhelp">On vérifie ton paiement Wave. Cela prend en général quelques secondes.</p>
+        <p class="qhelp">${flow.data.slow
+          ? "Wave met un peu plus de temps que d'habitude. Pas d'inquiétude : si tu as payé, ton accès s'activera dès la confirmation. Tu peux rester sur cette page."
+          : "On vérifie ton paiement Wave. Cela prend en général quelques secondes — reste sur cette page."}</p>
         <span class="ussd num">${esc(flow.data.ref||'')}</span>
+        ${flow.data.slow?`<p class="qhelp" style="margin-top:12px;font-size:13px">Rien ne bouge ? Tu peux relancer la vérification.</p>`:''}
       </div>`;
-      foot = '';
+      foot = flow.data.slow
+        ? `<button class="btn soft" onclick="App.payRecheck()">Vérifier à nouveau</button>
+           <button class="btn ghost" style="margin-top:9px" onclick="App.flowClose()">Fermer — je reviendrai</button>`
+        : '';
     }
     if(flow.step==='failed'){
       inner = `
@@ -2016,32 +2022,22 @@ const App = {
       renderFlow();
     }
   },
-  /* Au retour de Wave : on interroge le serveur jusqu'à confirmation (webhook ou réconciliation) */
-  payRecheck(){ if(!flow||flow.type!=='pay') return; flow.data.timeout=false; flow.step='poll'; renderFlow(); this.pollOrder(); },
-  async pollOrder(){
-    const ref = flow && flow.data && flow.data.ref; if(!ref) return;
-    for(let i=0;i<60;i++){
-      if(!flow || flow.type!=='pay' || flow.data.ref!==ref) return;
-      try{
-        const r = await fetch('/api/order?ref='+encodeURIComponent(ref), {cache:'no-store'});
-        if(r.status===404) break;
-        if(r.ok){
-          const j = await r.json();
-          if(j.status==='paid'){
-            const cid = j.courseId || flow.courseId;
-            S.enrolled[cid] = {at:Date.now(), paid:true, op:'Wave', ref:j.ref};
-            if(!S.done[cid]) S.done[cid]={};
-            delete S.pendingOrder; save();
-            flow.courseId=cid; flow.data.ref=j.ref; flow.data.txn=j.transactionId; flow.step='done';
-            renderFlow(); render(); return;
-          }
-          if(j.status==='failed'){ flow.step='failed'; renderFlow(); return; }
-        }
-      }catch(e){}
-      await new Promise(rs=>setTimeout(rs, 2000));
-    }
-    if(flow && flow.type==='pay' && flow.data.ref===ref){ flow.data.timeout=true; flow.step='failed'; renderFlow(); }
+  /* Au retour de Wave : on relance la vérification (le sondage ne s'arrête jamais tant
+     que l'écran est ouvert ; il repart aussi automatiquement au retour dans l'app). */
+  payRecheck(){ if(!flow||flow.type!=='pay') return; flow.data.timeout=false; flow.data.slow=false; flow.step='poll'; renderFlow(); payWatchStart(flow.data.ref); },
+  pollOrder(){ if(flow && flow.data && flow.data.ref) payWatchStart(flow.data.ref); },
+  /* Paiement confirmé par le serveur (source de vérité : réconciliation Wave). */
+  onPaid(j){
+    const cid = (j && j.courseId) || (flow && flow.courseId) || (S.pendingOrder && S.pendingOrder.courseId);
+    if(cid){ S.enrolled[cid] = {at:Date.now(), paid:true, op:'Wave', ref:j.ref}; if(!S.done[cid]) S.done[cid]={}; }
+    delete S.pendingOrder; save();
+    if(flow && flow.type==='pay'){
+      flow.courseId=cid; flow.data.ref=j.ref; flow.data.txn=j.transactionId;
+      if(j.amount!=null) flow.data.amount=j.amount;
+      flow.step='done'; renderFlow(); render();
+    } else { render(); toast('Paiement confirmé 🎉'); }
   },
+  onPayFailed(){ if(flow && flow.type==='pay'){ flow.data.timeout=true; flow.step='failed'; renderFlow(); } },
   paySend(){
     const inp=$('#finput'), pre=$('#fprefix');
     const v = inp?inp.value:'';
@@ -2201,22 +2197,83 @@ function render(){
 }
 render();
 
-/* Retour d'un paiement Wave : si une commande est en attente, on reprend le parcours
-   (écran de confirmation + sondage du serveur). success_url/error_url ramènent ici
-   avec ?wave=success|error&ref=… */
+/* ===== Suivi robuste du paiement Wave =====
+   Le sondage ne « lâche » jamais tant que l'écran de paiement est ouvert, et il
+   REPART tout seul dès que l'app redevient visible (retour depuis l'app Wave ou
+   un autre navigateur) — c'est ce qui évite l'écran qui tourne sans fin sur mobile,
+   où les navigateurs gèlent les minuteurs des onglets en arrière-plan. */
+const PENDING_MAX_AGE = 60*60*1000;   // au-delà d'1 h, on ne relance plus une vieille commande
+let payWatch = { ref:null, tries:0, timer:null, busy:false, gen:0 };
+function payWatchStop(){ if(payWatch.timer){ clearTimeout(payWatch.timer); payWatch.timer=null; } payWatch.ref=null; payWatch.gen++; }
+async function payCheckOnce(){
+  const ref = payWatch.ref; if(!ref || payWatch.busy) return false;
+  payWatch.busy = true;
+  try{
+    const r = await fetch('/api/order?ref='+encodeURIComponent(ref), {cache:'no-store'});
+    if(r.ok){
+      const j = await r.json();
+      if(j.status==='paid'){ App.onPaid(j); return true; }
+      if(j.status==='failed'){ App.onPayFailed(); return true; }
+    }
+  }catch(e){/* réseau : on réessaiera */}
+  finally{ payWatch.busy = false; }
+  return false;
+}
+/* Une seule chaîne de minuteurs à la fois (jeton `gen`) : les événements focus/visibility
+   multiples ne créent jamais de sondages parallèles. */
+function payWatchTick(gen){
+  if(gen!==payWatch.gen || !payWatch.ref) return;
+  const ref = payWatch.ref;
+  payCheckOnce().then(done=>{
+    if(gen!==payWatch.gen) return;
+    if(done || payWatch.ref!==ref){ if(done) payWatchStop(); return; }
+    payWatch.tries++;
+    /* Message rassurant si Wave met du temps — sans jamais déclarer d'échec. */
+    if(payWatch.tries===12 && flow && flow.type==='pay' && flow.step==='poll' && !flow.data.slow){ flow.data.slow=true; renderFlow(); }
+    const delay = payWatch.tries<20 ? 2000 : 4000;
+    payWatch.timer = setTimeout(()=>payWatchTick(gen), delay);
+  });
+}
+function payWatchStart(ref){ if(!ref) return; payWatchStop(); payWatch.ref=ref; payWatch.tries=0; const g=++payWatch.gen; payWatchTick(g); }
+/* Reprise immédiate quand l'utilisateur revient dans l'app. */
+function payResume(){
+  if(document.visibilityState==='hidden') return;
+  if(payWatch.ref){                                   // sondage en cours : on revérifie tout de suite
+    if(payWatch.timer){ clearTimeout(payWatch.timer); payWatch.timer=null; }
+    const g=++payWatch.gen; payWatchTick(g);
+  } else if(S.pendingOrder && S.pendingOrder.ref && !S.enrolled[S.pendingOrder.courseId]){
+    resumePendingPayment();                           // page restaurée (BFCache) : on relance
+  }
+}
+/* Ouvre/relance l'écran de suivi pour une commande en attente. */
+function resumePendingPayment(retFailed){
+  const po = S.pendingOrder;
+  if(!po || !po.ref) return false;
+  if(po.at && Date.now()-po.at > PENDING_MAX_AGE){ delete S.pendingOrder; save(); return false; }
+  if(po.courseId && S.enrolled[po.courseId]){ delete S.pendingOrder; save(); return false; }
+  if(!flow || flow.type!=='pay' || flow.data.ref!==po.ref){
+    flow = {type:'pay', courseId:po.courseId, step: retFailed ? 'failed' : 'poll', data:{op:'wave', ref:po.ref}};
+    if(retFailed) flow.data.timeout=true;
+    renderFlow();
+  }
+  if(flow.step==='poll') payWatchStart(po.ref);
+  return true;
+}
+document.addEventListener('visibilitychange', payResume);
+window.addEventListener('focus', payResume);
+window.addEventListener('pageshow', payResume);   // restauration depuis le cache arrière/avant
+
+/* Retour d'un paiement Wave : success_url/error_url ramènent ici avec ?wave=success|error&ref=…
+   On enregistre la référence puis on laisse le suivi robuste faire son travail. */
 (function resumeWavePayment(){
   const qs = new URLSearchParams(location.search);
   const ret = qs.get('wave');
   const refUrl = qs.get('ref');
-  if(ret) history.replaceState(null, '', location.pathname);
+  if(ret || refUrl) history.replaceState(null, '', location.pathname + location.hash);
   const ref = (S.pendingOrder && S.pendingOrder.ref) || refUrl;
   if(!ref) return;                       // rien à reprendre
-  if(!S.pendingOrder) S.pendingOrder = {ref, courseId:null, at:Date.now()};
-  flow = {type:'pay', courseId:S.pendingOrder.courseId,
-          step: ret==='error' ? 'failed' : 'poll',
-          data:{op:'wave', ref:S.pendingOrder.ref}};
-  renderFlow();
-  if(flow.step==='poll') App.pollOrder();
+  if(!S.pendingOrder || S.pendingOrder.ref!==ref) S.pendingOrder = {ref, courseId:(S.pendingOrder&&S.pendingOrder.courseId)||null, at:Date.now()};
+  resumePendingPayment(ret==='error');
 })();
 
 /* Accès direct à l'espace admin : /boyiaadmin ou #admin */
