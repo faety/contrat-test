@@ -59,8 +59,27 @@ Région Vercel `fra1` (Francfort, proche de Neon et de l'Afrique de l'Ouest) —
    | `WAVE_WEBHOOK_SECRET` | secret du webhook Wave |
    | `DATABASE_URL` | chaîne de connexion Neon |
    | `APP_URL` | l'URL publique (ex. `https://contrat-test.vercel.app`) — optionnel, sinon déduite des en-têtes |
+   | `ADMIN_PASSWORD` | mot de passe de l'espace admin (`/boyiaadmin`) |
+   | `SMTP_HOST` | serveur d'envoi d'e-mails (ex. `smtp.hostinger.com`) |
+   | `SMTP_PORT` | `465` (SSL, défaut) ou `587` |
+   | `SMTP_USER` | boîte d'envoi (ex. `contact@boyiainstitute.com`) |
+   | `SMTP_PASS` | mot de passe de la boîte |
+   | `MAIL_FROM` | adresse d'expédition affichée — optionnel (défaut : `SMTP_USER`) |
+   | `NOTIFY_EMAIL` | reçoit une notification à chaque vente — optionnel |
    Redéploie. Sans `WAVE_API_KEY`, le site tourne en **mode démo** (paiement simulé) ;
-   sans `DATABASE_URL`, stockage en mémoire (non persistant — à éviter en prod).
+   sans `DATABASE_URL`, stockage en mémoire (non persistant — à éviter en prod) ;
+   sans `SMTP_*`, aucun e-mail n'est envoyé (le site fonctionne normalement).
+
+### E-mails transactionnels
+
+Trois e-mails automatiques (`lib/mail.js`, SMTP via nodemailer — Hostinger, Gmail, Brevo…) :
+- **Reçu de paiement** au client dès que la commande passe en « payé » (webhook, réconciliation
+  ou inscription gratuite par coupon). Envoyé **une seule fois** (colonne `emailed` en base) ;
+  si le SMTP est en panne, le flag n'est pas posé et l'envoi sera retenté à la prochaine
+  vérification de la commande.
+- **Bienvenue** à la création de compte (`POST /api/welcome`, appelé par le front, non bloquant).
+- **Notification de vente** à `NOTIFY_EMAIL` (référence, cours, montant, coupon, contact client).
+`GET /api/health` expose `mail: true|false` pour vérifier la configuration.
 4. **Circuit d'un paiement** : `POST /api/checkout` (crée la session Wave, `currency: XOF`,
    `client_reference` = référence de commande, montant serveur) → redirection vers
    `wave_launch_url` → l'utilisateur paie dans Wave → Wave appelle le webhook

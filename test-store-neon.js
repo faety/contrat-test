@@ -6,11 +6,12 @@ const path = require('path');
 const rows = [];
 function fakeSql(strings, ...vals) {
   const q = strings.join('?').toLowerCase().trim();
-  if (q.includes('create table')) return Promise.resolve([]);
+  if (q.includes('create table') || q.includes('alter table')) return Promise.resolve([]);
+  if (q.includes('coupons')) return Promise.resolve([]); // seed/lecture coupons : hors sujet ici
   if (q.startsWith('insert into orders')) {
     rows.push({ ref: vals[0], course_id: vals[1], amount: vals[2], status: vals[3],
-      wave_session_id: vals[4], transaction_id: null, buyer: JSON.parse(vals[5]),
-      last_error: null, created_at: new Date().toISOString(), paid_at: null });
+      wave_session_id: vals[4], transaction_id: null, buyer: JSON.parse(vals[5]), coupon: vals[6] || null,
+      last_error: null, emailed: false, created_at: new Date().toISOString(), paid_at: null });
     return Promise.resolve([]);
   }
   if (q.startsWith('select * from orders where ref')) {
@@ -20,13 +21,14 @@ function fakeSql(strings, ...vals) {
     return Promise.resolve(rows.filter(r => r.wave_session_id === vals[0]).slice(0, 1));
   }
   if (q.startsWith('update orders')) {
-    // vals ordre : status, waveSessionId, transactionId, lastError, status(pour paid_at), ref
+    // vals ordre : status, waveSessionId, transactionId, lastError, emailed, status(pour paid_at), ref
     const ref = vals[vals.length - 1];
     const r = rows.find(x => x.ref === ref); if (!r) return Promise.resolve([]);
     if (vals[0] != null) r.status = vals[0];
     if (vals[1] != null) r.wave_session_id = vals[1];
     if (vals[2] != null) r.transaction_id = vals[2];
     if (vals[3] != null) r.last_error = vals[3];
+    if (vals[4] != null) r.emailed = vals[4];
     if (vals[0] === 'paid' && !r.paid_at) r.paid_at = new Date().toISOString();
     return Promise.resolve([{ ...r }]);
   }
@@ -59,6 +61,9 @@ const store = require('/home/user/contrat-test/lib/store.js');
   check(o.status === 'paid' && o.transactionId === 'TX-1' && o.paidAt, 'update → paid + transaction + paidAt');
   o = await store.get('KL-TEST');
   check(o.status === 'paid', 'persistance de la mise à jour');
+  check(o.emailed === false, 'emailed = false par défaut');
+  o = await store.update('KL-TEST', { emailed: true });
+  check(o.emailed === true && o.status === 'paid', 'update emailed sans toucher au statut');
 
   console.log(`\n${pass}/${pass + fail} tests store Neon OK`);
   process.exit(fail ? 1 : 0);

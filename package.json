@@ -1,8 +1,8 @@
 {
-  "name": "kalan",
+  "name": "boyia-institute",
   "version": "1.0.0",
   "private": true,
-  "description": "Kalan — cours en ligne & communauté (mobile first), paiement Wave Côte d'Ivoire.",
+  "description": "Boyia Institute — cours en ligne & communauté (mobile first), paiement Wave Côte d'Ivoire.",
   "engines": {
     "node": ">=18"
   },
@@ -10,6 +10,7 @@
     "serve:local": "node server.js"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.10.4"
+    "@neondatabase/serverless": "^0.10.4",
+    "nodemailer": "^6.9.16"
   }
 }

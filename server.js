@@ -52,6 +52,12 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.order(url.searchParams.get('ref') || ''));
     }
 
+    if (req.method === 'POST' && url.pathname === '/api/welcome') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.welcome(input));
+    }
+
     if (req.method === 'POST' && url.pathname === '/api/coupon') {
       const raw = await H.readRawBody(req);
       let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }

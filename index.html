@@ -409,7 +409,7 @@ const COURSES = [
 
   /* ---------- GRATUIT · IA ---------- */
   {id:'ia', title:"Comprendre l'IA en 30 minutes", cat:'IA', price:0, g:0,
-   instr:'Équipe Boyia Institute', instrRole:'Sélection des meilleures vidéos francophones', rating:4.8, students:126, dur:'~35 min',
+   instr:'Équipe Boyia Institute', instrRole:'Sélection des meilleures vidéos francophones', dur:'~35 min',
    desc:"Une sélection de vraies vidéos, bien ordonnées, pour comprendre ce qu'est l'IA, ce qu'elle sait faire et comment elle va t'aider au travail. Zéro jargon.",
    learn:["Expliquer l'IA avec des mots simples","Savoir ce que l'IA sait faire (et pas faire)","Découvrir ChatGPT en pratique","Choisir ta prochaine étape (ChatGPT, Claude ou Copilot)"],
    modules:[
@@ -467,9 +467,9 @@ Chaque cours dure environ 2 h, en leçons de 7 à 10 minutes, avec des exemples 
 
   /* ---------- PAYANT · IA · ChatGPT ---------- */
   {id:'chatgpt', title:'ChatGPT au travail : gagner du temps chaque jour', cat:'IA', price:5000, g:1,
-   instr:'Aïcha Diallo', instrRole:'Formatrice IA & bureautique', rating:4.8, students:58, dur:'2 h 10',
+   instr:'Équipe Boyia Institute', instrRole:'Formation IA pour le travail', dur:'2 h 45',
    desc:"Utilise ChatGPT comme un assistant de bureau : e-mails, comptes rendus, tableaux, idées. Des méthodes simples et des exemples de vrai travail, applicables dès aujourd'hui.",
-   learn:["Accéder à ChatGPT et faire ta première demande utile","Écrire des consignes claires qui donnent de bons résultats","Gagner du temps sur tes e-mails, résumés et documents","Vérifier les réponses et protéger les infos confidentielles"],
+   learn:["Accéder à ChatGPT et faire ta première demande utile","Écrire des consignes claires qui donnent de bons résultats","Gagner du temps sur tes e-mails, résumés et documents","Vérifier les réponses et protéger les infos confidentielles","Repartir avec 10 consignes + un pack e-mails à copier-coller","Suivre un plan de 7 jours pour en faire un réflexe quotidien"],
    modules:[
      {t:'Prendre ChatGPT en main', l:[
        ["C'est quoi ChatGPT, en une phrase",'7 min',
@@ -601,13 +601,65 @@ Fixe-toi un objectif simple cette semaine : automatiser **une** tâche écrite r
 
 À toi de jouer : choisis une tâche à automatiser cette semaine et note la consigne qui marche le mieux pour la réutiliser.`,null],
      ]},
+     {t:'Ta boîte à outils (à copier-coller)', l:[
+       ["10 consignes prêtes à copier",'12 min',
+`Voici ta bibliothèque de départ. Copie ces consignes dans le bloc-notes de ton téléphone, remplace ce qui est entre [crochets], colle dans ChatGPT. Elles couvrent l'essentiel d'une semaine de bureau.
+
+**1. Répondre à un e-mail** : « Voici un e-mail que j'ai reçu : [colle l'e-mail]. Rédige une réponse qui [accepte / refuse / demande un délai], ton courtois et professionnel, 6 lignes maximum. »
+
+**2. Relancer sans fâcher** : « Rédige une relance polie pour [un devis / une facture / un dossier] envoyé le [date] à [nom], sans réponse à ce jour. Ton cordial mais clair, avec une question simple à la fin. »
+
+**3. Compte rendu express** : « Voici mes notes de réunion en vrac : [colle tes notes]. Transforme-les en compte rendu : contexte en 2 lignes, décisions, actions avec responsable et échéance. »
+
+**4. Annonce à l'équipe** : « Rédige un message pour annoncer [le changement] à l'équipe. Explique la raison en une phrase, ce qui change concrètement, et termine sur une note positive. 8 lignes max. »
+
+**5. Tableau de suivi** : « Transforme cette liste en tableau à 4 colonnes (tâche, responsable, échéance, statut) : [colle ta liste]. »
+
+**6. Message difficile** : « Je dois annoncer [la mauvaise nouvelle] à [client / collègue / chef]. Rédige 2 versions : une directe, une diplomate. Les deux doivent préserver la relation. »
+
+**7. Traduction professionnelle** : « Traduis en anglais professionnel, sans changer le sens : [colle le texte]. Puis donne une version plus simple si mon interlocuteur n'est pas anglophone natif. »
+
+**8. Générer des idées** : « Donne-moi 10 idées de [promotion / nom / sujet de publication] pour [ton activité]. Public : [décris tes clients]. Classe-les de la plus simple à la plus ambitieuse. »
+
+**9. Préparer une présentation** : « Prépare le plan d'une présentation de [10] minutes sur [sujet] pour [public]. 5 parties, 3 points par partie, plus une phrase d'accroche pour commencer. »
+
+**10. Améliorer un texte** : « Corrige les fautes et améliore ce texte sans changer le sens ni le ton : [colle ton texte]. Puis liste en 3 points ce que tu as changé. »
+
+À toi de jouer : copie ces 10 consignes dans ton téléphone maintenant, et utilises-en une vraie aujourd'hui.`,null],
+       ["Ton pack e-mails : les 5 situations qui reviennent toujours",'10 min',
+`Au bureau, 5 situations d'e-mail reviennent sans arrêt. Prépare une consigne pour chacune une bonne fois, et tu ne repartiras plus jamais de zéro.
+
+**Demander (info, prix, délai)** : « Rédige un e-mail court pour demander [quoi] à [qui], en donnant le contexte en une phrase. Termine par une question précise et une formule polie. »
+
+**Confirmer (commande, rendez-vous, accord)** : « Rédige un e-mail qui confirme [quoi], reprend les points convenus ([liste-les]) et précise la prochaine étape. »
+
+**S'excuser (retard, erreur)** : « Rédige un e-mail qui reconnaît [le problème] sans se justifier à l'excès, présente des excuses sincères, et propose [la solution]. Ton professionnel, pas dramatique. »
+
+**Refuser en gardant la relation** : « Rédige un refus de [la demande] : remercie, explique la raison en une phrase honnête, propose une alternative si possible. Le lecteur doit se sentir respecté. »
+
+**Remercier / féliciter** : « Rédige un message de remerciement pour [quoi], chaleureux mais professionnel, 4 lignes, sans exagération. »
+
+Astuce de pro : après chaque bon résultat, colle l'e-mail final sous ta consigne dans ton fichier. La prochaine fois, tu donnes les deux à ChatGPT : « même style que cet exemple ». La qualité devient constante.
+
+À toi de jouer : identifie la situation qui revient le plus dans TA semaine et prépare ta consigne personnalisée dès maintenant.`,null],
+       ["Ton plan d'action : 7 jours pour en faire un réflexe",'10 min',
+`Tu as la méthode et la boîte à outils. Voici comment les transformer en réflexe quotidien — c'est ce qui change vraiment ta semaine de travail.
+
+**Jour 1** : réponds à 2 vrais e-mails avec la consigne n°1. Chronomètre : note le temps gagné. **Jour 2** : fais rédiger une relance ou une demande réelle (consignes 2 ou du pack). **Jour 3** : transforme tes notes (réunion, idées) en compte rendu ou tableau (consignes 3 et 5). **Jour 4** : traite un message difficile ou une annonce (consignes 4 ou 6) — compare les 2 versions proposées. **Jour 5** : prépare un document plus gros : présentation, texte long à améliorer (consignes 9 et 10). **Jours 6-7** : bilan — quelles consignes t'ont servi ? Mets à jour ton fichier, supprime ce qui ne sert pas, garde tes 5 gagnantes.
+
+**Mesure tes gains** : note chaque jour le temps gagné (même approximatif). La plupart des apprenants gagnent 30 à 60 minutes par jour dès la première semaine — c'est ta preuve pour continuer, et un excellent argument auprès de ton équipe.
+
+**Ensuite** : chaque nouvelle tâche écrite qui te prend plus de 10 minutes, demande-toi d'abord : « ChatGPT peut-il faire le premier jet ? » La réponse est presque toujours oui.
+
+À toi de jouer : ouvre ton agenda et bloque 15 minutes par jour cette semaine, intitulées « ChatGPT au travail ». Puis viens partager ton temps gagné dans la communauté (Victoires) — ça motive tout le monde.`,null],
+     ]},
    ]},
 
   /* ---------- PAYANT · IA · Claude ---------- */
   {id:'claude', title:"Claude au travail : rédiger et analyser comme un pro", cat:'IA', price:5000, g:3,
-   instr:'Yao Kouadio', instrRole:'Consultant productivité & IA', rating:4.9, students:41, dur:'2 h 15',
+   instr:'Équipe Boyia Institute', instrRole:'Formation IA pour le travail', dur:'2 h 50',
    desc:"Claude excelle sur les textes longs, l'analyse de documents et le ton juste. Fais-en ton assistant pour les documents pros, les rapports et l'analyse.",
-   learn:["Accéder à Claude et comprendre ses points forts","Faire analyser et résumer de longs documents","Produire des documents professionnels soignés (Artifacts)","Travailler en confiance : confidentialité et vérification"],
+   learn:["Accéder à Claude et comprendre ses points forts","Faire analyser et résumer de longs documents","Produire des documents professionnels soignés (Artifacts)","Travailler en confiance : confidentialité et vérification","Repartir avec 10 consignes + 4 modèles de documents réutilisables","Suivre un plan de 7 jours pour en faire un réflexe quotidien"],
    modules:[
      {t:'Prendre Claude en main', l:[
        ["C'est quoi Claude, et ses points forts",'8 min',
@@ -711,13 +763,63 @@ Pour progresser : garde tes meilleures consignes, travaille par conversations th
 
 À toi de jouer : choisis un document long récurrent et crée le modèle qui te fera gagner du temps à chaque fois.`,null],
      ]},
+     {t:'Ta boîte à outils (à copier-coller)', l:[
+       ["10 consignes prêtes à copier (documents et analyse)",'12 min',
+`Ta bibliothèque de départ, spécialisée documents et analyse — le terrain où Claude excelle. Copie-la dans ton téléphone, remplace les [crochets], joins ton document quand c'est indiqué.
+
+**1. Lire un rapport à ta place** : joins le document + « Résume ce rapport en une page : contexte, points clés, chiffres importants, conclusion. Puis liste ce qui reste flou ou manquant. »
+
+**2. Décisions et actions** : joins le compte rendu + « Extrais les décisions prises et les actions à faire, sous forme de tableau : action, responsable, échéance. »
+
+**3. Lire un contrat** : joins le contrat + « Que dit ce document sur [les délais de paiement / la résiliation / les pénalités] ? Cite le passage exact à chaque fois. »
+
+**4. Synthèse pour la direction** : joins le document + « Prépare une synthèse en 5 lignes pour un directeur pressé : la situation, le chiffre clé, la recommandation. »
+
+**5. Comparer des offres** : joins les documents + « Compare ces offres dans un tableau : prix, délais, garanties, risques. Termine par une recommandation argumentée en 3 lignes. »
+
+**6. Note interne soignée** : « Rédige une note interne d'une demi-page pour annoncer [le sujet] : contexte, ce qui change, calendrier, qui contacter. Ton clair et rassurant. »
+
+**7. Procédure réutilisable** : « Crée une procédure étape par étape pour [la tâche], compréhensible par un nouveau collègue : prérequis, étapes numérotées, erreurs fréquentes à éviter. »
+
+**8. Réponse à une plainte** : « Voici la plainte reçue : [colle le message]. Rédige une réponse qui reconnaît le problème, garde un ton respectueux, et propose [la solution], sans promettre l'impossible. »
+
+**9. Préparer une réunion** : joins le dossier + « Prépare-moi pour cette réunion : les 3 points essentiels du dossier, les questions qu'on risque de me poser (avec des éléments de réponse), et les 2 questions que je devrais poser. »
+
+**10. Améliorer un long texte** : joins ton texte + « Relis ce document : signale les incohérences, propose un meilleur titre, et améliore l'introduction et la conclusion sans changer le fond. »
+
+À toi de jouer : copie ces 10 consignes maintenant, et utilise la n°1 ou la n°2 sur un vrai document aujourd'hui.`,null],
+       ["4 modèles à générer une fois, réutiliser pour toujours",'10 min',
+`La force des Artifacts : tu fais créer un modèle une fois, tu le gardes, tu le réutilises chaque semaine. Voici les 4 modèles qui servent dans presque tous les métiers — demande-les à Claude tels quels.
+
+**Modèle de compte rendu** : « Crée un modèle de compte rendu de réunion réutilisable : en-tête (date, participants, objet), points discutés, décisions, tableau des actions (qui / quoi / quand), points reportés. Format sobre et professionnel. »
+
+**Modèle de note interne** : « Crée un modèle de note interne : objet, contexte en 2 lignes, corps structuré, prochaines étapes, contact. Avec des instructions entre crochets pour me guider à chaque section. »
+
+**Checklist qualité avant envoi** : « Crée une checklist de relecture avant d'envoyer un document important : orthographe, chiffres vérifiés, destinataires, pièces jointes, ton, mentions confidentielles. Format à cocher. »
+
+**Tableau de bord hebdo** : « Crée un modèle de point hebdomadaire : ce qui a avancé, ce qui bloque, priorités de la semaine suivante, indicateurs clés. Une page maximum. »
+
+Garde ces modèles dans un dossier (ou un Projet Claude si tu as la version payante). Chaque fois que tu en utilises un, tu pars d'une structure prête au lieu d'une page blanche : 20 minutes gagnées à chaque document.
+
+À toi de jouer : fais générer le modèle qui te servira le plus, adapte-le à ton équipe, et range-le dans ton dossier « Modèles ».`,null],
+       ["Ton plan d'action : 7 jours pour en faire un réflexe",'10 min',
+`Une semaine pour installer l'habitude — objectif : plus jamais lire 30 pages sans aide, plus jamais partir d'une page blanche.
+
+**Jour 1** : joins un vrai document long (rapport, contrat) et utilise les consignes 1 et 3. Note le temps gagné. **Jour 2** : fais extraire décisions et actions d'un compte rendu (consigne 2), envoie le résultat à ton équipe. **Jour 3** : génère ton premier modèle réutilisable (leçon précédente). **Jour 4** : traite un message délicat (consigne 8) ou une synthèse direction (consigne 4). **Jour 5** : prépare une vraie réunion avec la consigne 9 — tu verras la différence en séance. **Jours 6-7** : bilan — mets à jour ton fichier de consignes, garde tes gagnantes, génère un deuxième modèle.
+
+**Règle d'or à retenir** : tout document que tu fournis à Claude rend sa réponse plus fiable. Joins toujours ta matière (document, notes, exemple) plutôt que de le laisser deviner — et vérifie les chiffres cités dans la source avant de t'en servir.
+
+**Ensuite** : chaque document de plus de 5 pages qui arrive, réflexe « Claude d'abord » : résumé, points clés, risques. Tu lis ensuite en connaissance de cause, deux fois plus vite.
+
+À toi de jouer : bloque 15 minutes par jour cette semaine dans ton agenda, intitulées « Claude au travail ». Et partage ta première victoire dans la communauté — un document de 20 pages lu en 3 minutes, ça inspire.`,null],
+     ]},
    ]},
 
   /* ---------- PAYANT · IA · Copilot ---------- */
   {id:'copilot', title:'Copilot au travail : l\'IA dans Word, Excel et Outlook', cat:'IA', price:5000, g:4,
-   instr:'Aminata Koné', instrRole:'Formatrice bureautique & Microsoft 365', rating:4.7, students:33, dur:'2 h',
+   instr:'Équipe Boyia Institute', instrRole:'Formation Microsoft 365 & IA', dur:'2 h 35',
    desc:"Copilot, c'est l'IA directement dans Word, Excel, Outlook, PowerPoint et Teams. Apprends à l'utiliser là où tu travailles déjà, pour aller beaucoup plus vite.",
-   learn:["Comprendre où se trouve Copilot dans Microsoft 365","Rédiger dans Word et reprendre le contrôle d'Outlook","Analyser des données et créer des tableaux dans Excel","Résumer une réunion Teams, monter une présentation PowerPoint"],
+   learn:["Comprendre où se trouve Copilot dans Microsoft 365","Rédiger dans Word et reprendre le contrôle d'Outlook","Analyser des données et créer des tableaux dans Excel","Résumer une réunion Teams, monter une présentation PowerPoint","Repartir avec des consignes prêtes à copier, appli par appli","Installer une routine quotidienne qui libère une heure par jour"],
    modules:[
      {t:'Prendre Copilot en main', l:[
        ["C'est quoi Copilot, et sa particularité",'8 min',
@@ -825,11 +927,51 @@ Objectif de la semaine : gagner 30 minutes par jour sur tes e-mails grâce au r�
 
 À toi de jouer : choisis un outil et une tâche quotidienne, et utilise Copilot dessus tous les jours cette semaine.`,null],
      ]},
+     {t:'Ta boîte à outils (à copier-coller)', l:[
+       ["Les consignes qui marchent, application par application",'12 min',
+`Ta bibliothèque de départ, organisée par application. Copie-la dans ton téléphone, remplace les [crochets], et utilise chaque consigne directement dans l'application concernée.
+
+**Outlook — résumer** : « Résume cette conversation : qu'est-ce qui a été décidé, et qu'attend-on de moi ? » **Outlook — répondre** : « Rédige une réponse qui [accepte / refuse / propose une autre date], ton courtois, 5 lignes maximum. »
+
+**Word — premier jet** : « Rédige un premier jet de [note de service / procédure / lettre] sur [sujet], pour [public], une demi-page, ton clair. » **Word — améliorer** : sélectionne un passage + « Reformule en plus court et plus simple, sans changer le sens. » **Word — résumer** : « Résume ce document en 5 points pour quelqu'un qui ne l'a pas lu. »
+
+**Excel — comprendre** : « Quelles sont les 3 tendances principales de ce tableau ? » **Excel — calculer** : « Ajoute une colonne qui calcule [la marge / l'écart / le total] et explique la formule utilisée. » **Excel — synthétiser** : « Crée un tableau récapitulatif par [mois / région / produit] avec un graphique adapté. »
+
+**PowerPoint — créer** : « Crée une présentation de [8] diapositives à partir de [ce document Word / ce sujet], style sobre, un message clé par diapositive. »
+
+**Teams — rattraper** : « Résume cette réunion : décisions, actions et responsables, points en suspens. » (Fonctionne même si tu es arrivé en retard.)
+
+À toi de jouer : copie ces consignes maintenant, et utilise aujourd'hui celle de l'application que tu ouvres le plus.`,null],
+       ["Ta routine quotidienne : matin, midi, fin de journée",'10 min',
+`Le vrai gain avec Copilot ne vient pas d'un exploit ponctuel, mais d'une routine simple répétée chaque jour. En voici une qui a fait ses preuves — adapte-la à ton poste.
+
+**Le matin (10 min)** : ouvre Outlook, demande le résumé des longs fils arrivés depuis hier ; fais rédiger les 2-3 réponses simples ; relis, ajuste, envoie. Ta boîte est sous contrôle avant même ton premier café fini.
+
+**Après chaque réunion Teams (3 min)** : demande le résumé avec décisions et actions ; colle-le dans un e-mail « suivi de réunion » à l'équipe. C'est toi qui envoies le compte rendu en premier — effet professionnel garanti.
+
+**Avant un document (5 min)** : au lieu de partir de zéro dans Word, demande le premier jet avec sujet, public et longueur. Ton travail devient : améliorer, pas créer.
+
+**Le vendredi (10 min)** : dans Excel, demande les tendances de tes chiffres de la semaine ; note les 3 points pour ton point hebdo.
+
+Cette routine prend 25 minutes par jour et en libère facilement une heure. La condition : la faire tous les jours pendant une semaine, jusqu'à ce qu'elle devienne automatique.
+
+À toi de jouer : choisis les 2 moments de la routine les plus utiles pour TON poste et mets un rappel dans ton téléphone pour demain matin.`,null],
+       ["Ton plan d'action : 7 jours pour en faire un réflexe",'10 min',
+`Une semaine pour installer Copilot dans ton quotidien, application par application.
+
+**Jour 1** : Outlook uniquement — résume 3 fils, fais rédiger 2 réponses. Note le temps gagné. **Jour 2** : ajoute Word — un premier jet réel (note, courrier, procédure). **Jour 3** : Teams — résume ta réunion du jour (ou un enregistrement récent) et envoie le suivi. **Jour 4** : Excel — tendances et récapitulatif sur un vrai tableau. Vérifie un chiffre à la main pour prendre le réflexe. **Jour 5** : PowerPoint — génère une trame de présentation à partir d'un document existant. **Jours 6-7** : bilan — quelles applications t'ont fait gagner le plus ? Installe la routine quotidienne (leçon précédente) sur ces 2-3 moments-là.
+
+**Si tu n'as pas encore la licence** : utilise cette semaine pour la demander. Montre à ton responsable la liste de ce que tu comptes automatiser (résumés Outlook, comptes rendus Teams, premiers jets Word) — c'est un argument concret, chiffrable en heures gagnées.
+
+**Ensuite** : garde le réflexe « Copilot d'abord » sur chaque tâche répétitive dans Office, et continue d'enrichir ta liste de consignes gagnantes.
+
+À toi de jouer : planifie les 5 premiers jours dans ton agenda dès maintenant, et viens raconter ton jour 1 dans la communauté (Victoires).`,null],
+     ]},
    ]},
 
   /* ---------- GRATUIT · Anglais ---------- */
   {id:'en', title:'Anglais : bien démarrer (les vraies bases)', cat:'Anglais', price:0, g:2,
-   instr:'Kofi Mensah', instrRole:"Professeur d'anglais, Accra", rating:4.6, students:98, dur:'~1 h 15',
+   instr:'Équipe Boyia Institute', instrRole:"Cours d'anglais — les vraies bases", dur:'~1 h 15',
    desc:"Les bases pour comprendre et te faire comprendre : te présenter, les mots essentiels, les phrases de tous les jours. Avec une grande leçon vidéo et des fiches simples.",
    learn:["Te présenter en anglais avec assurance","Retenir les mots les plus utiles du quotidien","Poser une question polie et comprendre la réponse","Écrire un message simple et correct"],
    modules:[
@@ -919,48 +1061,16 @@ if(/^https?:$/.test(location.protocol)){
   }).catch(()=>{});
 }
 
+/* Publications officielles de l'équipe — seul contenu pré-rempli de la communauté.
+   Tout le reste vient des vrais apprenants. */
 const H = 3600e3, D = 24*H;
 const SEED_POSTS = [
-  {id:'p1', by:'Équipe Boyia Institute', role:'Équipe', cat:'Annonces', at: 2*H,
-   text:"Bienvenue à Boyia Institute ! 🎉 Ici on apprend l'IA et l'anglais, simplement. Commence par un cours gratuit, puis présente-toi en commentaire : ton prénom, ta ville, et ce que tu veux apprendre.",
-   likes:21, comments:[
-     {by:'Aïcha Diallo', text:'Bienvenue à tous ! Je réponds à vos questions IA dans Entraide.', at:2*H-600e3},
-     {by:'Mariam Coulibaly', text:'Mariam, de Bouaké. Je commence le cours ChatGPT cette semaine !', at:H},
-   ]},
-  {id:'p2', by:'Ibrahim Sow', role:'Apprenant', cat:'Victoires', at: 6*H,
-   text:"Grâce au module « E-mails » du cours ChatGPT, j'ai répondu à 12 e-mails en 30 minutes ce matin au bureau. Mon chef m'a demandé comment je faisais 😄 Merci Aïcha !",
-   likes:34, comments:[
-     {by:'Aïcha Diallo', text:'Bravo Ibrahim ! Prochaine étape : les comptes rendus de réunion.', at:5*H},
-     {by:'Awa Kouassi', text:'Félicitations 👏 je commence ce module ce soir.', at:4*H},
-   ]},
-  {id:'p3', by:'Mariam Coulibaly', role:'Apprenante', cat:'Entraide', at: 10*H,
-   text:"Question : au travail on a Word et Outlook, mais je ne vois pas le bouton Copilot. C'est normal ? Comment savoir si mon entreprise a la licence ?",
-   likes:9, comments:[
-     {by:'Aminata Koné', text:'Très bonne question ! C\'est la leçon 2 du cours Copilot : la licence est activée par ton employeur. Demande au service informatique.', at:9*H},
-     {by:'Mariam Coulibaly', text:'Merci, je leur demande demain 🙏', at:8*H},
-   ]},
-  {id:'p4', by:'Awa Kouassi', role:'Apprenante', cat:'Général', at: D,
-   text:"Astuce : je bloque 15 minutes chaque matin pour une leçon + mon « My English time ». En 2 semaines, j'ai fini le cours gratuit d'IA et je sais me présenter en anglais. La régularité > la motivation.",
-   likes:27, comments:[
-     {by:'Kofi Mensah', text:'Exactement la bonne méthode. Petit pas chaque jour ! Keep going 💪', at:20*H},
-   ]},
-  {id:'p5', by:'Kofi Mensah', role:'Formateur', cat:'Entraide', at: 2*D,
-   text:"Défi de la semaine (anglais) : présente-toi en 2 phrases en anglais, en commentaire. Je corrige tout le monde avec bienveillance 💪",
-   likes:18, comments:[
-     {by:'Ibrahim Sow', text:'Hello, my name is Ibrahim. I sell shoes in Dakar.', at:1.5*D},
-     {by:'Kofi Mensah', text:'Perfect Ibrahim ! Tu peux ajouter : « Nice to meet you! »', at:1.4*D},
-   ]},
-  {id:'p6', by:'Yao Kouadio', role:'Formateur', cat:'Général', at: 3*D,
-   text:"Rappel du cours Claude : ne collez jamais de données confidentielles de votre entreprise dans une IA. Anonymisez d'abord (Client A, montant X), réintégrez les vraies valeurs après. Réflexe pro. 🔒",
-   likes:31, comments:[]},
-  {id:'p7', by:'Aminata Koné', role:'Formatrice', cat:'Annonces', at: 4*D,
-   text:"Rappel sécurité : personne — ni formateur, ni support — ne vous demandera jamais votre code secret mobile money. Si quelqu'un le fait, c'est une arnaque : signalez-le.",
-   likes:39, comments:[]},
-];
-
-const LEADERS = [
-  {name:'Ibrahim Sow', pts:340},{name:'Awa Kouassi', pts:285},{name:'Mariam Coulibaly', pts:210},
-  {name:'Sekou Camara', pts:180},{name:'Fatim Ouattara', pts:145},
+  {id:'off1', by:'Équipe Boyia Institute', role:'Équipe', cat:'Annonces', at: H,
+   text:"Bienvenue à Boyia Institute ! 🎉 Ici on apprend l'IA et l'anglais, simplement. Commence par un cours gratuit, puis présente-toi en commentaire : ton prénom, ta ville, et ce que tu veux apprendre. On lit tout et on répond dans Entraide.",
+   likes:0, comments:[]},
+  {id:'off2', by:'Équipe Boyia Institute', role:'Équipe', cat:'Annonces', at: 2*H,
+   text:"Rappel sécurité 🔒 : personne — ni l'équipe, ni le support — ne vous demandera jamais votre code secret mobile money. Le paiement se fait uniquement dans votre application Wave. Si quelqu'un vous demande un code, c'est une arnaque : signalez-la.",
+   likes:0, comments:[]},
 ];
 
 const PREFIXES = [
@@ -993,7 +1103,14 @@ try{
   const raw = localStorage.getItem(KEY);
   if(raw){ S = Object.assign(baseState(), JSON.parse(raw)); }
 }catch(e){}
-if(!S.posts){ S.posts = SEED_POSTS.map(p=>({...p, at: Date.now()-p.at, comments:p.comments.map(c=>({...c, at: Date.now()-c.at}))})); }
+function materializeSeeds(){ return SEED_POSTS.map(p=>({...p, at: Date.now()-p.at, comments:p.comments.map(c=>({...c, at: Date.now()-c.at}))})); }
+if(!S.posts){ S.posts = materializeSeeds(); }
+else if(S.posts.some(p=>/^p\d+$/.test(String(p.id)))){
+  /* Migration « passage au réel » : on retire les publications de démonstration
+     déjà enregistrées sur l'appareil, on garde celles écrites par l'utilisateur. */
+  S.posts = materializeSeeds().concat(S.posts.filter(p=>String(p.id).startsWith('u')));
+  save();
+}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 function applyTheme(){ if(S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme; }
 applyTheme();
@@ -1102,8 +1219,8 @@ function courseCard(c){
       <div class="ctitle">${esc(c.title)}</div>
       <div class="cmeta">
         <span>${esc(c.instr)}</span>
-        <span class="star">${I.star}${c.rating}</span>
-        <span class="num">${c.students.toLocaleString('fr-FR')} inscrits</span>
+        <span class="num">${c.dur}</span>
+        <span class="num">${lessonCount(c)} leçons</span>
       </div>
       ${enr?`<div class="pbar"><i style="width:${courseProgress(c)}%"></i></div><span class="muted" style="font-size:12px">Inscrit · ${courseProgress(c)} % terminé</span>`:''}
     </div>
@@ -1174,10 +1291,10 @@ function screenCourse(){
       <div><b style="font-size:14.5px">${esc(c.instr)}</b><div class="muted" style="font-size:12.5px">${esc(c.instrRole)}</div></div>
     </div>
     <div class="statrow">
-      <div class="stat"><b>${c.rating} ★</b><span>note</span></div>
-      <div class="stat"><b class="num">${c.students.toLocaleString('fr-FR')}</b><span>inscrits</span></div>
       <div class="stat"><b>${c.dur}</b><span>de contenu</span></div>
+      <div class="stat"><b class="num">${c.modules.length}</b><span>modules</span></div>
       <div class="stat"><b class="num">${lessonCount(c)}</b><span>leçons</span></div>
+      <div class="stat"><b class="num">${lessonCount(c)}</b><span>exercices</span></div>
     </div>
     <p class="muted" style="padding:6px 18px;font-size:14.8px">${esc(c.desc)}</p>
     <div class="sect">Ce que tu vas apprendre</div>
@@ -1324,7 +1441,7 @@ function screenFeed(){
     <header class="apphead">
       <div style="flex:1"><div class="brand" style="font-size:22px">Communauté</div>
       <div class="tagline" style="padding:0">Entraide, victoires et défis de la semaine</div></div>
-      <button class="iconbtn" onclick="App.goLeader()" aria-label="Classement" title="Classement">${I.award}</button>
+      <button class="iconbtn" onclick="App.goLeader()" aria-label="Mes points" title="Mes points">${I.award}</button>
     </header>
     <button class="card compose" onclick="App.compose()">
       <span class="avatar">${me}</span>
@@ -1361,22 +1478,23 @@ function screenPost(){
 }
 
 function screenLeader(){
-  const rows = LEADERS.slice();
-  if(S.user){ rows.push({name:S.user.prenom+' '+S.user.nom+' (toi)', pts:S.points, me:true}); }
-  rows.sort((a,b)=>b.pts-a.pts);
+  /* Les points sont pour l'instant comptés sur cet appareil ; le classement
+     général entre apprenants arrivera avec les comptes en ligne. */
   return `<div class="screen">
     <div class="subhead">
       <button class="iconbtn" onclick="App.tab('commu')" aria-label="Retour">${I.back}</button>
-      <h1>Classement de la semaine</h1>
+      <h1>Mes points</h1>
     </div>
     <p class="muted px" style="font-size:13.5px;padding-top:2px">Gagne des points en terminant des leçons (+10), en publiant (+5) et en commentant (+2).</p>
-    <div class="card leader">
-      ${rows.map((r,i)=>`<div class="leadrow" ${r.me?'style="background:var(--primary-soft);border-radius:12px"':''}>
-        <span class="rank ${i<3?'top':''}">${i+1}</span>
-        <span class="avatar" style="width:34px;height:34px;font-size:12.5px">${initials(r.name)}</span>
-        <b>${esc(r.name)}</b><span class="pts num">${r.pts} pts</span>
-      </div>`).join('')}
+    ${S.user?`<div class="card leader">
+      <div class="leadrow" style="background:var(--primary-soft);border-radius:12px">
+        <span class="rank top">★</span>
+        <span class="avatar" style="width:34px;height:34px;font-size:12.5px">${initials(S.user.prenom+' '+S.user.nom)}</span>
+        <b>${esc(S.user.prenom)} ${esc(S.user.nom)}</b><span class="pts num">${S.points} pts</span>
+      </div>
     </div>
+    <p class="muted px" style="font-size:13px;margin-top:10px">Le classement entre tous les apprenants arrive bientôt — continue d'accumuler des points dès maintenant.</p>`
+    :`<div class="empty">${I.award}<b>Pas encore de points</b><span>Crée ton compte et termine ta première leçon pour marquer tes premiers points.</span></div>`}
   </div>`;
 }
 
@@ -1429,12 +1547,12 @@ function screenProfile(){
     <div class="sect">Application</div>
     <div class="card" style="margin:0 14px">
       <button class="prow" onclick="App.toggleTheme()">${I.moon}<span>Thème</span><span class="val">${S.theme==null?'Automatique':S.theme==='dark'?'Sombre':'Clair'}</span></button>
-      <div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>
+      ${API.mode==='live'?'':`<div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>`}
       <button class="prow" onclick="App.invite()">${I.send}<span>Inviter un ami sur WhatsApp</span></button>
       ${CONFIG.whatsappSupport?`<a class="prow" style="text-decoration:none" href="https://wa.me/${CONFIG.whatsappSupport}?text=${encodeURIComponent('Bonjour, j\'utilise Boyia Institute et je voudrais…')}" target="_blank" rel="noopener">${I.msg}<span>Aide &amp; donner mon avis</span></a>`:''}
-      <button class="prow danger" onclick="App.reset()">${I.trash}<span>Réinitialiser la démo</span></button>
+      <button class="prow danger" onclick="App.reset()">${I.trash}<span>Effacer mes données sur cet appareil</span></button>
     </div>
-    <p class="demonote" style="margin:18px 0 26px">Boyia Institute — démo fonctionnelle. En production, les paiements passent par Wave (Côte d'Ivoire).</p>
+    <p class="demonote" style="margin:18px 0 26px">Boyia Institute — paiements sécurisés via Wave (Côte d'Ivoire).</p>
   </div>`;
 }
 
@@ -1822,6 +1940,8 @@ const App = {
       // Confirmation du récapitulatif → création du compte
       S.user = {prenom:flow.data.prenom, nom:flow.data.nom, whatsapp:flow.data.whatsapp, email:flow.data.email, prefix:flow.data.prefix||'+225'};
       S.points += 20; save();
+      /* Email de bienvenue (si le serveur a un SMTP configuré) — jamais bloquant. */
+      if(API.mode==='live'){ try{ fetch('/api/welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prenom:S.user.prenom,email:S.user.email})}).catch(()=>{}); }catch(e){} }
       const cid = flow.courseId;
       if(cid && courseById(cid).price>0){
         flow = {type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix, phone:S.user.whatsapp}};
@@ -1997,7 +2117,7 @@ const App = {
     save(); applyTheme(); render();
   },
   reset(){
-    if(!confirm('Réinitialiser la démo ? Ton compte, tes cours et tes publications locales seront effacés.')) return;
+    if(!confirm('Effacer tes données sur cet appareil ? Ton compte, ta progression et tes publications locales seront supprimés.')) return;
     localStorage.removeItem(KEY);
     location.reload();
   },
@@ -2006,7 +2126,7 @@ const App = {
   openAdmin(){ ADMIN.err=''; if(flow){ flow=null; renderFlow(); } go('profil','admin'); this.adminLoad(); },
   adminTab(t){ ADMIN.tab=t; render(); },
   async adminLoad(){
-    if(API.mode!=='live'){ ADMIN.list=demoCoupons(); ADMIN.stats=null; ADMIN.recent=null; ADMIN.err=''; render(); return; }
+    if(API.mode!=='live'){ ADMIN.list=demoCoupons(); ADMIN.stats=null; ADMIN.recent=null; ADMIN.err=''; ADMIN.tab='coupons'; render(); return; }
     if(!ADMIN.key){ render(); return; }
     try{
       const {status,json}=await adminApi('GET');
