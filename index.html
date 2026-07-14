@@ -1432,7 +1432,6 @@ function screenProfile(){
       <div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>
       <button class="prow" onclick="App.invite()">${I.send}<span>Inviter un ami sur WhatsApp</span></button>
       ${CONFIG.whatsappSupport?`<a class="prow" style="text-decoration:none" href="https://wa.me/${CONFIG.whatsappSupport}?text=${encodeURIComponent('Bonjour, j\'utilise Boyia Institute et je voudrais…')}" target="_blank" rel="noopener">${I.msg}<span>Aide &amp; donner mon avis</span></a>`:''}
-      <button class="prow" onclick="App.openAdmin()">${I.shield}<span>Espace admin</span><span class="val">coupons</span></button>
       <button class="prow danger" onclick="App.reset()">${I.trash}<span>Réinitialiser la démo</span></button>
     </div>
     <p class="demonote" style="margin:18px 0 26px">Boyia Institute — démo fonctionnelle. En production, les paiements passent par Wave (Côte d'Ivoire).</p>
