@@ -81,8 +81,12 @@ const waveStub = http.createServer((req, res) => {
   try {
     const body = JSON.stringify({ type: 'checkout.session.completed', data: { client_reference: ref } });
     const r = await fetch(`${APP_URL}/api/wave/webhook`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Wave-Signature': 't=1,v1=mauvaise' }, body });
-    if (r.status === 400) ok('webhook : signature invalide rejetée'); else throw new Error('status=' + r.status);
-  } catch (e) { fail('webhook rejet', e.message); }
+    const j = await r.json();
+    const o = await (await fetch(`${APP_URL}/api/order?ref=${ref}`)).json();
+    // 200 accepté, mais NON confirmé (verified:false) et commande NON payée (le paiement n'a pas eu lieu)
+    if (r.status === 200 && j.verified === false && o.status !== 'paid') ok('webhook non signé : accepté mais non confirmé (pas de faux paiement)');
+    else throw new Error('status=' + r.status + ' verified=' + j.verified + ' order=' + o.status);
+  } catch (e) { fail('webhook non signé', e.message); }
 
   try {
     const body = JSON.stringify({ type: 'checkout.session.completed', data: { id: 'cos-x', client_reference: ref, transaction_id: 'TX-999' } });

@@ -106,8 +106,9 @@ input,select,textarea{font:inherit;color:inherit}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn{color:#0E1512} }
 .btn:active{transform:scale(.98)}
 .btn svg{width:19px;height:19px;flex:none}
-.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
-.btn.soft{background:var(--primary-soft);color:var(--primary)}
+.btn.ghost{background:var(--surface);color:var(--primary-deep);border:1.5px solid color-mix(in srgb,var(--primary) 45%,var(--line))}
+.btn.soft{background:color-mix(in srgb,var(--primary) 14%,var(--surface));color:var(--primary-deep);border:1.5px solid color-mix(in srgb,var(--primary) 34%,transparent);font-weight:700}
+.btn.soft[disabled]{opacity:.6}
 .btn[disabled]{opacity:.45;pointer-events:none}
 .chiprow{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none}
 .chiprow::-webkit-scrollbar{display:none}
@@ -1635,10 +1636,13 @@ function renderFlow(){
         <div class="bigcheck" style="background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--danger)">${I.x}</div>
         <h2 class="qlabel" style="text-align:center;margin-top:16px">Paiement non confirmé</h2>
         <p class="qhelp" style="text-align:center">${flow.data.timeout
-          ? "On n'a pas encore reçu la confirmation de Wave. Si tu as bien payé, réouvre l'app dans une minute : ton accès sera activé automatiquement."
+          ? "On n'a pas encore reçu la confirmation de Wave. Si tu as bien payé, attends quelques instants puis clique « Vérifier à nouveau » — ton accès s'activera sans repayer."
           : "Le paiement a été annulé ou n'a pas abouti. Aucun montant n'a été débité. Tu peux réessayer quand tu veux."}</p>`;
-      foot = `<button class="btn" onclick="App.payWaveStart()">Réessayer le paiement</button>
-        <button class="btn ghost" style="margin-top:9px" onclick="App.flowClose(true)">Plus tard</button>`;
+      foot = flow.data.timeout
+        ? `<button class="btn" onclick="App.payRecheck()">Vérifier à nouveau</button>
+           <button class="btn ghost" style="margin-top:9px" onclick="App.flowClose(true)">Fermer</button>`
+        : `<button class="btn" onclick="App.payWaveStart()">Réessayer le paiement</button>
+           <button class="btn ghost" style="margin-top:9px" onclick="App.flowClose(true)">Plus tard</button>`;
     }
     if(flow.step==='confirm'){
       const o = OPERATORS.find(x=>x.id===flow.data.op);
@@ -1846,9 +1850,10 @@ const App = {
     }
   },
   /* Au retour de Wave : on interroge le serveur jusqu'à confirmation (webhook ou réconciliation) */
+  payRecheck(){ if(!flow||flow.type!=='pay') return; flow.data.timeout=false; flow.step='poll'; renderFlow(); this.pollOrder(); },
   async pollOrder(){
     const ref = flow && flow.data && flow.data.ref; if(!ref) return;
-    for(let i=0;i<45;i++){
+    for(let i=0;i<60;i++){
       if(!flow || flow.type!=='pay' || flow.data.ref!==ref) return;
       try{
         const r = await fetch('/api/order?ref='+encodeURIComponent(ref), {cache:'no-store'});
@@ -2032,8 +2037,11 @@ render();
 (function resumeWavePayment(){
   const qs = new URLSearchParams(location.search);
   const ret = qs.get('wave');
+  const refUrl = qs.get('ref');
   if(ret) history.replaceState(null, '', location.pathname);
-  if(!S.pendingOrder || !S.user) return;
+  const ref = (S.pendingOrder && S.pendingOrder.ref) || refUrl;
+  if(!ref) return;                       // rien à reprendre
+  if(!S.pendingOrder) S.pendingOrder = {ref, courseId:null, at:Date.now()};
   flow = {type:'pay', courseId:S.pendingOrder.courseId,
           step: ret==='error' ? 'failed' : 'poll',
           data:{op:'wave', ref:S.pendingOrder.ref}};
