@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kalan — Cours en ligne &amp; communauté</title>
+<title>Boyia Institute — Cours en ligne &amp; communauté</title>
 <meta name="description" content="Apprends des compétences pratiques, paie par mobile money, échange avec la communauté.">
 <style>
 :root{
@@ -378,7 +378,7 @@ const COURSES = [
 
   /* ---------- GRATUIT · IA ---------- */
   {id:'ia', title:"Comprendre l'IA en 30 minutes", cat:'IA', price:0, g:0,
-   instr:'Équipe Kalan', instrRole:'Sélection des meilleures vidéos francophones', rating:4.8, students:126, dur:'~35 min',
+   instr:'Équipe Boyia Institute', instrRole:'Sélection des meilleures vidéos francophones', rating:4.8, students:126, dur:'~35 min',
    desc:"Une sélection de vraies vidéos, bien ordonnées, pour comprendre ce qu'est l'IA, ce qu'elle sait faire et comment elle va t'aider au travail. Zéro jargon.",
    learn:["Expliquer l'IA avec des mots simples","Savoir ce que l'IA sait faire (et pas faire)","Découvrir ChatGPT en pratique","Choisir ta prochaine étape (ChatGPT, Claude ou Copilot)"],
    modules:[
@@ -890,8 +890,8 @@ if(/^https?:$/.test(location.protocol)){
 
 const H = 3600e3, D = 24*H;
 const SEED_POSTS = [
-  {id:'p1', by:'Équipe Kalan', role:'Équipe', cat:'Annonces', at: 2*H,
-   text:"Bienvenue sur Kalan ! 🎉 Ici on apprend l'IA et l'anglais, simplement. Commence par un cours gratuit, puis présente-toi en commentaire : ton prénom, ta ville, et ce que tu veux apprendre.",
+  {id:'p1', by:'Équipe Boyia Institute', role:'Équipe', cat:'Annonces', at: 2*H,
+   text:"Bienvenue à Boyia Institute ! 🎉 Ici on apprend l'IA et l'anglais, simplement. Commence par un cours gratuit, puis présente-toi en commentaire : ton prénom, ta ville, et ce que tu veux apprendre.",
    likes:21, comments:[
      {by:'Aïcha Diallo', text:'Bienvenue à tous ! Je réponds à vos questions IA dans Entraide.', at:2*H-600e3},
      {by:'Mariam Coulibaly', text:'Mariam, de Bouaké. Je commence le cours ChatGPT cette semaine !', at:H},
@@ -1045,7 +1045,7 @@ function screenCatalog(){
   return `<div class="screen">
     <header class="apphead">
       <div style="flex:1">
-        <div class="brand">Ka<em>lan</em></div>
+        <div class="brand">Boyia<em> Institute</em></div>
         <div class="tagline">L'IA et l'anglais, simplement. À ton rythme.</div>
       </div>
       ${S.user?`<button class="avatar" style="width:42px;height:42px" onclick="App.tab('profil')" aria-label="Profil">${initials(S.user.prenom+' '+S.user.nom)}</button>`:''}
@@ -1316,7 +1316,7 @@ function screenProfile(){
     <div class="card pcard">
       <span class="avatar">${initials(u.prenom+' '+u.nom)}</span>
       <h2>${esc(u.prenom)} ${esc(u.nom)}</h2>
-      <span class="muted" style="font-size:13.5px">Membre de la communauté Kalan</span>
+      <span class="muted" style="font-size:13.5px">Membre de la communauté Boyia Institute</span>
     </div>
     <div class="pstats">
       <div class="stat"><b class="num" style="color:var(--accent)">${S.points}</b><span>points</span></div>
@@ -1340,10 +1340,10 @@ function screenProfile(){
       <button class="prow" onclick="App.toggleTheme()">${I.moon}<span>Thème</span><span class="val">${S.theme==null?'Automatique':S.theme==='dark'?'Sombre':'Clair'}</span></button>
       <div class="prow">${I.shield}<span>Mode démo</span><span class="val">aucune donnée envoyée</span></div>
       <button class="prow" onclick="App.invite()">${I.send}<span>Inviter un ami sur WhatsApp</span></button>
-      ${CONFIG.whatsappSupport?`<a class="prow" style="text-decoration:none" href="https://wa.me/${CONFIG.whatsappSupport}?text=${encodeURIComponent('Bonjour, j\'utilise Kalan et je voudrais…')}" target="_blank" rel="noopener">${I.msg}<span>Aide &amp; donner mon avis</span></a>`:''}
+      ${CONFIG.whatsappSupport?`<a class="prow" style="text-decoration:none" href="https://wa.me/${CONFIG.whatsappSupport}?text=${encodeURIComponent('Bonjour, j\'utilise Boyia Institute et je voudrais…')}" target="_blank" rel="noopener">${I.msg}<span>Aide &amp; donner mon avis</span></a>`:''}
       <button class="prow danger" onclick="App.reset()">${I.trash}<span>Réinitialiser la démo</span></button>
     </div>
-    <p class="demonote" style="margin:18px 0 26px">Kalan — démo fonctionnelle. Les paiements sont simulés ; en production ils passeraient par un agrégateur mobile money (CinetPay, PayDunya, FedaPay…).</p>
+    <p class="demonote" style="margin:18px 0 26px">Boyia Institute — démo fonctionnelle. En production, les paiements passent par Wave (Côte d'Ivoire).</p>
   </div>`;
 }
 
@@ -1518,7 +1518,7 @@ function renderFlow(){
           ${flow.data.txn?`<div class="row"><span>Transaction Wave</span><b class="num">${esc(flow.data.txn)}</b></div>`:''}
           <div class="row"><span>Date</span><b>${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</b></div>
         </div>
-        <p class="demonote">${API.mode==='live'?'Reçu Kalan — paiement Wave confirmé. Garde cette référence.':'Reçu de démonstration — aucun argent réel n\'a été débité.'}</p>`;
+        <p class="demonote">${API.mode==='live'?'Reçu Boyia Institute — paiement Wave confirmé. Garde cette référence.':'Reçu de démonstration — aucun argent réel n\'a été débité.'}</p>`;
       foot = `<button class="btn" onclick="App.payDone()">Commencer le cours ${I.arrowr}</button>`;
     }
     ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true" aria-label="Paiement">
@@ -1751,7 +1751,7 @@ const App = {
 
   /* --- Profil --- */
   invite(){
-    const msg = "Je suis des cours d'IA et d'anglais sur Kalan 🎓 Simple et en français. Rejoins-moi ici : " + CONFIG.appUrl;
+    const msg = "Je suis des cours d'IA et d'anglais sur Boyia Institute 🎓 Simple et en français. Rejoins-moi ici : " + CONFIG.appUrl;
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
   },
   toggleTheme(){

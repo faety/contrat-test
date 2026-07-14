@@ -1,6 +1,6 @@
-# Kalan — cours en ligne & communauté (mobile first)
+# Boyia Institute — cours en ligne & communauté (mobile first)
 
-> **Kalan** signifie « apprendre » en bambara.
+> **Boyia Institute** — apprends l'IA et l'anglais, simplement.
 
 Webapp mobile first de cours en ligne, **testable immédiatement** : un seul fichier `index.html`, sans installation, sans base de données, sans compte tiers.
 
@@ -26,7 +26,7 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
   Chaque leçon écrite contient un exemple concret et un exercice « À toi de jouer ».
 - **Inscription style Tally** : une question par écran (prénom → nom → numéro WhatsApp avec indicatif pays → e-mail), barre de progression, validation champ par champ, touche Entrée pour avancer, récapitulatif avant confirmation. Le compte n'est demandé **qu'au moment de s'inscrire à un cours** (zéro friction pour explorer).
 - **Paiement Wave (Côte d'Ivoire) — réel ou simulé** : Wave est le seul opérateur actif (les autres affichent « Bientôt disponible »).
-  - **Mode réel** : servi par `server.js` avec une clé API Wave → bouton « Payer avec Wave » → redirection vers l'app Wave (`wave_launch_url`) → retour dans Kalan → confirmation (webhook signé + réconciliation) → reçu avec l'identifiant de transaction Wave.
+  - **Mode réel** : servi par `server.js` avec une clé API Wave → bouton « Payer avec Wave » → redirection vers l'app Wave (`wave_launch_url`) → retour dans Boyia Institute → confirmation (webhook signé + réconciliation) → reçu avec l'identifiant de transaction Wave.
   - **Mode démo** (fichier ouvert sans serveur, ou serveur sans clé) : simulation locale, clairement indiquée.
 - **Espace d'apprentissage** : leçons par module, « marquer comme terminée », progression par cours.
 - **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire).
