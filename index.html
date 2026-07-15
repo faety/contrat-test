@@ -1091,6 +1091,7 @@ const KEY = 'kalan-v1';
 function baseState(){
   return {
     user:null,               // {prenom, nom, whatsapp, email}
+    token:null,              // jeton de session serveur (compte)
     enrolled:{},             // courseId -> {at, paid, op, ref}
     done:{},                 // courseId -> {lessonKey:true}
     points:0,
@@ -1135,7 +1136,7 @@ const fcfa = n => n===0 ? 'Gratuit' : n.toLocaleString('fr-FR').replace(/ /g,'
 const initials = n => n.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 /* Numéro WhatsApp au format international : indicatif + numéro local (avec le 0 conservé).
    Ex. +225 + 0576020058 -> +2250576020058. */
-function waFull(u){ if(!u) return ''; const p=(u.prefix||'+225'); const n=String(u.whatsapp||'').replace(/\D/g,''); return p+n; }
+function waFull(u){ if(!u) return ''; const raw=String(u.whatsapp||'').trim(); if(raw[0]==='+') return raw.replace(/[^\d+]/g,''); const p=(u.prefix||'+225'); return p+raw.replace(/\D/g,''); }
 function ago(t){
   const s = Math.max(1,(Date.now()-t)/1000);
   if(s<60) return 'à l\'instant';
@@ -1456,7 +1457,7 @@ function screenCommuLocked(){
       <b>Rejoins la communauté</b>
       <span>L'entraide, les victoires et les défis sont réservés aux membres. Crée ton compte gratuit (ou inscris-toi à un cours) pour y accéder et poser tes questions.</span>
       <button class="btn" style="width:auto;padding:12px 22px;margin-top:8px" onclick="App.enrollGeneric()">Créer mon compte gratuit</button>
-      <button class="btn ghost" style="width:auto;padding:12px 22px;margin-top:10px" onclick="App.tab('cours')">Découvrir les cours</button>
+      <button class="btn ghost" style="width:auto;padding:12px 22px;margin-top:10px" onclick="App.login()">J'ai déjà un compte</button>
     </div>
   </div>`;
 }
@@ -1571,6 +1572,7 @@ function screenProfile(){
       <h2>Pas encore de compte</h2>
       <span class="muted" style="font-size:13.5px;max-width:260px">Inscris-toi en moins d'une minute pour rejoindre les cours et la communauté.</span>
       <button class="btn" style="margin-top:14px" onclick="App.enrollGeneric()">Créer mon compte</button>
+      <button class="btn ghost" style="margin-top:10px" onclick="App.login()">J'ai déjà un compte — me connecter</button>
     </div>`}
     <div class="sect">Application</div>
     <div class="card" style="margin:0 14px">
@@ -1781,6 +1783,47 @@ function renderFlow(){
     return;
   }
 
+  /* ---- Compte : connexion / vérification par code ---- */
+  if(flow.type==='account'){
+    let inner='', foot='';
+    if(flow.step==='wait'){
+      inner = `<div class="paywait"><div class="spinner" aria-hidden="true"></div>
+        <h2 class="qlabel" style="font-size:21px">${esc(flow.waitMsg||'Un instant…')}</h2></div>`;
+    } else if(flow.step==='email'){
+      inner = `<h2 class="qlabel">Se connecter</h2>
+        <p class="qhelp">Entre l'e-mail de ton compte. On t'envoie un code à 6 chiffres pour te reconnecter et retrouver tes cours.</p>
+        <input id="finput" class="qinput" type="email" inputmode="email" placeholder="ton@email.com" autocomplete="email" enterkeyhint="go">
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>`;
+      foot = `<button class="btn" onclick="App.acctLoginRequest()">Recevoir mon code ${I.arrowr}</button>`;
+    } else if(flow.step==='code'){
+      inner = `<h2 class="qlabel">Entre ton code</h2>
+        <p class="qhelp">${esc(flow.info||('Code envoyé à '+flow.email))}</p>
+        <input id="finput" class="qinput num" type="text" inputmode="numeric" maxlength="6" placeholder="––––––"
+          style="letter-spacing:10px;text-align:center;font-size:26px" autocomplete="one-time-code" enterkeyhint="go">
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>
+        <button class="btn soft" style="margin-top:12px;width:auto;padding:10px 16px" onclick="App.acctResend()">Renvoyer le code</button>`;
+      foot = `<button class="btn" onclick="App.acctVerify()">Valider ${I.arrowr}</button>`;
+    } else if(flow.step==='error'){
+      inner = `<div class="bigcheck" style="background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--danger)">${I.x}</div>
+        <h2 class="qlabel" style="text-align:center;margin-top:16px">Oups</h2>
+        <p class="qhelp" style="text-align:center">${esc(flow.err||'Une erreur est survenue.')}</p>`;
+      foot = `<button class="btn" onclick="App.submitAccount()">Réessayer</button>`;
+    }
+    const closable = flow.step!=='wait';
+    ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true" aria-label="Compte">
+      <div class="flowhead">
+        <button class="iconbtn" onclick="App.flowClose()" aria-label="Fermer" ${closable?'':'disabled style="opacity:.3"'}>${I.x}</button>
+        <span class="muted" style="font-size:13px">Connexion sécurisée</span>
+        <span style="width:42px"></span>
+      </div>
+      <div class="flowbody center">${inner}</div>
+      ${foot?`<div class="flowfoot">${foot}</div>`:''}
+    </div>`;
+    const inp=$('#finput');
+    if(inp){ inp.focus(); inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); flow.step==='email'?App.acctLoginRequest():App.acctVerify(); } }); }
+    return;
+  }
+
   /* ---- Paiement mobile money ---- */
   if(flow.type==='pay'){
     const STEP_POS = {op:1, confirm:2, redirect:2, wait:3, poll:3, failed:3, done:4};
@@ -1920,6 +1963,39 @@ function renderFlow(){
   }
 }
 
+/* ===== Comptes serveur : authentification par e-mail + code à 6 chiffres ===== */
+function authHeaders(){ return Object.assign({'Content-Type':'application/json'}, S.token?{'Authorization':'Bearer '+S.token}:{}); }
+async function acctFetch(path, body){
+  const r = await fetch(path, {method:'POST', headers:authHeaders(), cache:'no-store', body: body?JSON.stringify(body):undefined});
+  let json={}; try{ json=await r.json(); }catch(e){}
+  return {status:r.status, json};
+}
+/* Fusionne les données serveur (compte, inscriptions, progression, points) dans l'état local. */
+function applyAccount(j){
+  if(!j) return;
+  if(j.token) S.token=j.token;
+  if(j.user){
+    S.user = {prenom:j.user.prenom||'', nom:j.user.nom||'', whatsapp:j.user.whatsapp||'', email:j.user.email||'', prefix:j.user.prefix||'+225'};
+    if(typeof j.user.points==='number') S.points=j.user.points;
+  }
+  if(Array.isArray(j.enrollments)) for(const e of j.enrollments){
+    const cur = S.enrolled[e.courseId]||{at:e.at||Date.now()};
+    S.enrolled[e.courseId] = {at:cur.at, paid: cur.paid||!!e.paid, op: e.paid?'Wave':(cur.op||null), ref: e.orderRef||cur.ref||null};
+    if(!S.done[e.courseId]) S.done[e.courseId]={};
+  }
+  if(Array.isArray(j.progress)) for(const p of j.progress){ if(!S.done[p.courseId]) S.done[p.courseId]={}; S.done[p.courseId][p.lessonKey]=true; }
+  save();
+}
+/* Au chargement : si on a un jeton, on récupère le compte à jour (autre appareil, nouveaux cours). */
+async function hydrateAccount(){
+  if(!S.token || !/^https?:$/.test(location.protocol)) return;
+  try{
+    const r = await fetch('/api/me', {headers:authHeaders(), cache:'no-store'});
+    if(r.status===401){ S.token=null; save(); render(); return; }
+    if(r.ok){ applyAccount(await r.json()); render(); }
+  }catch(e){}
+}
+
 /* ================= Actions ================= */
 const App = {
   tab(t){ filters.q=''; go(t, {cours:'catalog',commu:'feed',mescours:'my',profil:'profil'}[t]); },
@@ -1973,26 +2049,83 @@ const App = {
       flow.err=null; flow.step++;
       renderFlow();
     } else {
-      // Confirmation du récapitulatif → création du compte
-      S.user = {prenom:flow.data.prenom, nom:flow.data.nom, whatsapp:flow.data.whatsapp, email:flow.data.email, prefix:flow.data.prefix||'+225'};
-      S.points += 20; save();
-      /* Email de bienvenue (si le serveur a un SMTP configuré) — jamais bloquant. */
-      if(API.mode==='live'){ try{ fetch('/api/welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prenom:S.user.prenom,email:S.user.email})}).catch(()=>{}); }catch(e){} }
-      const cid = flow.courseId;
-      if(cid && courseById(cid).price>0){
-        flow = {type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix, phone:S.user.whatsapp}};
-        renderFlow();
-      } else if(cid){
-        this.finishEnroll(cid,null);
-      } else {
-        flow = {type:'welcome', courseId:null}; renderFlow(); render();
-      }
+      // Confirmation du récapitulatif → création du compte (serveur en mode réel).
+      this.submitAccount();
     }
+  },
+  /* Crée le compte : e-mail nouveau → compte + session immédiats ; e-mail déjà utilisé
+     → on bascule sur la saisie du code envoyé par e-mail (anti-usurpation). */
+  async submitAccount(){
+    const d = flow.data, cid = flow.courseId;
+    if(API.mode!=='live'){
+      S.user = {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, email:d.email, prefix:d.prefix||'+225'};
+      S.points += 20; save(); this.proceedAfterSignup(cid); return;
+    }
+    flow = {type:'account', mode:'signup', step:'wait', waitMsg:'Création de ton compte…', email:d.email, data:d, courseId:cid};
+    renderFlow();
+    let res; try{ res = await acctFetch('/api/signup', {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, prefix:d.prefix||'+225', email:d.email}); }
+    catch(e){ res = {status:0, json:{}}; }
+    if(res.status===200 && res.json.token){ applyAccount(res.json); this.proceedAfterSignup(cid); return; }
+    if(res.status===200 && res.json.needsCode){
+      flow = {type:'account', mode:'signup', step:'code', email:d.email, data:d, courseId:cid, err:null,
+              info:'Cet e-mail a déjà un compte. Entre le code que nous venons de t\'envoyer pour continuer.'};
+      renderFlow(); return;
+    }
+    flow = {type:'account', mode:'signup', step:'error', email:d.email, data:d, courseId:cid,
+            err: res.status===400 ? 'E-mail invalide. Reviens en arrière pour le corriger.' : 'Création impossible. Vérifie ta connexion et réessaie.'};
+    renderFlow();
+  },
+  proceedAfterSignup(cid){
+    if(cid && courseById(cid) && courseById(cid).price>0){
+      flow = {type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix||'+225', phone:S.user.whatsapp}};
+      renderFlow();
+    } else if(cid){ this.finishEnroll(cid,null); }
+    else { flow = {type:'welcome', courseId:null}; renderFlow(); render(); }
+  },
+  /* Connexion (depuis un autre appareil) : saisie e-mail → code → session. */
+  login(){ flow = {type:'account', mode:'login', step:'email', email:'', data:{}, courseId:null, err:null}; renderFlow(); },
+  async acctLoginRequest(){
+    const inp=$('#finput'); const email=(inp?inp.value:'').trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ flow.err='Entre un e-mail valide.'; const e=$('#ferr'); if(e) e.textContent=flow.err; inp&&inp.focus(); return; }
+    flow.email=email; flow.step='wait'; flow.waitMsg='Envoi du code…'; flow.err=null; renderFlow();
+    try{ await acctFetch('/api/auth/request', {email}); }catch(e){}
+    flow.step='code'; flow.info='Nous avons envoyé un code à 6 chiffres à '+email+' (pense à vérifier tes spams).'; renderFlow();
+  },
+  async acctVerify(){
+    const inp=$('#finput'); const code=(inp?inp.value:'').replace(/\D/g,'');
+    if(code.length!==6){ flow.err='Le code fait 6 chiffres.'; const e=$('#ferr'); if(e) e.textContent=flow.err; inp&&inp.focus(); return; }
+    const d=flow.data||{}, mode=flow.mode, cid=flow.courseId;
+    flow.step='wait'; flow.waitMsg='Vérification…'; flow.err=null; renderFlow();
+    let res; try{ res = await acctFetch('/api/auth/verify', {email:flow.email, code, prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp||'', prefix:d.prefix||'+225'}); }
+    catch(e){ res={status:0, json:{}}; }
+    if(res.status===200 && res.json.token){
+      applyAccount(res.json);
+      if(mode==='login'){ const nom=S.user.prenom||''; flow=null; renderFlow(); render(); toast('Content de te revoir '+nom+' 👋'); }
+      else { this.proceedAfterSignup(cid); }
+      return;
+    }
+    const msg = {'code-incorrect':'Code incorrect. Réessaie.','code-expire':'Code expiré. Renvoie un code.',
+      'trop-d-essais':'Trop d\'essais. Renvoie un nouveau code.','code-absent':'Aucun code en attente. Renvoie un code.'}[res.json&&res.json.error]
+      || 'Vérification impossible. Réessaie.';
+    flow = {type:'account', mode, step:'code', email:flow.email, data:d, courseId:cid, err:msg};
+    renderFlow();
+  },
+  async acctResend(){
+    const email=flow.email, mode=flow.mode, d=flow.data||{}, cid=flow.courseId;
+    flow.step='wait'; flow.waitMsg='Renvoi du code…'; flow.err=null; renderFlow();
+    try{
+      if(mode==='login') await acctFetch('/api/auth/request', {email});
+      else await acctFetch('/api/signup', {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, prefix:d.prefix||'+225', email});
+    }catch(e){}
+    flow = {type:'account', mode, step:'code', email, data:d, courseId:cid, info:'Nouveau code envoyé à '+email+'.'};
+    renderFlow();
   },
   finishEnroll(cid, pay){
     S.enrolled[cid] = {at:Date.now(), paid:!!pay, op:pay?pay.op:null, ref:pay?pay.ref:null};
     if(!S.done[cid]) S.done[cid]={};
     save();
+    /* Cours gratuit : on enregistre l'inscription sur le compte serveur (retrouvable partout). */
+    if(API.mode==='live' && S.token && !pay){ acctFetch('/api/me/enroll', {courseId:cid}).then(r=>{ if(r.status===200) applyAccount(r.json); }).catch(()=>{}); }
     flow = {type:'welcome', courseId:cid}; renderFlow(); render();
   },
   welcomeGo(){
@@ -2094,7 +2227,13 @@ const App = {
     if(!S.done[cid]) S.done[cid]={};
     if(!S.done[cid][k]){
       S.done[cid][k]=true; save();
-      addPoints(10,'leçon terminée');
+      if(API.mode==='live' && S.token){
+        /* Le serveur fait foi pour les points (non falsifiables) ; on affiche le gain tout de suite. */
+        toast('+10 points — leçon terminée');
+        acctFetch('/api/me/progress', {courseId:cid, lessonKey:k}).then(r=>{ if(r.status===200){ applyAccount(r.json); render(); } }).catch(()=>{});
+      } else {
+        addPoints(10,'leçon terminée');
+      }
       const c=courseById(cid);
       if(courseProgress(c)===100) setTimeout(()=>toast('🎓 Cours terminé, félicitations !'), 1200);
     }
@@ -2143,7 +2282,9 @@ const App = {
     save(); applyTheme(); render();
   },
   logout(){
-    if(!confirm('Te déconnecter de cet appareil ? Ton compte et ta progression enregistrés ici seront effacés. Un reçu de tes cours payés reste dans ta boîte e-mail.')) return;
+    if(!confirm('Te déconnecter sur cet appareil ? Tu pourras te reconnecter avec ton e-mail et retrouver tes cours.')) return;
+    const tok=S.token;
+    if(tok){ try{ fetch('/api/logout', {method:'POST', headers:{'Authorization':'Bearer '+tok}}).catch(()=>{}); }catch(e){} }
     localStorage.removeItem(KEY);
     location.href = location.pathname;   // repart propre (sans #admin ni paramètres)
   },
@@ -2308,6 +2449,9 @@ window.addEventListener('pageshow', payResume);   // restauration depuis le cach
   if(!S.pendingOrder || S.pendingOrder.ref!==ref) S.pendingOrder = {ref, courseId:(S.pendingOrder&&S.pendingOrder.courseId)||null, at:Date.now()};
   resumePendingPayment(ret==='error');
 })();
+
+/* Compte serveur : si on a un jeton, on synchronise (profil, cours payés, progression). */
+hydrateAccount();
 
 /* Accès direct à l'espace admin : /boyiaadmin ou #admin */
 if(location.pathname.replace(/\/+$/,'')==='/boyiaadmin' || location.hash==='#admin') App.openAdmin();

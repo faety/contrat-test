@@ -67,6 +67,28 @@ Région Vercel `fra1` (Francfort, proche de Neon et de l'Afrique de l'Ouest) —
    sans `DATABASE_URL`, stockage en mémoire (non persistant — à éviter en prod) ;
    sans configuration e-mail, aucun e-mail n'est envoyé (le site fonctionne normalement).
 
+### Comptes serveur (connexion multi-appareils)
+
+De vrais comptes côté serveur (Neon) : un apprenant retrouve ses cours (gratuits et
+**payés**) et sa progression depuis n'importe quel téléphone.
+
+- **Inscription fluide** : e-mail nouveau → compte + session créés immédiatement
+  (`POST /api/signup`), aucun code à saisir.
+- **Connexion sur un autre appareil** : `POST /api/auth/request` envoie un **code à
+  6 chiffres** par e-mail (Resend), `POST /api/auth/verify` le vérifie et ouvre une session.
+- **Anti-usurpation** : s'inscrire avec un e-mail déjà utilisé exige le code (`needsCode`).
+- **Session** : jeton opaque (32 octets) envoyé au client, stocké **haché** en base
+  (`sessions`), en-tête `Authorization: Bearer …`. `GET /api/me` renvoie compte +
+  inscriptions + progression + points ; `POST /api/logout` invalide la session.
+- **Cours & progression** : `POST /api/me/enroll` (cours gratuit) et
+  `POST /api/me/progress` (leçon terminée, +10 points, non falsifiable côté serveur).
+- **Paiement lié au compte** : au passage en « payé », la commande est rattachée au
+  compte de l'acheteur par e-mail (création d'un compte minimal si besoin) → le cours
+  payé est accessible partout après connexion.
+- Tables Neon créées automatiquement : `users`, `sessions`, `login_codes`,
+  `enrollments`, `progress`. Aucune variable d'environnement supplémentaire (réutilise
+  `DATABASE_URL` et la configuration e-mail).
+
 ### E-mails transactionnels
 
 Trois e-mails automatiques (`lib/mail.js`) :

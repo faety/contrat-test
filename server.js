@@ -58,6 +58,39 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.welcome(input));
     }
 
+    /* ---- Comptes serveur ---- */
+    if (req.method === 'POST' && url.pathname === '/api/signup') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.signup(input));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/auth/request') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.authRequest(input));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/auth/verify') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.authVerify(input));
+    }
+    if (req.method === 'GET' && url.pathname === '/api/me') {
+      return send(res, await H.me(req.headers['authorization'] || ''));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/me/enroll') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.meEnroll(req.headers['authorization'] || '', input));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/me/progress') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.meProgress(req.headers['authorization'] || '', input));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/logout') {
+      return send(res, await H.logout(req.headers['authorization'] || ''));
+    }
+
     if (req.method === 'POST' && url.pathname === '/api/coupon') {
       const raw = await H.readRawBody(req);
       let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
