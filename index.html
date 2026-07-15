@@ -345,6 +345,21 @@ a.lplayer{text-decoration:none;cursor:pointer}
 .copycard .cc-btn:active{transform:scale(.96)}
 .copycard pre{white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.3px;line-height:1.5;margin:0}
 
+/* ---- Cloche & notifications ---- */
+.hdact{display:flex;align-items:center;gap:9px;flex:none}
+.iconbtn.bell{position:relative}
+.iconbtn.bell .dot{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:var(--danger);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--ground);line-height:1}
+.announce{padding:0;overflow:hidden;border-left:3px solid var(--primary)}
+.announce .ahead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 15px 0}
+.announce .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--primary)}
+.announce .badge svg{width:15px;height:15px}
+.announce .atime{font-size:12px;color:var(--muted)}
+.announce.fresh .badge::after{content:'Nouveau';background:var(--primary);color:#fff;font-size:10px;padding:2px 7px;border-radius:999px;letter-spacing:.02em}
+.announce .atitle{font-size:16px;margin:8px 15px 0;color:var(--ink)}
+.announce .abody{padding:2px 15px 14px}
+.announce .abody p{margin:8px 0;font-size:14.5px;line-height:1.6}
+.announce .abody p:first-child{margin-top:6px}
+
 /* ---- Profil ---- */
 .pcard{margin:12px 14px 0;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
 .pcard .avatar{width:66px;height:66px;font-size:24px;margin-bottom:6px}
@@ -403,7 +418,9 @@ const I = {
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
   award:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
   shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>'
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  megaphone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>'
 };
 
 /* ================= Données de démonstration ================= */
@@ -441,51 +458,129 @@ const COURSES = [
    modules:[
      {t:"C'est quoi l'IA ?", l:[
        ["L'intelligence artificielle expliquée simplement",'2 min',
-`Commence par cette vidéo très courte : elle explique l'idée de base de l'intelligence artificielle avec des mots de tous les jours.
+`🎯 Objectif : comprendre, en une image simple, ce qu'est vraiment l'intelligence artificielle — et pourquoi ça change ton quotidien.
 
-Retiens une chose : une IA ne « pense » pas comme un humain. Elle a appris à partir d'énormes quantités d'exemples, et elle s'en sert pour produire une réponse probable. C'est pour ça qu'elle est très forte pour écrire, résumer et proposer des idées — et qu'il faut vérifier quand elle donne un fait précis.
+## Regarde d'abord la vidéo (2 min)
+La vidéo ci-dessus explique l'idée de base avec des mots de tous les jours. Regarde-la, puis reviens lire ci-dessous pour bien ancrer l'essentiel.
+
+## L'idée en une phrase
+Une IA ne « pense » pas comme un humain. Elle a appris à partir d'**énormes quantités d'exemples**, et elle s'en sert pour produire la réponse la plus probable.
+
+## Ce que ça change pour toi
+- Elle est **très forte** pour écrire, résumer et proposer des idées.
+- Elle peut **se tromper** sur un fait précis : à toi de vérifier.
+- Elle **accélère** ton travail, mais c'est toi qui décides.
+
+💡 Vois l'IA comme un assistant brillant mais pressé : génial pour un premier jet, à relire avant d'envoyer.
+
+✅ À retenir : l'IA propose, tu disposes. Elle fait gagner du temps, elle ne remplace pas ton jugement.
 
 À toi de jouer : après la vidéo, explique l'IA en une phrase à un proche. Si ta phrase est claire pour lui, tu as compris l'essentiel.`,'ourd-ZeOl78'],
        ["IA, ChatGPT, IA générative : les mots à connaître",'4 min',
-`Trois mots reviennent partout, mets-les au clair une fois pour toutes.
+`🎯 Objectif : mettre au clair, une fois pour toutes, les 3 mots que tu vas croiser partout.
 
-**Intelligence artificielle (IA)** : un programme capable de réaliser des tâches qui demandaient jusqu'ici l'intelligence humaine (comprendre un texte, reconnaître une image, répondre à une question).
+Trois mots reviennent sans arrêt. Voici la différence, simplement.
 
-**IA générative** : la famille d'IA qui **crée** du contenu — du texte, des images, du son — à partir d'une demande écrite. C'est elle qui a tout changé depuis 2023.
+## Intelligence artificielle (IA)
+Un programme capable de réaliser des tâches qui demandaient jusqu'ici l'intelligence humaine : comprendre un texte, reconnaître une image, répondre à une question.
 
-**ChatGPT, Claude, Copilot, Gemini…** : ce sont des **assistants** construits sur des IA génératives. Même principe pour tous : tu écris une demande en langage normal, l'assistant répond. Si tu sais en utiliser un, tu sais utiliser les autres.
+## IA générative
+La famille d'IA qui **crée** du contenu — texte, images, son — à partir d'une simple demande écrite. C'est elle qui a tout changé depuis 2023.
+
+## Les assistants (ChatGPT, Claude, Copilot, Gemini…)
+Des outils construits sur des IA génératives. Même principe pour tous : tu écris une demande en langage normal, l'assistant répond.
+
+💡 Bonne nouvelle : si tu sais en utiliser un, tu sais utiliser les autres. La compétence se transfère.
+
+✅ À retenir :
+- IA = la grande famille.
+- IA générative = celle qui crée du contenu.
+- ChatGPT & co = les assistants que tu utilises au quotidien.
 
 À toi de jouer : note ces 3 définitions dans ton téléphone. Ce vocabulaire te servira dans toutes les leçons suivantes.`,null],
      ]},
      {t:"Vois l'IA en action", l:[
        ["Découvre ChatGPT, pas à pas",'15 min',
-`Cette vidéo te montre concrètement ChatGPT : créer un compte, écrire une première demande, comprendre la réponse. Regarde-la en entier, c'est la meilleure façon de « voir » ce que l'IA peut faire.
+`🎯 Objectif : voir concrètement ce que l'IA peut faire, en suivant une vraie démonstration de ChatGPT.
 
-Pendant que tu regardes, note deux ou trois idées d'usage qui correspondent à TON quotidien : un type d'e-mail, un document à résumer, une liste à organiser.
+## Regarde la vidéo en entier (15 min)
+Elle te montre pas à pas : créer un compte, écrire une première demande, comprendre la réponse. C'est la meilleure façon de « voir » l'IA en action.
 
-À toi de jouer : crée ton compte (gratuit) sur chat.openai.com ou claude.ai, et envoie ta toute première demande — par exemple : « Rédige un message poli pour prévenir un client d'un léger retard de livraison. »`,'WPRgJso2Z-k'],
+## Pendant que tu regardes
+Note deux ou trois idées d'usage qui collent à TON quotidien :
+- un type d'e-mail que tu écris souvent,
+- un document à résumer,
+- une liste à organiser.
+
+## Ta première demande
+Crée ton compte gratuit sur chat.openai.com ou claude.ai, puis copie cette demande pour démarrer :
+
+[COPIER] Rédige un message poli et court pour prévenir un client d'un léger retard de livraison de 2 jours. Ton courtois et rassurant.
+
+💡 Plus tu donnes de contexte (qui, quoi, ton attendu), meilleure est la réponse.
+
+✅ À retenir : on apprend l'IA en l'utilisant, pas en la regardant. Envoie une vraie demande dès aujourd'hui.
+
+À toi de jouer : crée ton compte et envoie ta toute première demande. Observe la réponse — qu'est-ce que tu changerais ?`,'WPRgJso2Z-k'],
        ["Les bons réflexes dès le début",'10 min',
-`Cette vidéo va plus loin : comment formuler tes demandes pour obtenir de bien meilleures réponses. C'est LA compétence qui sépare ceux qui trouvent l'IA « gadget » de ceux qui gagnent une heure par jour.
+`🎯 Objectif : apprendre la formule qui sépare ceux qui trouvent l'IA « gadget » de ceux qui gagnent une heure par jour.
 
-Le principe à retenir : donne toujours **la tâche + le contexte + le format attendu**. « Rédige une relance (tâche) pour un devis envoyé il y a 5 jours à M. Koné (contexte), en 5 lignes, ton courtois (format). »
+La vidéo ci-dessus va plus loin : comment formuler tes demandes pour obtenir de bien meilleures réponses.
 
-À toi de jouer : reformule une demande que tu as déjà faite en ajoutant le contexte et le format. Compare les deux réponses.`,'1c4N_hp21Ns'],
+## La règle d'or : Tâche + Contexte + Format
+Donne toujours les trois :
+1. **La tâche** : ce que tu veux (« Rédige une relance »).
+2. **Le contexte** : les détails utiles (« pour un devis envoyé il y a 5 jours à M. Koné »).
+3. **Le format** : la forme attendue (« en 5 lignes, ton courtois »).
+
+## Compare toi-même
+Demande faible : « Écris une relance. » — Demande forte, à copier :
+
+[COPIER] Rédige une relance pour un devis envoyé il y a 5 jours à M. Koné, resté sans réponse. 5 lignes maximum, ton courtois et professionnel, termine par une question simple qui invite à répondre.
+
+⚠️ Une demande vague donne une réponse vague. Le temps que tu gagnes vient de la précision de ta demande.
+
+✅ À retenir : Tâche + Contexte + Format. Écris-le sur un papier au-dessus de ton bureau.
+
+À toi de jouer : reprends une demande déjà faite et ajoute-lui le contexte et le format. Compare les deux réponses.`,'1c4N_hp21Ns'],
      ]},
      {t:'Et au travail ?', l:[
        ["Là où l'IA t'aide vraiment au bureau",'5 min',
-`Au travail, l'IA générative excelle sur cinq familles de tâches. Vérifie lesquelles existent dans ta semaine :
+`🎯 Objectif : repérer, dans TA semaine, les tâches où l'IA te fera gagner du temps dès demain.
 
-**Écrire** : e-mails, notes, annonces, comptes rendus — l'IA fait le premier jet, tu ajustes. **Résumer** : longs documents, fils d'e-mails, notes de réunion — l'essentiel en quelques lignes. **Organiser** : transformer des idées en vrac en plan, liste ou tableau. **Traduire et corriger** : messages en anglais, textes sans fautes. **Réfléchir** : demander 10 idées, comparer des options, préparer des questions.
+## Les 5 familles de tâches où l'IA excelle
+- **Écrire** : e-mails, notes, annonces, comptes rendus — l'IA fait le premier jet, tu ajustes.
+- **Résumer** : longs documents, fils d'e-mails, notes de réunion — l'essentiel en quelques lignes.
+- **Organiser** : transformer des idées en vrac en plan, liste ou tableau.
+- **Traduire et corriger** : messages en anglais, textes sans fautes.
+- **Réfléchir** : demander 10 idées, comparer des options, préparer des questions.
 
-Ce que l'IA ne fait pas : connaître ton entreprise mieux que toi, garantir un fait précis, décider à ta place. Elle **accélère**, tu **diriges**.
+## Ce que l'IA ne fait pas
+- Connaître ton entreprise mieux que toi.
+- Garantir un fait précis (vérifie toujours).
+- Décider à ta place.
+
+💡 La bonne image : l'IA **accélère**, toi tu **diriges**.
+
+✅ À retenir : commence par « écrire » et « résumer » — ce sont les gains les plus rapides.
 
 À toi de jouer : dans ta semaine type, identifie 2 tâches « écrire », 1 tâche « résumer » et 1 tâche « organiser ». Ce sont tes premiers chantiers IA.`,null],
        ["Ta suite : ChatGPT, Claude ou Copilot ?",'4 min',
-`Tu as les bases. Pour passer au niveau « je m'en sers tous les jours au travail », choisis ton outil selon ta situation :
+`🎯 Objectif : choisir l'outil qui correspond à ta situation pour passer au niveau « je m'en sers tous les jours ».
 
-**ChatGPT au travail** : le plus polyvalent, parfait pour commencer — e-mails, résumés, tableaux, idées. **Claude au travail** : imbattable sur les documents longs, l'analyse de rapports et le ton juste des messages délicats. **Copilot au travail** : si ton entreprise utilise Word, Excel, Outlook et Teams, c'est l'IA directement dans tes outils.
+Tu as les bases. Voici comment choisir ta suite.
 
-Chaque cours dure environ 2 h, en leçons de 7 à 10 minutes, avec des exemples de vrai travail et un exercice à chaque leçon.
+## Quel outil pour toi ?
+- **ChatGPT au travail** : le plus polyvalent, parfait pour commencer — e-mails, résumés, tableaux, idées.
+- **Claude au travail** : imbattable sur les documents longs, l'analyse de rapports et le ton juste des messages délicats.
+- **Copilot au travail** : si ton entreprise utilise Word, Excel, Outlook et Teams, c'est l'IA directement dans tes outils.
+
+## À quoi t'attendre
+Chaque cours dure environ 2 h, en leçons de 7 à 10 minutes, avec des exemples de vrai travail, des consignes à copier-coller et un exercice à chaque leçon.
+
+💡 Tu hésites ? Commence par **ChatGPT au travail** : ce que tu y apprends se transfère aux autres.
+
+✅ À retenir : le meilleur outil est celui que tu utiliseras vraiment. Choisis selon tes outils du quotidien.
 
 À toi de jouer : inscris-toi au cours qui correspond à ta situation, et présente-toi dans la communauté : dis-nous quel outil tu as choisi et pourquoi.`,null],
      ]},
@@ -1956,63 +2051,170 @@ Cette routine prend 25 minutes par jour et en libère facilement une heure. La c
    modules:[
      {t:'Se présenter', l:[
        ["Hello ! Te présenter en 6 phrases",'8 min',
-`Apprends ces six phrases par cœur — elles couvrent 90 % des présentations :
+`🎯 Objectif : savoir te présenter en anglais avec 6 phrases simples qui couvrent 90 % des situations.
 
-**Hello, my name is Awa.** (Bonjour, je m'appelle Awa.) **I'm from Côte d'Ivoire.** (Je viens de Côte d'Ivoire.) **I live in Abidjan.** (J'habite à Abidjan.) **I work in a shop.** / **I'm a student.** (Je travaille dans une boutique. / Je suis étudiant·e.) **Nice to meet you!** (Enchanté·e !) **And you?** (Et toi ?)
+## Les 6 phrases à connaître par cœur
+- **Hello, my name is Awa.** — Bonjour, je m'appelle Awa.
+- **I'm from Côte d'Ivoire.** — Je viens de Côte d'Ivoire.
+- **I live in Abidjan.** — J'habite à Abidjan.
+- **I work in a shop. / I'm a student.** — Je travaille dans une boutique. / Je suis étudiant·e.
+- **Nice to meet you!** — Enchanté·e !
+- **And you?** — Et toi ?
 
-Prononciation : ne cherche pas la perfection, cherche à être compris. Parle lentement et articule. « Nice to meet you » se dit à peu près « naïss tou mit you ».
+## Prononciation
+Ne cherche pas la perfection, cherche à être **compris**. Parle lentement et articule.
+
+💡 « Nice to meet you » se dit à peu près « naïss tou mit you ».
+
+✅ À retenir : ces 6 phrases suffisent pour te présenter à n'importe qui. Apprends-les par cœur.
 
 À toi de jouer : enregistre-toi sur ton téléphone en te présentant avec ces 6 phrases, puis réécoute. Fais-le 3 jours de suite : tu verras la différence.`,null],
        ["Dire ce que tu fais dans la vie",'7 min',
-`Pour parler de ton activité, une structure suffit : **I'm a…** (je suis…) ou **I work in / as…** (je travaille dans / comme…).
+`🎯 Objectif : savoir dire ton métier ou ton activité en une phrase simple.
 
-**I'm a seller.** (Je suis vendeur·se.) **I'm a driver.** (chauffeur) **I'm a hairdresser.** (coiffeur·se) **I'm a teacher.** (enseignant·e) **I work in a restaurant.** (Je travaille dans un restaurant.) **I have a small business.** (J'ai un petit commerce.) **I'm looking for a job.** (Je cherche du travail.)
+## Une seule structure à retenir
+**I'm a…** (je suis…) ou **I work in / as…** (je travaille dans / comme…).
 
-Ajoute une phrase sur ce que tu vends ou fais : **I sell shoes.** (Je vends des chaussures.) **I make dresses.** (Je fais des robes.)
+## Des exemples pour toi
+- **I'm a seller.** — Je suis vendeur·se.
+- **I'm a driver.** — Je suis chauffeur.
+- **I'm a hairdresser.** — Je suis coiffeur·se.
+- **I'm a teacher.** — Je suis enseignant·e.
+- **I work in a restaurant.** — Je travaille dans un restaurant.
+- **I have a small business.** — J'ai un petit commerce.
+- **I'm looking for a job.** — Je cherche du travail.
+
+## Ajoute un détail
+- **I sell shoes.** — Je vends des chaussures.
+- **I make dresses.** — Je fais des robes.
+
+💡 Une phrase sur ton métier + une sur ce que tu vends suffisent pour une vraie conversation.
+
+✅ À retenir : **I'm a…** pour le métier, **I sell / I make…** pour le détail.
 
 À toi de jouer : écris 2 phrases sur ton activité (ou celle que tu vises) et dis-les à voix haute jusqu'à les dire sans lire.`,null],
      ]},
      {t:'Le vocabulaire de survie', l:[
        ["Grande leçon vidéo : le vocabulaire de base",'60 min',
-`Cette leçon vidéo intensive couvre le vocabulaire de base pour débutant, en français. Elle est longue : ne la regarde pas d'un coup !
+`🎯 Objectif : construire ton vocabulaire de base avec une grande leçon vidéo — à ton rythme.
 
-**La bonne méthode** : 10 à 15 minutes par jour, en répétant chaque mot à voix haute après la vidéo. Mets sur pause, répète, avance. Ton oreille et ta bouche apprennent en même temps.
+## Regarde la vidéo par petites doses (60 min au total)
+La vidéo ci-dessus est intensive et longue : ne la regarde pas d'un coup !
 
-Reviens marquer cette leçon comme terminée quand tu as fini la vidéo — même si cela te prend une semaine. C'est le rythme normal.
+## La bonne méthode
+1. Regarde 10 à 15 minutes par jour.
+2. Mets sur **pause** après chaque mot.
+3. **Répète à voix haute** — ton oreille et ta bouche apprennent en même temps.
+4. Avance seulement quand tu es à l'aise.
 
-À toi de jouer : chaque jour, note 5 mots de la vidéo dans ton téléphone et utilise-les dans une phrase.`,'fDxP2m6qvH4'],
+⚠️ Ne vise pas la vitesse. Prendre une semaine pour finir cette vidéo, c'est le rythme normal.
+
+✅ À retenir : 15 minutes par jour en répétant à voix haute valent mieux qu'une heure passive.
+
+À toi de jouer : chaque jour, note 5 mots de la vidéo dans ton téléphone et utilise-les dans une phrase. Reviens marquer la leçon terminée quand tu as fini la vidéo — même si cela te prend une semaine.`,'fDxP2m6qvH4'],
        ["Les 20 phrases de tous les jours",'8 min',
-`Ces phrases reviennent sans arrêt. Apprends-en 4 par jour pendant 5 jours :
+`🎯 Objectif : mémoriser les 20 phrases qui reviennent tous les jours. Apprends-en 4 par jour pendant 5 jours.
 
-**Thank you (very much).** Merci (beaucoup). **You're welcome.** De rien. **Please.** S'il te plaît. **Excuse me.** Excusez-moi. **I'm sorry.** Pardon. **Yes / No / Maybe.** Oui / Non / Peut-être. **I don't understand.** Je ne comprends pas. **Can you repeat, please?** Tu peux répéter ? **Slowly, please.** Doucement, s'il te plaît. **How much is it?** C'est combien ? **Where is…?** Où est… ? **What time is it?** Quelle heure est-il ? **I would like…** Je voudrais… **Of course.** Bien sûr. **No problem.** Pas de problème. **See you later!** À plus tard ! **Have a nice day!** Bonne journée ! **I don't know.** Je ne sais pas. **Can you help me?** Tu peux m'aider ? **It's okay.** Ça va.
+## Politesse
+- **Thank you (very much).** — Merci (beaucoup).
+- **You're welcome.** — De rien.
+- **Please.** — S'il te plaît.
+- **Excuse me. / I'm sorry.** — Excusez-moi. / Pardon.
+
+## Se faire comprendre
+- **I don't understand.** — Je ne comprends pas.
+- **Can you repeat, please?** — Tu peux répéter ?
+- **Slowly, please.** — Doucement, s'il te plaît.
+- **I don't know.** — Je ne sais pas.
+
+## Au quotidien
+- **How much is it?** — C'est combien ?
+- **Where is…?** — Où est… ?
+- **What time is it?** — Quelle heure est-il ?
+- **I would like…** — Je voudrais…
+
+## Réagir
+- **Yes / No / Maybe.** — Oui / Non / Peut-être.
+- **Of course. / No problem.** — Bien sûr. / Pas de problème.
+- **It's okay.** — Ça va.
+- **Can you help me?** — Tu peux m'aider ?
+
+## Se quitter
+- **See you later!** — À plus tard !
+- **Have a nice day!** — Bonne journée !
+
+✅ À retenir : ces phrases couvrent l'essentiel d'une journée. 4 par jour, et en 5 jours tu les as toutes.
 
 À toi de jouer : choisis les 5 phrases qui te serviront le plus et utilise-les aujourd'hui, même seul·e à voix haute.`,null],
      ]},
      {t:'Communiquer vraiment', l:[
        ["Poser une question polie",'8 min',
-`La politesse anglaise tient en deux formules magiques : **Can you…?** (Tu peux… ?) et **Could you…, please?** (Pourriez-vous…, s'il vous plaît ? — plus poli).
+`🎯 Objectif : poser une question polie et comprendre la réponse.
 
-**Can you help me, please?** (Tu peux m'aider ?) **Could you repeat, please?** (Pourriez-vous répéter ?) **Can I pay with mobile money?** (Je peux payer par mobile money ?) **Could you send me the price?** (Pourriez-vous m'envoyer le prix ?)
+## Les deux formules magiques
+- **Can you…?** — Tu peux… ?
+- **Could you…, please?** — Pourriez-vous…, s'il vous plaît ? (plus poli)
 
-Pour comprendre la réponse, guette les mots clés : **yes / no / sure** (bien sûr) / **sorry** (désolé) / **later** (plus tard) / **tomorrow** (demain).
+## Des questions utiles
+- **Can you help me, please?** — Tu peux m'aider ?
+- **Could you repeat, please?** — Pourriez-vous répéter ?
+- **Can I pay with mobile money?** — Je peux payer par mobile money ?
+- **Could you send me the price?** — Pourriez-vous m'envoyer le prix ?
+
+## Comprendre la réponse
+Guette les mots clés :
+- **yes / no / sure** — oui / non / bien sûr
+- **sorry** — désolé
+- **later** — plus tard
+- **tomorrow** — demain
+
+💡 « Could you… please » est toujours plus poli que « Can you » — utile avec un client ou un supérieur.
+
+✅ À retenir : **Can you…?** au quotidien, **Could you…, please?** pour être très poli.
 
 À toi de jouer : écris 3 questions « Can you… ? » utiles dans TA vie (travail, marché, téléphone) et répète-les.`,null],
        ["Écrire un message simple (WhatsApp, e-mail)",'9 min',
-`À l'écrit, reste simple : sujet + verbe + complément. Personne ne te reprochera des phrases courtes.
+`🎯 Objectif : écrire un message court et correct (WhatsApp, e-mail) sans stresser.
 
-Message WhatsApp type : **Hello! I saw your product. How much is it? Can you deliver to Abidjan? Thank you!** (Bonjour ! J'ai vu votre produit. C'est combien ? Vous livrez à Abidjan ? Merci !)
+## La règle : simple = correct
+Sujet + verbe + complément. Personne ne te reprochera des phrases courtes.
 
-Début d'e-mail : **Hello Mr. Smith, / Dear Madam,** — Fin : **Best regards, Awa** (Cordialement).
+## Message WhatsApp type
+**Hello! I saw your product. How much is it? Can you deliver to Abidjan? Thank you!**
+(Bonjour ! J'ai vu votre produit. C'est combien ? Vous livrez à Abidjan ? Merci !)
 
-Trois erreurs à éviter : n'écris pas tout en majuscules (impoli), n'oublie pas **please** et **thank you**, et relis avant d'envoyer (ou fais corriger par une IA — voir nos cours IA !).
+## Un e-mail simple
+- Début : **Hello Mr. Smith,** / **Dear Madam,**
+- Fin : **Best regards, Awa** (Cordialement).
+
+⚠️ Trois erreurs à éviter :
+- n'écris pas TOUT EN MAJUSCULES (c'est impoli),
+- n'oublie pas **please** et **thank you**,
+- relis avant d'envoyer (ou fais corriger par une IA — voir nos cours IA !).
+
+✅ À retenir : phrases courtes, polies, relues. C'est tout ce qu'il faut.
 
 À toi de jouer : écris un message de 3 phrases en anglais pour demander le prix d'un produit, comme si tu l'envoyais vraiment.`,null],
        ["Ton plan des 30 prochains jours",'6 min',
-`La langue s'apprend par petites doses répétées, pas en une fois. Voici un plan simple et tenable :
+`🎯 Objectif : repartir avec un plan simple et tenable pour progresser sur 30 jours.
 
-**Chaque jour (15 min)** : 5 mots de vocabulaire + 2 phrases de la leçon « tous les jours » + te présenter à voix haute une fois. **Chaque semaine** : écris un message en anglais (leçon précédente) et écoute 10 minutes d'anglais (une chanson dont tu lis les paroles, une vidéo simple). **Dans la communauté** : poste une phrase en anglais par semaine dans Entraide — on te corrige avec bienveillance !
+La langue s'apprend par petites doses répétées, pas en une fois.
 
-Dans 30 jours, tu sauras te présenter, demander un prix, remercier et écrire un message simple. C'est une vraie base — et c'est plus que la majorité des gens.
+## Chaque jour (15 min)
+- 5 mots de vocabulaire,
+- 2 phrases de la leçon « tous les jours »,
+- te présenter à voix haute une fois.
+
+## Chaque semaine
+- écris un message en anglais (leçon précédente),
+- écoute 10 minutes d'anglais (une chanson dont tu lis les paroles, une vidéo simple).
+
+## Dans la communauté
+Poste une phrase en anglais par semaine dans Entraide — on te corrige avec bienveillance !
+
+💡 Dans 30 jours : te présenter, demander un prix, remercier, écrire un message simple. C'est une vraie base — plus que la majorité des gens.
+
+✅ À retenir : la régularité bat la motivation. 15 minutes par jour, tous les jours.
 
 À toi de jouer : mets un rappel quotidien de 15 minutes dans ton téléphone, intitulé « My English time ». Commence demain matin.`,null],
      ]},
@@ -2021,6 +2223,9 @@ Dans 30 jours, tu sauras te présenter, demander un prix, remercier et écrire u
 
 const CATS = ['Tout','IA','Anglais'];
 const COMMU_CATS = ['Général','Entraide','Victoires','Annonces'];
+/* Catégories qu'un membre peut choisir en publiant. « Annonces » est réservé à
+   l'équipe Boyia (envoyées depuis l'espace admin, diffusées en notification). */
+const USER_CATS = ['Général','Entraide','Victoires'];
 
 /* Test réel : Côte d'Ivoire uniquement, via Wave (API Checkout officielle).
    Les autres opérateurs sont affichés « Bientôt disponible ». */
@@ -2081,6 +2286,7 @@ function baseState(){
     likes:{},                // postId -> true
     posts:null,              // copie mutable des posts (init au 1er chargement)
     theme:null,              // null=auto | 'light' | 'dark'
+    notifSeenAt:0,           // horodatage des annonces déjà lues (badge notifications)
   };
 }
 let S = baseState();
@@ -2168,7 +2374,7 @@ async function couponResolve(courseId, code){
   const r = couponCompute(base, c);
   return {valid:true, code:c.code, original:base, amount:r.amount, free:r.free, summary:couponSummary(c)};
 }
-let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'', tab:'dash', stats:null, recent:null, config:null, orders:null, users:null, ordFilter:'all', ordQ:'', usrQ:'', busy:false };
+let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'', tab:'dash', stats:null, recent:null, config:null, orders:null, users:null, notices:null, ordFilter:'all', ordQ:'', usrQ:'', busy:false };
 async function adminApi(method, body){
   const r = await fetch('/api/admin/coupons', {method, headers:{'Content-Type':'application/json','x-admin-key':ADMIN.key},
     body: body?JSON.stringify(body):undefined});
@@ -2287,7 +2493,10 @@ function screenCatalog(){
         </div>
         <div class="tagline">L'IA et l'anglais, simplement. À ton rythme.</div>
       </div>
-      ${S.user?`<button class="avatar" style="width:42px;height:42px" onclick="App.tab('profil')" aria-label="Profil">${initials(S.user.prenom+' '+S.user.nom)}</button>`:''}
+      <div class="hdact">
+        ${bellBtn()}
+        ${S.user?`<button class="avatar" style="width:42px;height:42px" onclick="App.tab('profil')" aria-label="Profil">${initials(S.user.prenom+' '+S.user.nom)}</button>`:''}
+      </div>
     </header>
     <div class="search">
       ${I.search}
@@ -2484,12 +2693,19 @@ function screenCommuLocked(){
 function screenFeed(){
   const list = S.posts.filter(p=>filters.commu==='Tout'||p.cat===filters.commu)
                       .slice().sort((a,b)=>b.at-a.at);
+  /* Annonces officielles (serveur) en tête, dans « Tout » et « Annonces ». */
+  const showAnn = filters.commu==='Tout' || filters.commu==='Annonces';
+  const annHtml = showAnn ? notices.slice().sort((a,b)=>(b.at||0)-(a.at||0))
+                    .map(n=>announceCard(n,(n.at||0)>(S.notifSeenAt||0))).join('') : '';
   const me = S.user ? initials(S.user.prenom+' '+S.user.nom) : '?';
   return `<div class="screen">
     <header class="apphead">
       <div style="flex:1"><div class="brand" style="font-size:22px">Communauté</div>
       <div class="tagline" style="padding:0">Entraide, victoires et défis de la semaine</div></div>
-      <button class="iconbtn" onclick="App.goLeader()" aria-label="Mes points" title="Mes points">${I.award}</button>
+      <div class="hdact">
+        ${bellBtn()}
+        <button class="iconbtn" onclick="App.goLeader()" aria-label="Mes points" title="Mes points">${I.award}</button>
+      </div>
     </header>
     <button class="card compose" onclick="App.compose()">
       <span class="avatar">${me}</span>
@@ -2498,7 +2714,7 @@ function screenFeed(){
     <div class="chiprow">
       ${['Tout',...COMMU_CATS].map(c=>`<button class="chip ${filters.commu===c?'on':''}" onclick="App.commuCat('${c}')">${c}</button>`).join('')}
     </div>
-    <div class="feed">${list.map(p=>postCard(p,false)).join('')||`<div class="empty">${I.msg}<b>Rien ici pour l'instant</b><span>Sois la première personne à publier dans cette catégorie.</span></div>`}</div>
+    <div class="feed">${annHtml}${list.map(p=>postCard(p,false)).join('')||(annHtml?'':`<div class="empty">${I.msg}<b>Rien ici pour l'instant</b><span>Sois la première personne à publier dans cette catégorie.</span></div>`)}</div>
   </div>`;
 }
 
@@ -2554,10 +2770,37 @@ function screenCompose(){
     </div>
     <div class="composer">
       <div class="catpick">
-        ${COMMU_CATS.map((c,i)=>`<button class="chip ${i===0?'on':''}" data-cat="${c}" onclick="App.pickCat(this)">${c}</button>`).join('')}
+        ${USER_CATS.map((c,i)=>`<button class="chip ${i===0?'on':''}" data-cat="${c}" onclick="App.pickCat(this)">${c}</button>`).join('')}
       </div>
       <textarea id="ptext" maxlength="1000" placeholder="Pose une question, partage une victoire ou une astuce…"></textarea>
       <button class="btn" onclick="App.publish()">Publier</button>
+    </div>
+  </div>`;
+}
+
+/* Carte d'annonce officielle (équipe Boyia) — lecture seule. */
+function announceCard(n, fresh){
+  return `<article class="card announce ${fresh?'fresh':''}">
+    <div class="ahead"><span class="badge">${I.megaphone} Équipe Boyia</span><span class="atime">${ago(n.at)}</span></div>
+    ${n.title?`<h3 class="atitle">${esc(n.title)}</h3>`:''}
+    <div class="abody">${fmtBody(n.body||'')}</div>
+  </article>`;
+}
+
+/* ================= Écran : Notifications ================= */
+function screenNotifs(){
+  const seen = S.notifSeenAt||0;
+  const list = notices.slice().sort((a,b)=>(b.at||0)-(a.at||0));
+  return `<div class="screen">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.notifsBack()" aria-label="Retour">${I.back}</button>
+      <h1>Notifications</h1>
+    </div>
+    <p class="muted px" style="font-size:13.5px;padding-top:2px">Les annonces de l'équipe Boyia Institute.</p>
+    <div class="feed">
+      ${list.length
+        ? list.map(n=>announceCard(n, (n.at||0)>seen)).join('')
+        : `<div class="empty">${I.bell}<b>Aucune notification</b><span>Tu verras ici les annonces de l'équipe : nouveaux cours, nouveautés et informations importantes.</span></div>`}
     </div>
   </div>`;
 }
@@ -2630,7 +2873,7 @@ function screenAdmin(){
   const T = ADMIN.tab;
   const tabBtn=(id,label)=>`<button class="chip ${T===id?'on':''}" onclick="App.adminTab('${id}')">${label}</button>`;
   const tabs = `<div class="chiprow" style="padding-top:10px">
-    ${tabBtn('dash','Tableau de bord')}${tabBtn('orders','Commandes')}${tabBtn('members','Membres')}${tabBtn('coupons','Coupons')}${tabBtn('system','Système')}
+    ${tabBtn('dash','Tableau de bord')}${tabBtn('orders','Commandes')}${tabBtn('members','Membres')}${tabBtn('announce','Annonces')}${tabBtn('coupons','Coupons')}${tabBtn('system','Système')}
   </div>`;
 
   const loading = `<div class="adminwrap"><div class="empty">${I.clock}<b>Chargement…</b></div></div>`;
@@ -2642,6 +2885,8 @@ function screenAdmin(){
     panel = (API.mode!=='live') ? demoBlock : adminOrdersPanel();
   } else if(T==='members'){
     panel = (API.mode!=='live') ? demoBlock : adminMembersPanel();
+  } else if(T==='announce'){
+    panel = (API.mode!=='live') ? demoBlock : adminAnnouncePanel();
   } else if(T==='system'){
     panel = adminSystemPanel();
   } else if(ADMIN.tab==='coupons'){
@@ -2779,6 +3024,38 @@ function adminMembersPanel(){
         : `<div class="admpad">Aucun membre ne correspond.</div>`}
     </div>
     <p class="muted" style="font-size:12px;text-align:center">60 membres les plus récents correspondants.</p>
+  </div>`;
+}
+/* ---- Panneau Annonces (envoi d'une notification à tous les membres) ---- */
+function adminAnnouncePanel(){
+  const list = ADMIN.notices;
+  const mailOn = ADMIN.config && ADMIN.config.mail;
+  return `<div class="adminwrap">
+    <div class="card" style="padding:15px">
+      <b style="font-size:14.5px">Nouvelle annonce</b>
+      <p class="muted" style="font-size:12.5px;margin:5px 0 12px">Chaque membre la verra dans ses notifications (cloche 🔔) et dans la communauté.</p>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <label class="afield">Titre (optionnel)<input id="an_title" type="text" maxlength="120" placeholder="Ex. Nouveau cours disponible"></label>
+        <label class="afield">Message<textarea id="an_body" maxlength="4000" rows="5" placeholder="Écris ton annonce… (tu peux utiliser **gras**, des listes avec - , et des émojis)" style="width:100%;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 13px;font-size:15px;resize:vertical;font-family:inherit"></textarea></label>
+        <label class="acheck" style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink)">
+          <input id="an_email" type="checkbox" ${mailOn?'':'disabled'} style="width:18px;height:18px">
+          Envoyer aussi par e-mail à tous les membres${mailOn?'':' <span class="muted">(e-mail non configuré)</span>'}
+        </label>
+        <button class="btn" onclick="App.adminSendAnnounce()" ${ADMIN.busy?'disabled':''}>${ADMIN.busy?'Envoi…':'Publier l\'annonce'}</button>
+      </div>
+    </div>
+    <div class="sect" style="padding-left:0">Annonces publiées</div>
+    <div class="card">
+      ${list===null?`<div class="admpad">${I.clock} Chargement…</div>`
+        : list.length? list.map(n=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+            <div class="grow">
+              <div class="c-code" style="font-size:13.5px">${n.title?esc(n.title):'(sans titre)'}</div>
+              <div class="c-sum" style="white-space:pre-wrap">${esc((n.body||'').slice(0,140))}${(n.body||'').length>140?'…':''}</div>
+              <div class="c-uses">${n.at?ago(n.at):''}</div>
+            </div>
+          </div>`).join('')
+        : `<div class="admpad">Aucune annonce pour l'instant.</div>`}
+    </div>
   </div>`;
 }
 /* ---- Panneau Système (état & configuration) ---- */
@@ -3096,6 +3373,7 @@ function applyAccount(j){
     if(!S.done[e.courseId]) S.done[e.courseId]={};
   }
   if(Array.isArray(j.progress)) for(const p of j.progress){ if(!S.done[p.courseId]) S.done[p.courseId]={}; S.done[p.courseId][p.lessonKey]=true; }
+  if(typeof j.notifSeenAt==='number') S.notifSeenAt=Math.max(S.notifSeenAt||0, j.notifSeenAt);
   save();
 }
 /* Au chargement : si on a un jeton, on récupère le compte à jour (autre appareil, nouveaux cours). */
@@ -3106,6 +3384,24 @@ async function hydrateAccount(){
     if(r.status===401){ S.token=null; save(); render(); return; }
     if(r.ok){ applyAccount(await r.json()); render(); }
   }catch(e){}
+}
+
+/* ================= Notifications (annonces de l'équipe) ================= */
+let notices = [];                 // [{id, title, body, at}] — annonces serveur
+function unreadCount(){ const s=S.notifSeenAt||0; return notices.filter(n=>(n.at||0)>s).length; }
+async function loadNotices(){
+  if(!/^https?:$/.test(location.protocol)) return;
+  try{
+    const r = await fetch('/api/announcements', {cache:'no-store'});
+    if(r.ok){ const j=await r.json(); notices = Array.isArray(j.announcements)?j.announcements:[]; render(); }
+  }catch(e){}
+}
+/* Cloche de notifications (badge = annonces non lues). */
+function bellBtn(){
+  const n = unreadCount();
+  return `<button class="iconbtn bell" onclick="App.openNotifs()" aria-label="Notifications${n?` (${n} non lues)`:''}" title="Notifications">
+    ${I.bell}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}
+  </button>`;
 }
 
 /* ================= Actions ================= */
@@ -3366,6 +3662,17 @@ const App = {
   },
   openPost(pid){ go('commu','post',{id:pid}); },
   goLeader(){ go('commu','leader'); },
+  /* --- Notifications --- */
+  openNotifs(){
+    const tab = (V.tab==='commu')?'commu':'cours';
+    go(tab,'notifs');
+    /* Marque tout comme lu (badge à zéro) + synchronise le compte serveur. */
+    S.notifSeenAt = Date.now(); save();
+    if(S.token && /^https?:$/.test(location.protocol)){
+      fetch('/api/me/seen',{method:'POST',headers:authHeaders()}).then(r=>r.ok&&r.json()).then(j=>{ if(j) applyAccount(j); }).catch(()=>{});
+    }
+  },
+  notifsBack(){ this.tab(V.tab==='commu'?'commu':'cours'); },
   compose(){
     if(!S.user){ toast('Crée ton compte pour publier'); this.enrollGeneric(); return; }
     go('commu','compose');
@@ -3374,7 +3681,8 @@ const App = {
   publish(){
     const txt = $('#ptext').value.trim();
     if(txt.length<3){ toast('Écris ton message avant de publier'); return; }
-    const cat = document.querySelector('.catpick .chip.on').dataset.cat;
+    let cat = document.querySelector('.catpick .chip.on').dataset.cat;
+    if(!USER_CATS.includes(cat)) cat='Général';   // « Annonces » réservé à l'équipe
     S.posts.push({id:'u'+Date.now(), by:S.user.prenom+' '+S.user.nom, role:'Apprenant·e', cat, at:Date.now(), text:txt, likes:0, comments:[]});
     save(); addPoints(5,'publication');
     filters.commu='Tout';
@@ -3414,6 +3722,7 @@ const App = {
     if(API.mode==='live' && ADMIN.key){
       if(t==='orders' && ADMIN.orders===null) this.adminLoadOrders();
       if(t==='members' && ADMIN.users===null) this.adminLoadUsers();
+      if(t==='announce' && ADMIN.notices===null) this.adminLoadAnnounces();
     }
   },
   async adminLoad(){
@@ -3444,6 +3753,32 @@ const App = {
     }catch(e){ ADMIN.users=[]; }
     if(ADMIN.tab==='members'){ render(); const el=$('#usr_q'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length); } }
   },
+  async adminLoadAnnounces(){
+    if(!ADMIN.key) return;
+    try{ const r=await fetch('/api/announcements',{cache:'no-store'});
+      if(r.ok){ ADMIN.notices=(await r.json()).announcements||[]; } else { ADMIN.notices=[]; }
+    }catch(e){ ADMIN.notices=[]; }
+    if(ADMIN.tab==='announce') render();
+  },
+  async adminSendAnnounce(){
+    const t=$('#an_title'), b=$('#an_body'), em=$('#an_email');
+    const title=(t&&t.value||'').trim(); const body=(b&&b.value||'').trim();
+    if(body.length<3){ toast('Écris le message de l\'annonce.'); return; }
+    if(!confirm('Publier cette annonce ? Tous les membres la verront dans leurs notifications'+(em&&em.checked?', et la recevront par e-mail.':'.'))) return;
+    ADMIN.busy=true; render();
+    try{
+      const r=await fetch('/api/admin/announce',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':ADMIN.key},
+        body:JSON.stringify({title, body, email:!!(em&&em.checked)})});
+      const j=await r.json().catch(()=>({}));
+      ADMIN.busy=false;
+      if(r.ok){
+        ADMIN.notices=j.announcements||ADMIN.notices;
+        notices=ADMIN.notices;   // le fil et la cloche reflètent l'annonce immédiatement
+        toast('Annonce publiée'+(j.emailed?` — ${j.emailed} e-mail(s) envoyé(s) ✓`:' ✓'));
+        render();
+      } else { toast(j.message||'Échec de la publication.'); render(); }
+    }catch(e){ ADMIN.busy=false; toast('Connexion impossible.'); render(); }
+  },
   adminOrderFilter(f){ ADMIN.ordFilter=f; ADMIN.orders=null; render(); this.adminLoadOrders(); },
   adminOrdersDebounced(){ const el=$('#ord_q'); ADMIN.ordQ=el?el.value:''; clearTimeout(this._ordT); this._ordT=setTimeout(()=>this.adminLoadOrders(),350); },
   adminUsersDebounced(){ const el=$('#usr_q'); ADMIN.usrQ=el?el.value:''; clearTimeout(this._usrT); this._usrT=setTimeout(()=>this.adminLoadUsers(),350); },
@@ -3452,7 +3787,7 @@ const App = {
     ADMIN.key=k.value.trim(); try{localStorage.setItem('boyia-admin-key',ADMIN.key)}catch(e){}
     this.adminLoad();
   },
-  adminLogout(){ ADMIN.key=''; ADMIN.list=null; ADMIN.orders=null; ADMIN.users=null; ADMIN.stats=null; ADMIN.config=null; ADMIN.tab='dash'; try{localStorage.removeItem('boyia-admin-key')}catch(e){} render(); },
+  adminLogout(){ ADMIN.key=''; ADMIN.list=null; ADMIN.orders=null; ADMIN.users=null; ADMIN.notices=null; ADMIN.stats=null; ADMIN.config=null; ADMIN.tab='dash'; try{localStorage.removeItem('boyia-admin-key')}catch(e){} render(); },
   adminTypeHint(){ const t=$('#a_type'), v=$('#a_value'); if(t&&v) v.placeholder = t.value==='percent'?'50':'200'; },
   async adminSave(){
     const code=($('#a_code').value||'').trim().toUpperCase();
@@ -3503,7 +3838,7 @@ function render(){
   const screens = {
     catalog:screenCatalog, course:screenCourse, learn:screenLearn, lesson:screenLesson,
     feed:screenFeed, post:screenPost, leader:screenLeader, compose:screenCompose,
-    my:screenMyCourses, profil:screenProfile, admin:screenAdmin,
+    my:screenMyCourses, profil:screenProfile, admin:screenAdmin, notifs:screenNotifs,
   };
   /* Communauté verrouillée tant que l'utilisateur n'a pas de compte. */
   const commuScreens = {feed:1, post:1, leader:1, compose:1};
@@ -3594,6 +3929,8 @@ window.addEventListener('pageshow', payResume);   // restauration depuis le cach
 
 /* Compte serveur : si on a un jeton, on synchronise (profil, cours payés, progression). */
 hydrateAccount();
+/* Annonces de l'équipe (notifications) — chargées pour tous, même déconnecté. */
+loadNotices();
 
 /* Accès direct à l'espace admin : /boyiaadmin ou #admin */
 if(location.pathname.replace(/\/+$/,'')==='/boyiaadmin' || location.hash==='#admin') App.openAdmin();

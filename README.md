@@ -29,7 +29,8 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
   - **Mode réel** : servi par `server.js` avec une clé API Wave → bouton « Payer avec Wave » → redirection vers l'app Wave (`wave_launch_url`) → retour dans Boyia Institute → confirmation (webhook signé + réconciliation) → reçu avec l'identifiant de transaction Wave.
   - **Mode démo** (fichier ouvert sans serveur, ou serveur sans clé) : simulation locale, clairement indiquée.
 - **Espace d'apprentissage** : leçons par module, « marquer comme terminée », progression par cours.
-- **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire).
+- **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire). Les membres publient dans Général / Entraide / Victoires ; la catégorie **Annonces est réservée à l'équipe** (publiée depuis l'admin).
+- **Notifications** : cloche 🔔 dans l'en-tête avec badge de non-lus. L'admin publie une annonce → chaque membre la voit dans ses notifications et dans le fil, et peut la recevoir par e-mail. Le marquage « lu » est synchronisé au compte (multi-appareils).
 - **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
 
 ## Paiement réel avec Wave Côte d'Ivoire (déploiement Vercel + Neon)
@@ -135,18 +136,26 @@ WAVE_API_KEY=… WAVE_WEBHOOK_SECRET=… DATABASE_URL=… APP_URL=https://TON-DO
 - **Calcul du prix côté serveur** (`lib/coupons.js` + `checkout`) : le client ne peut jamais
   imposer un montant ; le coupon est revérifié et appliqué par le serveur avant de créer la
   session Wave. Un coupon à 100 % (ou prix fixe 0) inscrit gratuitement, sans Wave.
-- **Espace admin** (Profil → « Espace admin », ou `/#admin`) : créer/activer/supprimer des
-  coupons. Trois types : **prix fixe (FCFA)**, **réduction en %**, **réduction d'un montant**.
+- **Espace admin** (Profil → « Espace admin », ou `/#admin`) — six onglets :
+  **Tableau de bord** (CA, ventes, membres, conversion), **Commandes** (recherche + filtres),
+  **Membres** (agrégats par membre), **Annonces** (envoi de notifications à tous les membres,
+  option e-mail), **Coupons** (prix fixe / % / montant), **Système** (état des services, webhook).
   Protégé par la variable d'environnement **`ADMIN_PASSWORD`** (à définir sur Vercel). Sans
   elle, l'espace admin en ligne est désactivé ; en mode démo il fonctionne en local.
-- Endpoints : `POST /api/coupon` (aperçu public) · `GET|POST /api/admin/coupons`
-  (en-tête `x-admin-key`). Table Neon `coupons` créée et pré-remplie automatiquement.
+- Endpoints : `POST /api/coupon` (aperçu public) · `GET|POST /api/admin/coupons` ·
+  `GET /api/announcements` (public) · `POST /api/admin/announce` · `POST /api/me/seen`
+  (en-tête `x-admin-key` ou `Authorization: Bearer`). Tables Neon `coupons`, `announcements`
+  (+ colonne `users.notif_seen_at`) créées automatiquement.
 
 ### Tester sans argent réel
 
 - `node test-wave.js` : faux serveur Wave local + parcours navigateur complet (checkout →
   redirection → webhook **signé** → reçu → accès au cours). 9 vérifications.
 - `node test-coupon.js` : valide les coupons (aperçu, checkout à montant serveur, admin).
+- `node test-announce.js` : valide les annonces (publication admin, liste publique, diffusion
+  e-mail optionnelle, marquage « lu » synchronisé au compte).
+- `node test-notif-ui.js` : parcours navigateur des notifications (cloche, badge, centre,
+  fil communauté, « Annonces » absent du sélecteur membre).
 - `node test-store-neon.js` : valide la couche Neon (mapping des colonnes, `update`,
   persistance) avec un driver simulé, sans vraie base.
 

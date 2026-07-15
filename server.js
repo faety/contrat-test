@@ -87,8 +87,21 @@ const server = http.createServer(async (req, res) => {
       let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
       return send(res, await H.meProgress(req.headers['authorization'] || '', input));
     }
+    if (req.method === 'POST' && url.pathname === '/api/me/seen') {
+      return send(res, await H.meSeen(req.headers['authorization'] || ''));
+    }
     if (req.method === 'POST' && url.pathname === '/api/logout') {
       return send(res, await H.logout(req.headers['authorization'] || ''));
+    }
+
+    /* ---- Annonces (notifications) ---- */
+    if (req.method === 'GET' && url.pathname === '/api/announcements') {
+      return send(res, await H.announcements());
+    }
+    if (req.method === 'POST' && url.pathname === '/api/admin/announce') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.adminAnnounce(req.headers['x-admin-key'] || '', input));
     }
 
     if (req.method === 'POST' && url.pathname === '/api/coupon') {
