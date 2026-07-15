@@ -324,6 +324,26 @@ input,select,textarea{font:inherit;color:inherit}
 .ytnote{display:flex;align-items:center;justify-content:center;gap:7px;color:var(--muted);font-size:12.5px;margin:8px 14px 0}
 .ytnote svg{width:14px;height:14px}
 a.lplayer{text-decoration:none;cursor:pointer}
+/* Blocs de leçon enrichie */
+.lcontent h3.lh{font-family:var(--serif);font-size:17.5px;font-weight:700;line-height:1.3;margin:8px 0 0}
+.lcontent ul.lul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.lcontent ul.lul li{position:relative;padding-left:20px;line-height:1.55;max-width:65ch}
+.lcontent ul.lul li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--primary)}
+.lcontent ol.steps{margin:0;padding:0;list-style:none;counter-reset:st;display:flex;flex-direction:column;gap:11px}
+.lcontent ol.steps li{position:relative;padding:3px 0 3px 40px;counter-increment:st;line-height:1.55;max-width:65ch;min-height:28px;display:flex;align-items:center}
+.lcontent ol.steps li::before{content:counter(st);position:absolute;left:0;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.cal{border-radius:13px;padding:12px 15px;line-height:1.55;font-size:14.8px;border:1px solid transparent}
+.cal ul{margin:7px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.cal.tip{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 34%,transparent)}
+.cal.warn{background:color-mix(in srgb,var(--danger) 10%,var(--surface));border-color:color-mix(in srgb,var(--danger) 26%,transparent)}
+.cal.key{background:var(--primary-soft);border-color:color-mix(in srgb,var(--primary) 30%,transparent)}
+.cal.obj{background:color-mix(in srgb,var(--primary) 8%,var(--surface));border-left:4px solid var(--primary);border-radius:9px;font-weight:600}
+.copycard{background:#16233f;color:#e9eefb;border-radius:12px;padding:12px 14px}
+.copycard .cc-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}
+.copycard .cc-t{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9db0dd;font-weight:800}
+.copycard .cc-btn{background:rgba(255,255,255,.16);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:800;cursor:pointer;flex:none}
+.copycard .cc-btn:active{transform:scale(.96)}
+.copycard pre{white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.3px;line-height:1.5;margin:0}
 
 /* ---- Profil ---- */
 .pcard{margin:12px 14px 0;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
@@ -829,109 +849,445 @@ Garde ces modèles dans un dossier (ou un Projet Claude si tu as la version paya
    modules:[
      {t:'Prendre Copilot en main', l:[
        ["C'est quoi Copilot, et sa particularité",'8 min',
-`Copilot est l'assistant IA de Microsoft, **intégré directement dans les outils que beaucoup d'entreprises utilisent déjà** : Word, Excel, Outlook, PowerPoint et Teams.
+`🎯 **Objectif de la leçon :** comprendre ce qu'est Copilot, en quoi il est différent des autres IA, et repérer où il va t'aider dans ta journée de travail.
 
-Sa grande force n'est pas d'être « à part » dans un site web, mais d'être **là où tu travailles**. Dans Word, il rédige ; dans Outlook, il t'aide à répondre ; dans Excel, il analyse ; dans PowerPoint, il crée des diapositives ; dans Teams, il résume tes réunions.
+Copilot est l'assistant IA de Microsoft. Comme ChatGPT ou Claude, tu lui écris une demande en langage normal et il t'aide à écrire, résumer, analyser ou créer. Mais il a une particularité qui change tout au bureau.
 
-Tu n'as pas à copier-coller d'un outil à l'autre : l'IA agit dans ton document.
+## Sa force : il est LÀ OÙ tu travailles
 
-À toi de jouer : repère lesquels de ces outils (Word, Excel, Outlook, PowerPoint, Teams) tu utilises déjà au travail.`,null],
+Les autres IA vivent dans un site web à part : tu dois copier ton texte, aller sur le site, coller, récupérer le résultat, revenir. Copilot, lui, est **intégré directement dans les logiciels Microsoft que beaucoup d'entreprises utilisent déjà** — tu n'as rien à copier-coller, il agit dans ton document ouvert.
+
+Concrètement, un même assistant t'accompagne partout :
+
+- **Word** — il rédige et reformule tes documents
+- **Outlook** — il résume les longs e-mails et t'aide à répondre
+- **Excel** — il analyse tes tableaux et propose des formules
+- **PowerPoint** — il crée une première présentation
+- **Teams** — il résume tes réunions (décisions, actions)
+
+💡 **L'image à retenir :** ChatGPT, c'est un assistant assis dans un autre bureau — tu dois lui apporter le travail. Copilot, c'est un assistant assis **à côté de toi**, qui voit ton écran et agit directement dedans.
+
+## Une condition importante
+
+Cette intégration dans Word, Excel, etc. demande une **licence professionnelle Microsoft 365 Copilot**, activée par ton employeur (on voit ça à la leçon suivante). Il existe aussi un Copilot gratuit dans le navigateur Edge, utile pour discuter et rédiger, mais qui n'agit pas dans tes documents.
+
+✅ **À retenir :**
+- Copilot = l'IA de Microsoft, **intégrée dans tes outils de bureau**.
+- Sa valeur : **zéro copier-coller**, il travaille dans ton document.
+- L'intégration complète nécessite une licence pro (activée par l'employeur).
+
+À toi de jouer : fais la liste des outils Microsoft que tu ouvres chaque semaine (Word, Excel, Outlook, PowerPoint, Teams). Ce sont exactement les endroits où Copilot va te faire gagner du temps.`,null],
        ["Y accéder : une version professionnelle",'8 min',
-`Copilot dans Microsoft 365 est généralement une **offre professionnelle** liée au compte de ton organisation (ton employeur active la licence).
+`🎯 **Objectif :** savoir quelle version de Copilot tu peux utiliser, et comment vérifier en 2 minutes si tu y as accès.
 
-Il existe aussi un Copilot grand public (dans le navigateur Edge et sur copilot.microsoft.com) pour discuter et rédiger, mais l'intégration dans Word/Excel/Outlook nécessite la licence Microsoft 365 Copilot. Vérifie auprès de ton service informatique si tu y as accès. Si oui, tu verras un **bouton Copilot** dans le ruban de tes applications.
+Il existe **deux Copilot** différents. Ne pas les confondre t'évitera bien des malentendus.
 
-À toi de jouer : demande à ton service informatique (ou vérifie dans une appli Office) si le bouton Copilot est disponible pour toi.`,null],
+## 1. Le Copilot gratuit (grand public)
+
+Accessible à tous dans le navigateur **Edge** ou sur **copilot.microsoft.com**. Il discute, rédige, résume un texte que tu colles — comme ChatGPT. Utile, mais il **n'agit pas** dans tes fichiers Word ou Excel : c'est une fenêtre à part.
+
+## 2. Le Copilot professionnel (Microsoft 365 Copilot)
+
+C'est celui qui s'intègre **dans** Word, Excel, Outlook, PowerPoint et Teams. Il demande une **licence payante**, activée par ton **employeur** (ce n'est pas quelque chose que tu installes seul). C'est lui qui apporte le vrai gain de temps au bureau.
+
+## Comment savoir si tu y as accès
+
+Deux façons de vérifier :
+
+1. Ouvre **Word** ou **Outlook** et cherche une **icône Copilot** dans le ruban du haut ou sur le côté. Si elle est là, tu as la licence.
+2. Sinon, **demande à ton service informatique** (ou à ton responsable) : « Ai-je accès à Microsoft 365 Copilot ? »
+
+💡 **Astuce :** si tu n'as pas encore la licence, ne bloque pas — suis quand même tout le cours. Tu sauras exactement quoi demander à ton employeur, avec des exemples concrets de temps gagné (c'est un argument qui convainc, voir la dernière leçon).
+
+⚠️ **À éviter :** ne colle jamais un document confidentiel de ton entreprise dans le Copilot **grand public** (non géré par ton organisation). Pour le travail sensible, utilise uniquement la version professionnelle (on approfondit à la leçon « Confidentialité »).
+
+✅ **À retenir :**
+- Copilot **gratuit** = discute dans le navigateur, n'entre pas dans tes fichiers.
+- Copilot **pro (M365)** = intégré dans Office, activé par l'employeur.
+- Vérifie la présence de l'icône Copilot dans Word/Outlook.
+
+À toi de jouer : ouvre une application Office et cherche l'icône Copilot. Si tu ne la trouves pas, note la question à poser à ton service informatique aujourd'hui.`,null],
        ["Où le trouver dans chaque application",'7 min',
-`Le principe est constant : cherche l'**icône Copilot** dans le ruban ou sur le côté.
+`🎯 **Objectif :** repérer où se cache Copilot dans chaque application, pour ne jamais être perdu.
 
-Dans Word, elle apparaît dans la marge pour proposer de rédiger. Dans Outlook, un bouton « Copilot » au-dessus d'un e-mail propose de résumer ou de répondre. Dans Excel, il ouvre un panneau pour analyser ton tableau. Dans PowerPoint et Teams, même logique.
+Bonne nouvelle : le principe est **toujours le même**. Cherche l'**icône Copilot** (un petit logo coloré) dans le ruban du haut ou sur le côté droit. Une fois que tu l'as repérée une fois, tu sais l'utiliser partout.
 
-Une fois cette icône repérée, tu sais l'utiliser partout : tu lui écris ta demande en langage normal.
+## Où regarder, application par application
 
-À toi de jouer : ouvre une application Office et retrouve l'icône Copilot.`,null],
+- **Word** — l'icône apparaît dans la **marge de gauche** à côté d'une ligne vide, et dans le ruban « Accueil ». Elle propose de rédiger ou de résumer.
+- **Outlook** — un bouton **Copilot** au-dessus d'un e-mail ouvert : « Résumer » ou « Brouillon de réponse ».
+- **Excel** — l'icône dans le ruban ouvre un **panneau à droite** pour analyser ton tableau (le tableau doit être mis en forme en « tableau »).
+- **PowerPoint** — l'icône propose de **créer une présentation** ou de résumer.
+- **Teams** — après une réunion, **Copilot** apparaît dans le récapitulatif pour la résumer.
+
+## Le geste unique
+
+Partout, l'usage est identique : tu **cliques sur l'icône**, une zone de texte s'ouvre, et tu **écris ta demande en langage normal** (comme un message à un collègue). Copilot agit dans le document, tu relis, tu ajustes.
+
+💡 **Astuce :** si tu ne vois pas l'icône alors que tu as la licence, ferme et rouvre l'application, ou vérifie que tu es bien **connecté avec ton compte professionnel** (en haut à droite).
+
+✅ **À retenir :**
+- Même logo, même geste dans **toutes** les applications.
+- Cherche l'icône dans le **ruban** ou le **panneau de droite**.
+- Connecté avec le **compte pro** = Copilot visible.
+
+À toi de jouer : ouvre l'application Office que tu utilises le plus et retrouve l'icône Copilot. Clique dessus juste pour voir la zone de saisie s'ouvrir.`,null],
        ["Ta première demande utile",'7 min',
-`Choisis la tâche la plus fréquente. Dans Word : « Rédige un premier jet de note de service sur le nouveau règlement des congés. » Dans Outlook : ouvre un e-mail reçu et clique « Résumer ».
+`🎯 **Objectif :** obtenir ton premier vrai résultat avec Copilot, aujourd'hui, sur une tâche que tu fais déjà.
 
-Le résultat est un brouillon que tu ajustes. L'énorme avantage : tu restes dans ton document, sans copier-coller. Tu diriges, Copilot exécute là où tu es.
+Ne commence pas par une expérience compliquée. Choisis **une tâche fréquente et simple**, et laisse Copilot faire le premier jet.
 
-À toi de jouer : dans l'outil que tu utilises le plus, fais faire une première tâche simple à Copilot.`,null],
+## Exemple dans Word
+
+Clique sur l'icône Copilot dans un document vide et colle cette consigne :
+
+[COPIER] Rédige un premier jet de note de service pour annoncer à l'équipe le nouveau règlement des congés. Ton clair et professionnel, une demi-page maximum.
+
+Tu obtiens une note structurée en quelques secondes. Tu la relis, tu corriges un détail, c'est prêt.
+
+## Exemple dans Outlook
+
+Ouvre un e-mail un peu long que tu as reçu, clique sur **Copilot** puis **Résumer**. En une phrase, tu sais ce qu'on attend de toi — sans tout relire.
+
+## La bonne façon de voir les choses
+
+Le résultat de Copilot est un **brouillon**, pas une version finale. C'est normal, et c'est même une force : tu pars d'une base solide au lieu de la page blanche, puis tu ajustes. L'énorme avantage par rapport aux autres IA : **tu restes dans ton document**, aucun copier-coller.
+
+💡 **Astuce :** garde en tête la formule « **Copilot propose, je décide** ». Tu gardes toujours le contrôle : rien n'est envoyé ou validé sans toi.
+
+✅ **À retenir :**
+- Commence par une tâche **simple et fréquente**.
+- Le premier résultat est un **brouillon** à ajuster, pas une fin.
+- Tu diriges, Copilot exécute — **dans** ton document.
+
+À toi de jouer : dans l'outil que tu utilises le plus, fais faire une première tâche réelle à Copilot (un brouillon d'e-mail ou un résumé). Note le temps que ça t'a fait gagner.`,null],
      ]},
      {t:'Bien demander : la compétence clé', l:[
        ["La recette d'une bonne consigne",'9 min',
-`Même dans Copilot, la qualité vient de ta demande : **tâche + contexte + format**.
+`🎯 **Objectif :** apprendre la recette d'une consigne qui donne un excellent résultat du premier coup.
 
-« Rédige un e-mail (tâche) pour informer les clients d'une fermeture exceptionnelle vendredi (contexte), court et rassurant (format). »
+La qualité de la réponse dépend à 90 % de la qualité de ta demande. La bonne nouvelle : il suffit d'une recette simple en **3 ingrédients**.
 
-Copilot a un avantage : il **connaît le contexte de tes documents et e-mails** (avec ton autorisation), donc tu peux dire « réponds à ce message » ou « résume ce document » sans tout recopier. Reste précis sur ce que tu veux obtenir.
+## La recette : Tâche + Contexte + Format
 
-À toi de jouer : formule une demande claire (tâche, contexte, format) pour un e-mail réel dans Outlook.`,null],
+- **Tâche** — ce que tu veux : « rédige un e-mail », « résume », « crée un tableau ».
+- **Contexte** — les détails utiles : à qui, pourquoi, dans quelle situation.
+- **Format** — la forme voulue : longueur, ton, structure.
+
+Comparons. Demande faible : « Écris un e-mail de fermeture. » Résultat vague. Demande complète :
+
+[COPIER] Rédige un e-mail pour informer nos clients que la boutique sera exceptionnellement fermée ce vendredi pour inventaire. Ton rassurant, 5 lignes maximum, avec une formule d'excuse et la date de réouverture (samedi).
+
+La deuxième donne un e-mail presque prêt à envoyer. La différence, c'est le **contexte** et le **format** que tu as ajoutés.
+
+## Le super-pouvoir de Copilot : il voit déjà ton contexte
+
+Contrairement à une IA externe, Copilot **a accès à tes documents et e-mails ouverts** (avec ton autorisation). Tu peux donc dire simplement :
+
+- « **Réponds à ce message** en proposant lundi. »
+- « **Résume ce document** en 5 points. »
+
+…sans rien recopier. Il sait de quoi tu parles.
+
+💡 **Astuce :** si le résultat n'est pas parfait, ce n'est presque jamais l'IA le problème — c'est un ingrédient manquant. Ajoute le contexte ou le format qui manquait, et relance.
+
+✅ **À retenir :**
+- Recette : **Tâche + Contexte + Format**.
+- Le **contexte** fait la différence entre médiocre et excellent.
+- Avec Copilot, réfère-toi au document ouvert (« ce message », « ce tableau »).
+
+À toi de jouer : reprends une demande vague que tu ferais, et réécris-la avec les 3 ingrédients. Teste-la sur un vrai e-mail dans Outlook.`,null],
        ["Reformuler, raccourcir, changer de ton",'8 min',
-`Dans Word et Outlook, sélectionne un texte et demande à Copilot de le **reformuler**, le **raccourcir**, le **rendre plus formel** ou **plus simple**.
+`🎯 **Objectif :** améliorer un texte que tu as déjà écrit, sans repartir de zéro.
 
-Exemple : « Reformule ce paragraphe en langage plus clair et plus court. » C'est idéal pour améliorer un texte existant sans repartir de zéro. Tu gardes le contrôle : Copilot propose, tu acceptes ou tu ajustes.
+Souvent, tu n'as pas besoin de créer — tu as un texte, mais il est trop long, trop rigide, ou pas assez clair. C'est là que Copilot brille.
 
-À toi de jouer : prends un paragraphe existant et demande une version plus courte et plus simple.`,null],
+## Le geste : sélectionne, puis demande
+
+Dans **Word** ou **Outlook**, **sélectionne** le passage à améliorer, clique sur Copilot, et demande une transformation :
+
+- « **Reformule** ce paragraphe en plus clair et plus court. »
+- « **Rends** ce message plus **formel**. » (ou « plus chaleureux »)
+- « **Simplifie** pour quelqu'un qui ne connaît pas le sujet. »
+- « **Corrige** les fautes sans changer le sens. »
+
+## Un exemple concret
+
+Texte de départ, un peu lourd : « Je me permets de revenir vers vous concernant la question que nous avions évoquée… » Sélectionne-le et demande :
+
+[COPIER] Reformule ce passage en plus direct et plus court, ton poli mais moderne, 2 phrases maximum.
+
+Tu obtiens : « Je reviens vers vous au sujet de notre échange. Avez-vous pu avancer ? » Plus clair, plus efficace.
+
+💡 **Astuce :** pense à trois boutons magiques que tu peux toujours demander — **plus court**, **plus simple**, **plus poli**. À eux seuls, ils règlent 80 % des besoins de reformulation.
+
+⚠️ **À éviter :** ne demande pas « améliore » tout seul (trop vague). Dis **dans quel sens** améliorer : plus court ? plus formel ? plus simple ?
+
+✅ **À retenir :**
+- **Sélectionne** le texte, puis demande la transformation.
+- Précise **le sens** : court / simple / formel / chaleureux.
+- Copilot propose, **tu gardes le contrôle**.
+
+À toi de jouer : prends un paragraphe que tu as écrit récemment, sélectionne-le et demande une version « plus courte et plus simple ». Compare les deux.`,null],
        ["Itérer et vérifier avant d'accepter",'7 min',
-`Copilot propose souvent un texte que tu peux **insérer, régénérer ou modifier**. Ne clique pas « insérer » machinalement : relis, demande « une autre version » si besoin, ou précise ta demande.
+`🎯 **Objectif :** prendre le réflexe d'itérer (aller-retour) pour transformer un résultat « correct » en résultat « parfait ».
 
-Comme toute IA, il produit un brouillon de qualité, pas une vérité finale. Le bon réflexe : générer, relire, ajuster, puis valider.
+Quand Copilot propose un texte, tu vois des boutons : **Insérer**, **Régénérer**, ou une zone pour affiner. L'erreur du débutant est de cliquer « Insérer » machinalement. Le pro, lui, **itère**.
 
-À toi de jouer : génère un texte, demande une variante, et choisis la meilleure avant d'insérer.`,null],
+## Itérer, c'est juste continuer la conversation
+
+Tu n'as pas à réussir du premier coup. Après une première réponse, tu ajustes par petites phrases :
+
+- « Plus court. »
+- « Ajoute une formule de remerciement. »
+- « Propose-moi **3 versions** au choix. »
+- « Garde la même idée mais ton plus direct. »
+
+Chaque aller-retour coûte quelques secondes et rapproche du texte idéal.
+
+## Le cycle en 4 temps
+
+1. **Générer** un premier jet.
+2. **Relire** : qu'est-ce qui ne va pas ? (trop long ? ton ? un oubli ?)
+3. **Ajuster** avec une instruction précise.
+4. **Valider** et insérer seulement quand c'est bon.
+
+💡 **Astuce puissante :** demande souvent « **propose 3 versions différentes** ». Choisir entre 3 options est plus rapide et donne un meilleur résultat que de repartir de zéro.
+
+⚠️ **À éviter :** la plupart des gens abandonnent après la 1ʳᵉ réponse et se disent « l'IA n'est pas terrible ». La qualité est **dans l'aller-retour** — ne saute pas cette étape.
+
+✅ **À retenir :**
+- Générer → relire → ajuster → valider.
+- Itère par **petites instructions** précises.
+- « 3 versions au choix » = ton meilleur ami.
+
+À toi de jouer : génère un texte, puis améliore-le en **3 instructions successives** avant de l'insérer. Observe la différence avec la première version.`,null],
      ]},
      {t:'Cas d\'usage réels au travail', l:[
        ["Word : rédiger et mettre en forme",'9 min',
-`Dans Word, Copilot part d'une consigne et écrit un premier jet complet : note de service, compte rendu, procédure, lettre. Donne le sujet, le public et la longueur.
+`🎯 **Objectif :** ne plus jamais partir d'une page blanche dans Word, et mettre en forme deux fois plus vite.
 
-Ensuite, sélectionne des passages pour les reformuler, ajouter une section, ou résumer un long document en haut de page. Tu passes de la page blanche à un brouillon structuré en une minute, puis tu peaufines.
+Word est l'endroit où tu écris tes documents importants : notes de service, comptes rendus, procédures, lettres. Copilot t'y fait gagner sur **deux fronts** : créer et améliorer.
 
-À toi de jouer : fais rédiger dans Word une note dont tu as besoin, puis demande d'ajouter une section de conclusion.`,null],
+## 1. Créer un premier jet complet
+
+Dans un document vide, clique sur Copilot et donne **le sujet, le public et la longueur** :
+
+[COPIER] Rédige une note de service d'une page pour annoncer à toute l'équipe le passage à un nouveau logiciel de pointage à partir du 1er du mois. Explique la raison, la date, où trouver l'aide, et termine sur une note positive. Ton clair et rassurant.
+
+En quelques secondes, tu as une note structurée. Tu passes de la page blanche à un brouillon solide.
+
+## 2. Améliorer un document existant
+
+Sur un texte déjà écrit (ou collé), tu peux :
+
+- **Sélectionner** un passage → « reformule en plus clair ».
+- Demander « **ajoute une section** de conclusion avec les prochaines étapes ».
+- Demander « **résume ce document** en 5 points en haut de la page » (parfait pour un long rapport).
+
+## Un enchaînement type qui fait gagner 20 minutes
+
+1. Copilot rédige le premier jet à partir de ta consigne.
+2. Tu relis et corriges les détails propres à ton entreprise.
+3. Tu demandes une **conclusion** et un **titre**.
+4. Tu ajustes le ton (« plus formel » si besoin).
+
+💡 **Astuce :** Copilot peut aussi partir d'un fichier existant : « Crée une note à partir des points de ce document. » Il s'appuie sur ta matière au lieu d'inventer.
+
+✅ **À retenir :**
+- Word = créer un premier jet **+** améliorer l'existant.
+- Donne toujours **sujet + public + longueur**.
+- Fini la page blanche : tu **ajustes**, tu ne crées plus de zéro.
+
+À toi de jouer : fais rédiger dans Word une note dont tu as réellement besoin cette semaine, puis demande d'ajouter une section de conclusion. Garde le résultat.`,null],
        ["Outlook : trier et répondre aux e-mails",'9 min',
-`Outlook est le gain de temps le plus immédiat.
+`🎯 **Objectif :** reprendre le contrôle de ta boîte mail — l'usage de Copilot qui fait gagner le plus de temps, tout de suite.
 
-Copilot **résume** un long fil de discussion (« Résume cette conversation et dis-moi ce qu'on attend de moi »), puis **rédige une réponse** selon ton intention (« Réponds que j'accepte, mais propose lundi »). Pour une boîte pleine, il aide à repérer l'essentiel.
+Si tu ne devais retenir qu'un seul usage de Copilot, ce serait celui-ci. Les e-mails mangent une grande partie de la journée ; Copilot te les rend en minutes.
 
-Tu relis chaque réponse avant de l'envoyer — l'e-mail engage ton nom.
+## 1. Résumer un long fil de discussion
 
-À toi de jouer : sur un long fil d'e-mails, demande un résumé puis fais rédiger une réponse courte.`,null],
+Ouvre un e-mail à rallonge (10 réponses empilées) et clique **Copilot → Résumer**, ou demande :
+
+[COPIER] Résume cette conversation : qu'est-ce qui a été décidé, et qu'attend-on précisément de moi ?
+
+Plus besoin de tout relire pour comprendre où on en est.
+
+## 2. Rédiger une réponse selon TON intention
+
+Tu dis simplement ce que tu veux répondre, Copilot rédige :
+
+[COPIER] Rédige une réponse : j'accepte la réunion, mais je propose lundi 10 h plutôt que mercredi. Ton courtois et bref.
+
+Tu relis, tu ajustes un mot, tu envoies.
+
+## 3. Traiter les messages délicats
+
+Pour un refus, un retard, une réclamation, demande une version qui **préserve la relation** :
+
+- « Réponds pour refuser cette demande poliment, en proposant une alternative. »
+- « Version plus diplomate, sans casser la relation. »
+
+⚠️ **Règle d'or :** **relis toujours** avant d'envoyer. Un e-mail part en **ton nom** et engage ta responsabilité. Copilot fait le brouillon, la décision d'envoyer reste la tienne.
+
+💡 **Astuce :** le matin, traite d'abord les longs fils : demande un résumé de chacun, réponds aux 2-3 simples, et ta boîte est sous contrôle avant ton premier café fini.
+
+✅ **À retenir :**
+- **Résumer** un long fil = 10 secondes.
+- **Répondre** selon ton intention = un brouillon prêt à ajuster.
+- **Relis** systématiquement avant d'envoyer.
+
+À toi de jouer : sur un long fil d'e-mails réel, demande un résumé, puis fais rédiger une réponse courte. Chronomètre le temps gagné.`,null],
        ["Excel : analyser des données, créer des tableaux",'10 min',
-`Dans Excel, Copilot t'aide à **comprendre tes données** sans être expert en formules.
+`🎯 **Objectif :** comprendre et exploiter tes tableaux de chiffres, même si tu n'es pas à l'aise avec les formules Excel.
 
-Sur un tableau de ventes, demande « Quelles sont les 3 tendances principales ? », « Ajoute une colonne qui calcule la marge », « Crée un tableau récapitulatif par mois » ou « Fais un graphique des ventes par région ». Il propose des formules et des analyses que tu valides.
+Excel fait peur à beaucoup de gens à cause des formules. Copilot change ça : tu poses ta question **en français**, il fait le calcul.
 
-C'est l'occasion de tirer de la valeur de tableaux que tu n'avais pas le temps d'exploiter.
+## Prépare ton tableau (1 étape importante)
 
-À toi de jouer : sur un tableau de chiffres, demande à Copilot les grandes tendances et un récapitulatif mensuel.`,null],
+Pour que Copilot fonctionne bien dans Excel, ton tableau doit être **mis en forme en « tableau »** : sélectionne tes données, puis menu **Insertion → Tableau** (ou Accueil → Mettre sous forme de tableau). Ça donne à Copilot une structure claire à analyser.
+
+## Ce que tu peux demander (en français)
+
+- **Comprendre** : « Quelles sont les 3 tendances principales de ces ventes ? »
+- **Calculer** : « Ajoute une colonne qui calcule la marge (prix − coût). »
+- **Synthétiser** : « Crée un tableau récapitulatif du total par mois. »
+- **Visualiser** : « Fais un graphique des ventes par région. »
+- **Repérer** : « Quels produits se vendent le moins ? »
+
+Exemple concret sur un tableau de ventes :
+
+[COPIER] Analyse ce tableau : donne-moi les 3 tendances principales, le mois le plus fort, et ajoute une colonne qui calcule la marge en pourcentage.
+
+Copilot propose l'analyse **et** la formule ; tu valides d'un clic.
+
+⚠️ **Vérifie toujours un chiffre à la main.** Copilot peut se tromper d'interprétation. Sur un résultat qui compte (un total, une marge), recalcule-en un toi-même pour être sûr avant de le présenter.
+
+💡 **Astuce :** c'est l'occasion d'exploiter enfin des tableaux que tu n'avais jamais le temps d'analyser. 10 minutes avec Copilot valent une demi-journée de tri manuel.
+
+✅ **À retenir :**
+- Mets tes données **en forme de tableau** d'abord.
+- Pose tes questions **en français**, pas en formules.
+- **Revérifie** un chiffre clé avant de t'en servir.
+
+À toi de jouer : sur un vrai tableau de chiffres, demande à Copilot les grandes tendances et un récapitulatif mensuel. Vérifie un des chiffres proposés.`,null],
        ["PowerPoint et Teams : présentations et réunions",'9 min',
-`Dans **PowerPoint**, Copilot peut générer une première présentation à partir d'un sujet ou d'un document Word (« Crée une présentation de 8 diapositives à partir de ce rapport »). Tu obtiens une trame visuelle à ajuster.
+`🎯 **Objectif :** monter une présentation en minutes et ne plus jamais rater ce qui s'est dit en réunion.
 
-Dans **Teams**, il **résume une réunion** : décisions prises, actions à faire et par qui, points en suspens — même si tu es arrivé en retard ou absent.
+Deux tâches chronophages, deux gros gains avec Copilot.
 
-Deux usages qui font gagner un temps considérable sur la préparation et le suivi.
+## PowerPoint : une présentation en quelques minutes
 
-À toi de jouer : à ta prochaine réunion Teams (ou depuis un compte rendu), demande le résumé avec les actions et les responsables.`,null],
+Copilot génère une **première présentation complète** à partir d'un sujet ou, encore mieux, d'un document Word existant :
+
+[COPIER] Crée une présentation de 8 diapositives à partir de ce rapport. Un message clé par diapositive, style sobre et professionnel, avec une diapositive de titre et une de conclusion.
+
+Tu obtiens une trame visuelle structurée. Tu ajustes le texte, tu changes une image, et tu as gagné une heure de mise en page.
+
+## Teams : ne plus jamais rater une réunion
+
+Après une réunion Teams, Copilot la **résume** : décisions prises, **actions à faire et par qui**, points en suspens — **même si tu es arrivé en retard ou absent**.
+
+[COPIER] Résume cette réunion : les décisions, la liste des actions avec le responsable de chacune, et les points restés en suspens.
+
+## L'astuce qui te fait remarquer
+
+Colle ce résumé dans un e-mail « Suivi de réunion » et envoie-le à l'équipe **juste après**. C'est **toi** qui envoies le compte rendu en premier — effet professionnel garanti, pour un effort de 3 minutes.
+
+💡 **Astuce :** pour PowerPoint, pars toujours d'un document Word déjà rédigé si tu en as un : le résultat est bien meilleur que « à partir d'un sujet » seul.
+
+✅ **À retenir :**
+- PowerPoint : une **trame complète** à partir d'un sujet ou d'un Word.
+- Teams : **résumé + actions + responsables** de chaque réunion.
+- Envoie le suivi de réunion **le premier** : gros effet, petit effort.
+
+À toi de jouer : à ta prochaine réunion Teams (ou depuis un compte rendu écrit), demande le résumé avec les actions et les responsables, puis prépare l'e-mail de suivi.`,null],
      ]},
      {t:'Fiable et responsable', l:[
        ["Vérifier avant d'envoyer",'8 min',
-`Copilot travaille à partir de tes documents et e-mails, ce qui le rend souvent pertinent — mais il peut mal interpréter ou inventer un détail.
+`🎯 **Objectif :** prendre le réflexe de vérification qui te protège des erreurs — le geste qui sépare l'amateur du pro.
 
-Vérifie toujours les **chiffres d'Excel**, les **faits d'une note** et le **sens d'une réponse** avant de valider. Rien ne part en ton nom sans ta relecture. L'IA accélère ; la responsabilité reste humaine.
+Copilot travaille à partir de tes vrais documents, ce qui le rend souvent juste. Mais il peut **mal interpréter** une consigne ou **inventer** un détail avec assurance. Ta relecture est ta sécurité.
 
-À toi de jouer : après une analyse Excel, revérifie manuellement un des chiffres proposés.`,null],
+## Ce qu'il faut TOUJOURS revérifier
+
+- **Les chiffres d'Excel** — recalcule un total ou une marge à la main.
+- **Les faits d'une note** — une date, un nom, un montant, une règle interne.
+- **Le sens d'une réponse d'e-mail** — dit-elle vraiment ce que tu veux ?
+- **Les engagements** — Copilot n'a pas promis un délai que tu ne peux pas tenir ?
+
+## La règle simple
+
+L'IA est fiable sur la **forme** (rédiger, reformuler, structurer) et à **surveiller** sur le **fond** (les faits précis). Donc :
+
+1. Je fais **produire** par Copilot (gain de temps).
+2. Je **vérifie** les éléments factuels importants.
+3. Je **valide** et j'envoie.
+
+⚠️ **Jamais d'exception sur ce qui engage :** un chiffre présenté à ta direction, une clause, un montant client, un e-mail officiel. Vérifie **toujours** avant.
+
+💡 **Astuce :** pour un fait douteux, demande à Copilot « **sur quelle partie du document te bases-tu ?** ». S'il ne peut pas pointer la source dans ta matière, méfie-toi.
+
+✅ **À retenir :**
+- L'IA **accélère**, la **responsabilité reste humaine**.
+- Vérifie chiffres, faits, sens, engagements.
+- Rien ne part **en ton nom** sans ta relecture.
+
+À toi de jouer : après une analyse Excel faite par Copilot, revérifie **manuellement** un des chiffres proposés. Prends-en l'habitude.`,null],
        ["Confidentialité et périmètre professionnel",'9 min',
-`Un point rassurant : dans la version professionnelle Microsoft 365, Copilot travaille dans le périmètre de ton organisation et respecte les permissions de tes fichiers.
+`🎯 **Objectif :** utiliser Copilot en toute sécurité avec les données de ton entreprise, sans faux pas.
 
-Cela ne dispense pas de prudence : n'utilise pas Copilot pour extraire ou diffuser des données auxquelles tu n'as pas droit, et suis les consignes de ton service informatique. Ne colle pas d'informations sensibles dans une version grand public non gérée par ton entreprise.
+Bonne nouvelle rassurante : dans la version **professionnelle Microsoft 365**, Copilot travaille **dans le périmètre de ton organisation** et respecte les **permissions** de tes fichiers. Il ne voit que ce que toi tu as le droit de voir, et tes données ne servent pas à entraîner un modèle public.
 
-À toi de jouer : note la différence entre le Copilot pro de ton entreprise et un Copilot grand public, et lequel tu dois utiliser pour le travail.`,null],
+## La règle qui compte : le bon Copilot
+
+- ✅ **Version pro (M365)** = tu peux travailler sur les documents de l'entreprise auxquels tu as accès.
+- ⛔ **Version grand public** (site web, Edge non géré) = **n'y colle jamais** d'informations internes sensibles.
+
+## Bonnes pratiques simples
+
+- N'utilise pas Copilot pour **extraire ou diffuser** des données auxquelles tu n'as pas droit.
+- Suis les **consignes de ton service informatique** (certaines entreprises ont des règles écrites).
+- En cas de doute sur un document très sensible (RH, juridique, données clients), **demande** avant.
+
+💡 **Le test simple :** « Serais-je à l'aise si un tiers voyait ce que je colle ? » Si non, ne le colle pas dans une version non gérée.
+
+⚠️ **À éviter :** contourner les règles de l'entreprise « parce que c'est plus pratique ». La confiance se perd une seule fois.
+
+✅ **À retenir :**
+- Copilot **pro** respecte tes permissions et garde tes données dans l'entreprise.
+- **Jamais** de données internes dans un Copilot grand public.
+- En cas de doute → demande à l'IT.
+
+À toi de jouer : vérifie si ton entreprise a une consigne écrite sur l'usage de l'IA. Note quel Copilot tu dois utiliser pour le travail sensible.`,null],
        ["Bonnes habitudes pour durer",'8 min',
-`Commence par **un** outil (souvent Outlook ou Word), prends le réflexe de cliquer sur Copilot pour résumer et rédiger, relis toujours, et étends peu à peu aux autres applications. Garde tes meilleures consignes pour les réutiliser.
+`🎯 **Objectif :** transformer Copilot en habitude durable, au lieu d'un outil qu'on essaie une fois puis qu'on oublie.
 
-Vérifie aussi s'il existe une consigne interne sur l'usage de Copilot chez toi, et respecte-la — pour tout document officiel, la relecture humaine est la norme.
+La plupart des gens testent une IA, trouvent ça « sympa », puis retournent à leurs vieilles habitudes. Voici comment faire partie de ceux qui en tirent vraiment profit.
 
-Objectif de la semaine : gagner 30 minutes par jour sur tes e-mails grâce au résumé et à la réponse assistée.
+## La méthode : un seul outil à la fois
 
-À toi de jouer : choisis un outil et une tâche quotidienne, et utilise Copilot dessus tous les jours cette semaine.`,null],
+1. **Choisis UN outil** pour commencer — souvent **Outlook** (le plus rentable) ou **Word**.
+2. Prends le réflexe de **cliquer sur Copilot** pour chaque résumé et chaque brouillon.
+3. **Relis toujours** avant d'envoyer.
+4. Quand c'est devenu automatique, **étends** à Excel, PowerPoint, Teams.
+
+Vouloir tout faire d'un coup, c'est le meilleur moyen d'abandonner. Un outil maîtrisé vaut mieux que cinq survolés.
+
+## Garde tes consignes qui marchent
+
+Chaque fois qu'une consigne te donne un bon résultat, **copie-la dans un fichier** (« Mes consignes Copilot »). Tu les réutilises au lieu de réinventer. C'est ce fichier qui, en un mois, fait de toi la personne « douée avec l'IA » au bureau.
+
+💡 **Astuce sécurité :** vérifie s'il existe une consigne interne sur l'IA chez toi, et respecte-la. Pour tout document officiel, la relecture humaine reste la norme.
+
+✅ **À retenir :**
+- **Un** outil à la fois, jusqu'à l'automatisme.
+- **Relis** toujours, **garde** tes meilleures consignes.
+- La régularité bat la perfection.
+
+🎯 **Ton objectif de la semaine :** gagner **30 minutes par jour** sur tes e-mails grâce au résumé et à la réponse assistée dans Outlook.
+
+À toi de jouer : choisis un outil et une tâche quotidienne, et utilise Copilot dessus **tous les jours** cette semaine. Viens raconter ton gain de temps dans la communauté.`,null],
      ]},
      {t:'Ta boîte à outils (à copier-coller)', l:[
        ["Les consignes qui marchent, application par application",'12 min',
@@ -1207,15 +1563,51 @@ function courseById(id){ return COURSES.find(c=>c.id===id); }
 function lessonCount(c){ return c.modules.reduce((a,m)=>a+m.l.length,0); }
 function doneCount(c){ return Object.keys(S.done[c.id]||{}).length; }
 function courseProgress(c){ return Math.round(100*doneCount(c)/lessonCount(c)); }
+/* Rendu enrichi d'une leçon (compatible avec l'ancien format = simples paragraphes).
+   Balises de bloc (un bloc = séparé par une ligne vide) :
+     ## Titre            → sous-titre
+     - item / • item     → liste à puces
+     1. étape            → étapes numérotées
+     🎯 …                → objectif · 💡 … astuce · ⚠️ … piège · ✅/📌 … à retenir
+     [COPIER] …          → carte « consigne à copier » (bouton Copier)
+     À toi de jouer : …  → carte exercice
+   En ligne : **gras**. */
 function fmtBody(txt){
-  return txt.trim().split(/\n{2,}/).map(p=>{
-    let h = esc(p.trim()).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-    if(p.trim().startsWith('À toi de jouer')){
-      h = h.replace(/^À toi de jouer\s*:/,'<b>✏️ À toi de jouer :</b>');
-      return `<div class="exo">${h}</div>`;
+  const inl = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  const innerCallout = lines => {
+    const lead=[], bul=[];
+    for(const l of lines){ if(/^[-•]\s/.test(l)) bul.push(l.replace(/^[-•]\s*/,'')); else lead.push(l); }
+    let h = lead.length ? `<span>${inl(lead.join('\n')).replace(/\n/g,'<br>')}</span>` : '';
+    if(bul.length) h += `<ul>${bul.map(b=>`<li>${inl(b)}</li>`).join('')}</ul>`;
+    return h;
+  };
+  const cals = [['🎯','obj'],['💡','tip'],['⚠️','warn'],['✅','key'],['📌','key']];
+  return txt.trim().split(/\n{2,}/).map(raw=>{
+    const p = raw.trim(); if(!p) return '';
+    const lines = p.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(/^À toi de jouer\s*:/.test(p))
+      return `<div class="exo">${inl(p).replace(/^À toi de jouer\s*:/,'<b>✏️ À toi de jouer :</b>').replace(/\n/g,'<br>')}</div>`;
+    if(p.startsWith('## ')) return `<h3 class="lh">${inl(p.slice(3))}</h3>`;
+    if(p.startsWith('[COPIER]')){
+      const body = p.replace(/^\[COPIER\]\s*/,'');
+      return `<div class="copycard"><div class="cc-h"><span class="cc-t">📋 Consigne à copier</span><button class="cc-btn" onclick="App.copyText(this)">Copier</button></div><pre>${esc(body)}</pre></div>`;
     }
-    return `<p>${h}</p>`;
+    const cal = cals.find(c=>p.startsWith(c[0]));
+    if(cal) return `<div class="cal ${cal[1]}">${innerCallout(lines)}</div>`;
+    if(lines.length && lines.every(l=>/^\d+[.)]\s/.test(l)))
+      return `<ol class="steps">${lines.map(l=>`<li>${inl(l.replace(/^\d+[.)]\s*/,''))}</li>`).join('')}</ol>`;
+    if(lines.length && lines.every(l=>/^[-•]\s/.test(l)))
+      return `<ul class="lul">${lines.map(l=>`<li>${inl(l.replace(/^[-•]\s*/,''))}</li>`).join('')}</ul>`;
+    return `<p>${inl(p).replace(/\n/g,'<br>')}</p>`;
   }).join('');
+}
+/* Copie de secours quand navigator.clipboard n'est pas disponible (anciens mobiles). */
+function fallbackCopy(text, done){
+  try{
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta); done&&done();
+  }catch(e){ toast('Copie impossible — sélectionne le texte manuellement.'); }
 }
 
 /* ================= Rendu : barre d'onglets ================= */
@@ -2114,6 +2506,12 @@ const App = {
     go('mescours','lesson',{id:cid,k});
   },
   toast(m){ toast(m); },
+  copyText(btn){
+    const pre = btn.closest('.copycard') && btn.closest('.copycard').querySelector('pre');
+    const t = pre ? pre.innerText : '';
+    const done = ()=>{ btn.textContent='Copié ✓'; toast('Consigne copiée — colle-la dans ton outil ✨'); setTimeout(()=>{ if(btn) btn.textContent='Copier'; },1800); };
+    try{ navigator.clipboard.writeText(t).then(done, ()=>fallbackCopy(t,done)); }catch(e){ fallbackCopy(t,done); }
+  },
 
   /* --- Inscription / enrôlement --- */
   enroll(cid){
