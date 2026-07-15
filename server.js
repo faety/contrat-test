@@ -100,6 +100,12 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/admin/stats') {
       return send(res, await H.adminStats(req.headers['x-admin-key'] || ''));
     }
+    if (req.method === 'GET' && url.pathname === '/api/admin/orders') {
+      return send(res, await H.adminOrders(req.headers['x-admin-key'] || '', { status: url.searchParams.get('status'), q: url.searchParams.get('q') }));
+    }
+    if (req.method === 'GET' && url.pathname === '/api/admin/users') {
+      return send(res, await H.adminUsers(req.headers['x-admin-key'] || '', { q: url.searchParams.get('q') }));
+    }
 
     if (url.pathname === '/api/admin/coupons' && (req.method === 'GET' || req.method === 'POST')) {
       let body = {};

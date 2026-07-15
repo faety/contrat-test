@@ -234,6 +234,11 @@ input,select,textarea{font:inherit;color:inherit}
 .k-val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
 .k-lab{font-size:12px;color:var(--muted)}
 .adminwrap{padding:4px 14px 24px;display:flex;flex-direction:column;gap:12px}
+.admtools{display:flex;flex-direction:column;gap:9px}
+.admsearch{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:15px}
+.admsearch:focus{outline:none;border-color:var(--primary)}
+.chip.sm{padding:7px 12px;font-size:12.5px}
+.admpad{padding:16px;text-align:center;color:var(--muted);font-size:14px}
 .cpn{display:flex;align-items:center;gap:10px;padding:13px 14px}
 .cpn .c-code{font-weight:800;font-size:15px;letter-spacing:.04em}
 .cpn .c-sum{font-size:12.5px;color:var(--muted)}
@@ -1058,7 +1063,12 @@ const OPERATORS = [
 const API = { mode:'demo' };
 if(/^https?:$/.test(location.protocol)){
   fetch('/api/health',{cache:'no-store'}).then(r=>r.json()).then(j=>{
-    if(j && j.ok && !j.demo){ API.mode='live'; if(flow && flow.type==='pay' && flow.step==='op') renderFlow(); }
+    if(j && j.ok && !j.demo){
+      API.mode='live';
+      if(flow && flow.type==='pay' && flow.step==='op') renderFlow();
+      /* L'espace admin ouvert avant la détection du mode réel : on le recharge. */
+      if(V.screen==='admin'){ if(ADMIN.key) App.adminLoad(); else render(); }
+    }
   }).catch(()=>{});
 }
 
@@ -1185,7 +1195,7 @@ async function couponResolve(courseId, code){
   const r = couponCompute(base, c);
   return {valid:true, code:c.code, original:base, amount:r.amount, free:r.free, summary:couponSummary(c)};
 }
-let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'', tab:'dash', stats:null, recent:null };
+let ADMIN = { key: (function(){try{return localStorage.getItem('boyia-admin-key')||''}catch(e){return ''}})(), list:null, err:'', tab:'dash', stats:null, recent:null, config:null, orders:null, users:null, ordFilter:'all', ordQ:'', usrQ:'', busy:false };
 async function adminApi(method, body){
   const r = await fetch('/api/admin/coupons', {method, headers:{'Content-Type':'application/json','x-admin-key':ADMIN.key},
     body: body?JSON.stringify(body):undefined});
@@ -1608,13 +1618,24 @@ function screenAdmin(){
     return `<div class="screen">${back}<div class="empty">${I.shield}<b>${esc(ADMIN.err)}</b>
       <span>Ajoute la variable d'environnement <code>ADMIN_PASSWORD</code> sur Vercel pour activer l'espace admin en ligne.</span></div></div>`;
   }
+  const T = ADMIN.tab;
+  const tabBtn=(id,label)=>`<button class="chip ${T===id?'on':''}" onclick="App.adminTab('${id}')">${label}</button>`;
   const tabs = `<div class="chiprow" style="padding-top:10px">
-    <button class="chip ${ADMIN.tab==='dash'?'on':''}" onclick="App.adminTab('dash')">Tableau de bord</button>
-    <button class="chip ${ADMIN.tab==='coupons'?'on':''}" onclick="App.adminTab('coupons')">Coupons</button>
+    ${tabBtn('dash','Tableau de bord')}${tabBtn('orders','Commandes')}${tabBtn('members','Membres')}${tabBtn('coupons','Coupons')}${tabBtn('system','Système')}
   </div>`;
 
+  const loading = `<div class="adminwrap"><div class="empty">${I.clock}<b>Chargement…</b></div></div>`;
+  const demoBlock = `<div class="adminwrap"><div class="empty" style="padding:36px 24px">${I.shield}<b>Données en ligne</b>
+    <span>Cette section affiche les vraies données une fois l'app déployée. En mode démo local, seule la gestion des coupons fonctionne.</span></div></div>`;
+
   let panel;
-  if(ADMIN.tab==='coupons'){
+  if(T==='orders'){
+    panel = (API.mode!=='live') ? demoBlock : adminOrdersPanel();
+  } else if(T==='members'){
+    panel = (API.mode!=='live') ? demoBlock : adminMembersPanel();
+  } else if(T==='system'){
+    panel = adminSystemPanel();
+  } else if(ADMIN.tab==='coupons'){
     const list = ADMIN.list || [];
     panel = `
       <div class="sect">Coupons (${list.length})</div>
@@ -1662,8 +1683,10 @@ function screenAdmin(){
         <div class="kpis">
           ${kpi('Chiffre d\'affaires', fcfa(s.revenue), true)}
           ${kpi('Inscriptions payées', s.paid)}
-          ${kpi('Commandes', s.total)}
+          ${kpi('Membres', s.members!=null?s.members:'—')}
           ${kpi('Taux de conversion', conv+' %')}
+          ${kpi('Commandes', s.total)}
+          ${kpi('Cours débloqués', s.enrollments!=null?s.enrollments:'—')}
         </div>
         <div class="adminwrap">
           <div class="sect" style="padding-left:0">Ventes par cours</div>
@@ -1695,6 +1718,86 @@ function ordPill(st){
   if(st==='paid') return `<span class="pill free">payé</span>`;
   if(st==='failed') return `<span class="pill" style="background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)">échoué</span>`;
   return `<span class="pill paid">en attente</span>`;
+}
+/* ---- Panneau Commandes (recherche + filtres) ---- */
+function adminOrdersPanel(){
+  const filters = [['all','Toutes'],['paid','Payées'],['pending','En attente'],['failed','Échouées']];
+  const list = ADMIN.orders;
+  return `<div class="adminwrap">
+    <div class="admtools">
+      <input id="ord_q" class="admsearch" type="search" placeholder="Rechercher (réf, nom, e-mail…)" value="${esc(ADMIN.ordQ)}"
+        oninput="App.adminOrdersDebounced()" onkeydown="if(event.key==='Enter')App.adminLoadOrders()" aria-label="Rechercher une commande">
+      <div class="chiprow" style="padding:0">${filters.map(f=>`<button class="chip sm ${ADMIN.ordFilter===f[0]?'on':''}" onclick="App.adminOrderFilter('${f[0]}')">${f[1]}</button>`).join('')}</div>
+    </div>
+    <div class="card">
+      ${list===null?`<div class="admpad">${I.clock} Chargement…</div>`
+        : list.length? list.map(o=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+            <div class="grow">
+              <div class="c-code" style="font-size:13.5px">${o.buyer?esc((o.buyer.prenom||'')+' '+(o.buyer.nom||'')).trim()||esc(o.ref):esc(o.ref)}</div>
+              <div class="c-sum">${esc(o.name)}${o.coupon?` · <span style="color:var(--primary)">${esc(o.coupon)}</span>`:''}</div>
+              <div class="c-uses">${o.buyer&&o.buyer.email?esc(o.buyer.email)+' · ':''}${o.createdAt?ago(o.createdAt):''}</div>
+              <div class="c-uses">${esc(o.ref)}${o.transactionId?' · TX '+esc(o.transactionId):''}</div>
+            </div>
+            <div style="text-align:right"><b class="num">${fcfa(o.amount)}</b><div style="margin-top:3px">${ordPill(o.status)}</div></div>
+          </div>`).join('')
+        : `<div class="admpad">Aucune commande ne correspond.</div>`}
+    </div>
+    <p class="muted" style="font-size:12px;text-align:center">60 dernières commandes correspondantes.</p>
+  </div>`;
+}
+/* ---- Panneau Membres ---- */
+function adminMembersPanel(){
+  const list = ADMIN.users;
+  return `<div class="adminwrap">
+    <div class="admtools">
+      <input id="usr_q" class="admsearch" type="search" placeholder="Rechercher (nom, e-mail…)" value="${esc(ADMIN.usrQ)}"
+        oninput="App.adminUsersDebounced()" onkeydown="if(event.key==='Enter')App.adminLoadUsers()" aria-label="Rechercher un membre">
+    </div>
+    <div class="card">
+      ${list===null?`<div class="admpad">${I.clock} Chargement…</div>`
+        : list.length? list.map(u=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+            <span class="avatar" style="width:38px;height:38px;font-size:13px">${initials((u.prenom||'?')+' '+(u.nom||''))}</span>
+            <div class="grow" style="margin-left:10px">
+              <div class="c-code" style="font-size:13.5px">${esc((u.prenom||'')+' '+(u.nom||'')).trim()||esc(u.email)}</div>
+              <div class="c-sum">${esc(u.email)}</div>
+              <div class="c-uses">${esc(waFull(u))||'—'} · inscrit ${u.createdAt?ago(u.createdAt):''}</div>
+            </div>
+            <div style="text-align:right">
+              <b class="num" style="color:var(--primary)">${u.points||0} pts</b>
+              <div class="c-uses">${u.courses||0} cours${u.paidCourses?` · ${u.paidCourses} payé${u.paidCourses>1?'s':''}`:''}</div>
+            </div>
+          </div>`).join('')
+        : `<div class="admpad">Aucun membre ne correspond.</div>`}
+    </div>
+    <p class="muted" style="font-size:12px;text-align:center">60 membres les plus récents correspondants.</p>
+  </div>`;
+}
+/* ---- Panneau Système (état & configuration) ---- */
+function adminSystemPanel(){
+  const c = ADMIN.config || {};
+  const st = (label,ok,good,bad)=>`<div class="cpn" style="border-bottom:1px solid var(--line)">
+    <div class="grow"><div class="c-code" style="font-size:13.5px">${label}</div><div class="c-sum">${ok?esc(good):esc(bad)}</div></div>
+    <span class="pill ${ok?'free':''}" ${ok?'':'style="background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)"'}>${ok?'OK':'à faire'}</span>
+  </div>`;
+  const webhook = (c.appUrl||('https://'+location.host))+'/api/wave/webhook';
+  return `<div class="adminwrap">
+    <div class="sect" style="padding-left:0">État des services</div>
+    <div class="card">
+      ${st('Paiement Wave', c.wave, 'Clé API configurée (paiements réels)', 'WAVE_API_KEY manquante (mode démo)')}
+      ${st('E-mails (Resend)', c.mail, 'Reçus, bienvenue et codes actifs', 'Config e-mail manquante')}
+      ${st('Base de données', c.store==='neon', 'Neon/PostgreSQL (persistant)', 'Mémoire (non persistant)')}
+      ${st('Comptes membres', c.accounts, 'Connexion multi-appareils active', 'Indisponible')}
+      ${st('Notification de vente', c.notify, 'Un e-mail à chaque vente', 'NOTIFY_EMAIL non défini (optionnel)')}
+    </div>
+    <div class="sect" style="padding-left:0">Repères</div>
+    <div class="card" style="padding:14px 15px;font-size:13px;line-height:1.7">
+      <div><b>Espace admin</b><br><span class="muted">${esc((c.appUrl||('https://'+location.host)))}/boyiaadmin</span></div>
+      <div style="margin-top:10px"><b>Webhook Wave</b> (à coller dans business.wave.com)<br>
+        <span class="num" style="word-break:break-all">${esc(webhook)}</span></div>
+      <div style="margin-top:10px"><b>Coupon de test</b><br><span class="muted">CADEAU200 — fixe le prix à 200 F pour un vrai test à petit coût.</span></div>
+    </div>
+    <p class="muted" style="font-size:12px;text-align:center">Les clés secrètes ne sont jamais affichées ici ; elles se règlent dans les variables d'environnement Vercel.</p>
+  </div>`;
 }
 
 /* ================= Flux plein écran : inscription (style Tally) ================= */
@@ -2291,7 +2394,13 @@ const App = {
 
   /* --- Espace admin (coupons) --- */
   openAdmin(){ ADMIN.err=''; if(flow){ flow=null; renderFlow(); } go('profil','admin'); this.adminLoad(); },
-  adminTab(t){ ADMIN.tab=t; render(); },
+  adminTab(t){
+    ADMIN.tab=t; render();
+    if(API.mode==='live' && ADMIN.key){
+      if(t==='orders' && ADMIN.orders===null) this.adminLoadOrders();
+      if(t==='members' && ADMIN.users===null) this.adminLoadUsers();
+    }
+  },
   async adminLoad(){
     if(API.mode!=='live'){ ADMIN.list=demoCoupons(); ADMIN.stats=null; ADMIN.recent=null; ADMIN.err=''; ADMIN.tab='coupons'; render(); return; }
     if(!ADMIN.key){ render(); return; }
@@ -2301,16 +2410,34 @@ const App = {
       else if(status===401){ ADMIN.key=''; try{localStorage.removeItem('boyia-admin-key')}catch(e){} ADMIN.err='Mot de passe incorrect.'; render(); return; }
       else { ADMIN.err=json.message||'Espace admin indisponible.'; render(); return; }
       const s=await fetch('/api/admin/stats',{headers:{'x-admin-key':ADMIN.key}});
-      if(s.ok){ const sj=await s.json(); ADMIN.stats=sj.stats; ADMIN.recent=sj.recent; }
+      if(s.ok){ const sj=await s.json(); ADMIN.stats=sj.stats; ADMIN.recent=sj.recent; ADMIN.config=sj.config||null; }
     }catch(e){ ADMIN.err='Connexion impossible.'; }
     render();
   },
+  async adminLoadOrders(){
+    if(!ADMIN.key) return;
+    const qs = 'status='+encodeURIComponent(ADMIN.ordFilter||'all')+'&q='+encodeURIComponent(ADMIN.ordQ||'');
+    try{ const r=await fetch('/api/admin/orders?'+qs,{headers:{'x-admin-key':ADMIN.key},cache:'no-store'});
+      if(r.ok){ ADMIN.orders=(await r.json()).orders||[]; } else { ADMIN.orders=[]; }
+    }catch(e){ ADMIN.orders=[]; }
+    if(ADMIN.tab==='orders'){ render(); const el=$('#ord_q'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length); } }
+  },
+  async adminLoadUsers(){
+    if(!ADMIN.key) return;
+    try{ const r=await fetch('/api/admin/users?q='+encodeURIComponent(ADMIN.usrQ||''),{headers:{'x-admin-key':ADMIN.key},cache:'no-store'});
+      if(r.ok){ ADMIN.users=(await r.json()).users||[]; } else { ADMIN.users=[]; }
+    }catch(e){ ADMIN.users=[]; }
+    if(ADMIN.tab==='members'){ render(); const el=$('#usr_q'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length); } }
+  },
+  adminOrderFilter(f){ ADMIN.ordFilter=f; ADMIN.orders=null; render(); this.adminLoadOrders(); },
+  adminOrdersDebounced(){ const el=$('#ord_q'); ADMIN.ordQ=el?el.value:''; clearTimeout(this._ordT); this._ordT=setTimeout(()=>this.adminLoadOrders(),350); },
+  adminUsersDebounced(){ const el=$('#usr_q'); ADMIN.usrQ=el?el.value:''; clearTimeout(this._usrT); this._usrT=setTimeout(()=>this.adminLoadUsers(),350); },
   adminLogin(){
     const k=$('#adminkey'); if(!k||!k.value.trim()) return;
     ADMIN.key=k.value.trim(); try{localStorage.setItem('boyia-admin-key',ADMIN.key)}catch(e){}
     this.adminLoad();
   },
-  adminLogout(){ ADMIN.key=''; ADMIN.list=null; try{localStorage.removeItem('boyia-admin-key')}catch(e){} render(); },
+  adminLogout(){ ADMIN.key=''; ADMIN.list=null; ADMIN.orders=null; ADMIN.users=null; ADMIN.stats=null; ADMIN.config=null; ADMIN.tab='dash'; try{localStorage.removeItem('boyia-admin-key')}catch(e){} render(); },
   adminTypeHint(){ const t=$('#a_type'), v=$('#a_value'); if(t&&v) v.placeholder = t.value==='percent'?'50':'200'; },
   async adminSave(){
     const code=($('#a_code').value||'').trim().toUpperCase();
