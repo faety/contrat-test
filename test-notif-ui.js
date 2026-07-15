@@ -56,6 +56,7 @@ const email = `awa${Date.now()}@test.local`;
     await p.fill('#finput', 'Kouassi'); await p.keyboard.press('Enter');
     await p.fill('#finput', '0576020058'); await p.keyboard.press('Enter');
     await p.fill('#finput', email); await p.keyboard.press('Enter');
+    await p.fill('#finput', 'motdepasse1'); await p.keyboard.press('Enter');
     await p.click('.flowfoot .btn');
     await p.waitForSelector('.bigcheck', { timeout: 8000 });
     await p.click('#overlay .btn');                       // ferme l'écran de bienvenue

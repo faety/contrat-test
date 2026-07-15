@@ -49,6 +49,7 @@ const email = `awa${Date.now()}@test.local`;
     await p.fill('#finput', 'Kouassi'); await p.keyboard.press('Enter');
     await p.fill('#finput', '0576020058'); await p.keyboard.press('Enter');
     await p.fill('#finput', email); await p.keyboard.press('Enter');
+    await p.fill('#finput', 'motdepasse1'); await p.keyboard.press('Enter'); // étape mot de passe
     await p.click('.flowfoot .btn');                     // confirmer le récap → création compte serveur
     await p.waitForSelector('.bigcheck', { timeout: 8000 }); // écran de bienvenue
     ok('appareil A : compte créé via l\'app (écran de bienvenue)');
@@ -77,23 +78,18 @@ const email = `awa${Date.now()}@test.local`;
     await p.click('.tab:has-text("Mes cours")');
     if (await p.locator('.mccard').count() !== 0) throw new Error('des cours apparaissent sur un appareil vierge');
     ok('appareil B : aucun cours avant connexion');
-    // Connexion
+    // Connexion par e-mail + mot de passe (sans code)
     await p.click('.tab:has-text("Profil")');
     await p.click('.btn:has-text("me connecter")');
-    await p.waitForSelector('#finput');
+    await p.waitForSelector('#fpass');
     await p.fill('#finput', email);
-    await p.click('.btn:has-text("Recevoir mon code")');
-    await p.waitForSelector('.qlabel:has-text("Entre ton code")', { timeout: 8000 });
-    const code = codeFor(email);
-    if (!/^\d{6}$/.test(code || '')) throw new Error('code non capturé');
-    ok('appareil B : code de connexion reçu par e-mail');
-    await p.fill('#finput', code);
-    await p.click('.btn:has-text("Valider")');
+    await p.fill('#fpass', 'motdepasse1');
+    await p.click('.btn:has-text("Se connecter")');
     // Après connexion, le cours doit apparaître dans « Mes cours »
-    await p.waitForSelector('.overlay .flow', { state: 'detached', timeout: 8000 }).catch(() => {});
+    await p.waitForSelector('#overlay .flow', { state: 'detached', timeout: 8000 }).catch(() => {});
     await p.click('.tab:has-text("Mes cours")');
     await p.waitForSelector('.mccard:has-text("Comprendre l\'IA")', { timeout: 8000 });
-    ok('appareil B : connexion par code → cours retrouvé dans « Mes cours »');
+    ok('appareil B : connexion par e-mail + mot de passe → cours retrouvé');
     // Profil : e-mail et numéro international corrects
     await p.click('.tab:has-text("Profil")');
     await p.waitForSelector('.pcard');

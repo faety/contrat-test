@@ -110,6 +110,7 @@ const waveStub = http.createServer((req, res) => {
     await page.fill('#finput', 'Kouassi'); await page.keyboard.press('Enter');
     await page.fill('#finput', '0700123456'); await page.keyboard.press('Enter');
     await page.fill('#finput', 'awa.web@test.com'); await page.keyboard.press('Enter'); // e-mail distinct des tests API
+    await page.fill('#finput', 'motdepasse1'); await page.keyboard.press('Enter');       // étape mot de passe
     await page.click('.flowfoot .btn'); // confirmer inscription -> paiement (compte créé côté serveur)
     await page.waitForSelector('.ops');
     const soon = await page.locator('.op.soon').count();

@@ -420,6 +420,7 @@ const I = {
   shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
   logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
   bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  key:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-3.5 3.5a5 5 0 1 0-7 7l-4.5 4.5v3h3l1-1v-2h2v-2h2l1.5-1.5a5 5 0 0 0 7-7z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>',
   megaphone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>'
 };
 
@@ -2287,6 +2288,7 @@ function baseState(){
     posts:null,              // copie mutable des posts (init au 1er chargement)
     theme:null,              // null=auto | 'light' | 'dark'
     notifSeenAt:0,           // horodatage des annonces déjà lues (badge notifications)
+    hasPassword:false,       // le compte serveur a-t-il un mot de passe défini
   };
 }
 let S = baseState();
@@ -2827,6 +2829,7 @@ function screenProfile(){
     <div class="card" style="margin:0 14px">
       <div class="prow">${I.phone}<span>WhatsApp</span><span class="val num">${esc(waFull(u))}</span></div>
       <div class="prow">${I.mail}<span>E-mail</span><span class="val">${esc(u.email)}</span></div>
+      ${API.mode==='live'?`<button class="prow" onclick="App.openPassword()">${I.key}<span>Mot de passe</span><span class="val">${S.hasPassword?'Modifier':'Créer'}</span></button>`:''}
     </div>`
     : `
     <div class="card pcard">
@@ -3099,6 +3102,8 @@ function enrollSteps(){
      valid:v=>v.replace(/\D/g,'').length>=8||'Ce numéro semble trop court.'},
     {key:'email', label:'Ton adresse e-mail ?', help:'Pour retrouver ton compte et recevoir ton reçu.', ph:'awa@exemple.com', type:'email',
      valid:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())||'Vérifie le format de l\'adresse (ex. nom@gmail.com).'},
+    {key:'password', label:'Choisis un mot de passe', help:'Au moins 6 caractères. Il te permettra de te reconnecter partout, sans code e-mail.', ph:'Ton mot de passe', type:'password',
+     valid:v=>v.length>=6||'Au moins 6 caractères.'},
   ];
 }
 
@@ -3125,8 +3130,9 @@ function renderFlow(){
           <input id="finput" class="qinput" type="tel" inputmode="tel" placeholder="${st.ph}" value="${esc(val)}" autocomplete="tel" enterkeyhint="next">
         </div>`;
       } else {
+        const ac = st.key==='email'?'email':st.key==='prenom'?'given-name':st.key==='password'?'new-password':'family-name';
         input = `<input id="finput" class="qinput" type="${st.type}" placeholder="${st.ph}" value="${esc(val)}"
-          autocomplete="${st.key==='email'?'email':st.key==='prenom'?'given-name':'family-name'}" enterkeyhint="next">`;
+          autocomplete="${ac}" enterkeyhint="${st.key==='password'?'done':'next'}">`;
       }
       inner = `
         <div class="qnum">${flow.step+1} ${I.arrowr}</div>
@@ -3178,10 +3184,25 @@ function renderFlow(){
     if(flow.step==='wait'){
       inner = `<div class="paywait"><div class="spinner" aria-hidden="true"></div>
         <h2 class="qlabel" style="font-size:21px">${esc(flow.waitMsg||'Un instant…')}</h2></div>`;
-    } else if(flow.step==='email'){
+    } else if(flow.step==='login'){
       inner = `<h2 class="qlabel">Se connecter</h2>
+        <p class="qhelp">Entre ton e-mail et ton mot de passe pour retrouver tes cours.</p>
+        <input id="finput" class="qinput" type="email" inputmode="email" placeholder="ton@email.com" autocomplete="email" value="${esc(flow.email||'')}" enterkeyhint="next" style="margin-bottom:10px">
+        <input id="fpass" class="qinput" type="password" placeholder="Ton mot de passe" autocomplete="current-password" enterkeyhint="go">
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>
+        <button class="btn soft" style="margin-top:12px;width:auto;padding:10px 16px" onclick="App.forgotPassword()">Mot de passe oublié ?</button>`;
+      foot = `<button class="btn" onclick="App.acctLogin()">Se connecter ${I.arrowr}</button>`;
+    } else if(flow.step==='setpw'){
+      inner = `<h2 class="qlabel">${flow.pwTitle||'Crée ton mot de passe'}</h2>
+        <p class="qhelp">${esc(flow.info||'Au moins 6 caractères. Il te permettra de te reconnecter sans code e-mail.')}</p>
+        <input id="fpass" class="qinput" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password" enterkeyhint="done">
+        <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>
+        ${flow.canSkip?`<button class="btn soft" style="margin-top:12px;width:auto;padding:10px 16px" onclick="App.skipPassword()">Plus tard</button>`:''}`;
+      foot = `<button class="btn" onclick="App.savePassword()">Enregistrer ${I.arrowr}</button>`;
+    } else if(flow.step==='email'){
+      inner = `<h2 class="qlabel">Se connecter par e-mail</h2>
         <p class="qhelp">Entre l'e-mail de ton compte. On t'envoie un code à 6 chiffres pour te reconnecter et retrouver tes cours.</p>
-        <input id="finput" class="qinput" type="email" inputmode="email" placeholder="ton@email.com" autocomplete="email" enterkeyhint="go">
+        <input id="finput" class="qinput" type="email" inputmode="email" placeholder="ton@email.com" autocomplete="email" value="${esc(flow.email||'')}" enterkeyhint="go">
         <p class="qerr" id="ferr">${flow.err?esc(flow.err):''}</p>`;
       foot = `<button class="btn" onclick="App.acctLoginRequest()">Recevoir mon code ${I.arrowr}</button>`;
     } else if(flow.step==='code'){
@@ -3208,8 +3229,10 @@ function renderFlow(){
       <div class="flowbody center">${inner}</div>
       ${foot?`<div class="flowfoot">${foot}</div>`:''}
     </div>`;
-    const inp=$('#finput');
-    if(inp){ inp.focus(); inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); flow.step==='email'?App.acctLoginRequest():App.acctVerify(); } }); }
+    const inp=$('#finput'); const pass=$('#fpass');
+    const onEnter = ()=>{ if(flow.step==='login') App.acctLogin(); else if(flow.step==='setpw') App.savePassword(); else if(flow.step==='email') App.acctLoginRequest(); else App.acctVerify(); };
+    if(inp){ inp.focus(); inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); if(flow.step==='login' && pass){ pass.focus(); } else onEnter(); } }); }
+    if(pass){ if(!inp) pass.focus(); pass.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); onEnter(); } }); }
     return;
   }
 
@@ -3374,6 +3397,7 @@ function applyAccount(j){
   }
   if(Array.isArray(j.progress)) for(const p of j.progress){ if(!S.done[p.courseId]) S.done[p.courseId]={}; S.done[p.courseId][p.lessonKey]=true; }
   if(typeof j.notifSeenAt==='number') S.notifSeenAt=Math.max(S.notifSeenAt||0, j.notifSeenAt);
+  if(typeof j.hasPassword==='boolean') S.hasPassword=j.hasPassword;
   save();
 }
 /* Au chargement : si on a un jeton, on récupère le compte à jour (autre appareil, nouveaux cours). */
@@ -3459,7 +3483,7 @@ const App = {
       const pre = $('#fprefix'); if(pre) flow.data.prefix = pre.value;
       const ok = st.valid(v);
       if(ok!==true){ flow.err=ok; $('#ferr').textContent=ok; inp&&inp.focus(); return; }
-      flow.data[st.key] = st.type==='phone' ? v.replace(/\D/g,'') : v.trim();
+      flow.data[st.key] = st.type==='phone' ? v.replace(/\D/g,'') : st.key==='password' ? v : v.trim();
       flow.err=null; flow.step++;
       renderFlow();
     } else {
@@ -3477,7 +3501,7 @@ const App = {
     }
     flow = {type:'account', mode:'signup', step:'wait', waitMsg:'Création de ton compte…', email:d.email, data:d, courseId:cid};
     renderFlow();
-    let res; try{ res = await acctFetch('/api/signup', {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, prefix:d.prefix||'+225', email:d.email}); }
+    let res; try{ res = await acctFetch('/api/signup', {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, prefix:d.prefix||'+225', email:d.email, password:d.password}); }
     catch(e){ res = {status:0, json:{}}; }
     if(res.status===200 && res.json.token){ applyAccount(res.json); this.proceedAfterSignup(cid); return; }
     if(res.status===200 && res.json.needsCode){
@@ -3496,8 +3520,37 @@ const App = {
     } else if(cid){ this.finishEnroll(cid,null); }
     else { flow = {type:'welcome', courseId:null}; renderFlow(); render(); }
   },
-  /* Connexion (depuis un autre appareil) : saisie e-mail → code → session. */
-  login(){ flow = {type:'account', mode:'login', step:'email', email:'', data:{}, courseId:null, err:null}; renderFlow(); },
+  /* Connexion (depuis un autre appareil) : e-mail + mot de passe (code e-mail en secours). */
+  login(){
+    if(API.mode!=='live'){ toast('La connexion est disponible une fois l\'app en ligne.'); return; }
+    flow = {type:'account', mode:'login', step:'login', email:'', data:{}, courseId:null, err:null}; renderFlow();
+  },
+  async acctLogin(){
+    const ei=$('#finput'), pi=$('#fpass');
+    const email=(ei?ei.value:'').trim(), password=(pi?pi.value:'');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ flow.err='Entre un e-mail valide.'; const e=$('#ferr'); if(e) e.textContent=flow.err; ei&&ei.focus(); return; }
+    if(!password){ flow.err='Entre ton mot de passe.'; const e=$('#ferr'); if(e) e.textContent=flow.err; pi&&pi.focus(); return; }
+    flow.email=email; flow.step='wait'; flow.waitMsg='Connexion…'; flow.err=null; renderFlow();
+    let res; try{ res = await acctFetch('/api/auth/login', {email, password}); }catch(e){ res={status:0, json:{}}; }
+    if(res.status===200 && res.json.token){
+      applyAccount(res.json); const nom=S.user.prenom||''; flow=null; renderFlow(); render();
+      loadNotices(); toast('Content de te revoir '+nom+' 👋'); return;
+    }
+    if(res.status===409){
+      /* Compte sans mot de passe (ancien) : on bascule sur le code e-mail, puis on propose d'en créer un. */
+      flow = {type:'account', mode:'login', step:'email', email, data:{}, courseId:null, err:null, setPwAfter:true};
+      renderFlow(); toast('Ce compte n\'a pas encore de mot de passe — connecte-toi par e-mail.'); return;
+    }
+    flow = {type:'account', mode:'login', step:'login', email, data:{}, courseId:null,
+            err: res.status===401 ? 'E-mail ou mot de passe incorrect.' : 'Connexion impossible. Vérifie ta connexion et réessaie.'};
+    renderFlow();
+  },
+  /* « Mot de passe oublié ? » → connexion par code e-mail, puis création d'un nouveau mot de passe. */
+  forgotPassword(){
+    const ei=$('#finput'); const email=(ei?ei.value:'').trim();
+    flow = {type:'account', mode:'login', step:'email', email, data:{}, courseId:null, err:null, setPwAfter:true};
+    renderFlow();
+  },
   async acctLoginRequest(){
     const inp=$('#finput'); const email=(inp?inp.value:'').trim();
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ flow.err='Entre un e-mail valide.'; const e=$('#ferr'); if(e) e.textContent=flow.err; inp&&inp.focus(); return; }
@@ -3508,13 +3561,22 @@ const App = {
   async acctVerify(){
     const inp=$('#finput'); const code=(inp?inp.value:'').replace(/\D/g,'');
     if(code.length!==6){ flow.err='Le code fait 6 chiffres.'; const e=$('#ferr'); if(e) e.textContent=flow.err; inp&&inp.focus(); return; }
-    const d=flow.data||{}, mode=flow.mode, cid=flow.courseId;
+    const d=flow.data||{}, mode=flow.mode, cid=flow.courseId, setPwAfter=flow.setPwAfter;
     flow.step='wait'; flow.waitMsg='Vérification…'; flow.err=null; renderFlow();
-    let res; try{ res = await acctFetch('/api/auth/verify', {email:flow.email, code, prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp||'', prefix:d.prefix||'+225'}); }
+    let res; try{ res = await acctFetch('/api/auth/verify', {email:flow.email, code, prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp||'', prefix:d.prefix||'+225', password: mode==='signup'?d.password:undefined}); }
     catch(e){ res={status:0, json:{}}; }
     if(res.status===200 && res.json.token){
       applyAccount(res.json);
-      if(mode==='login'){ const nom=S.user.prenom||''; flow=null; renderFlow(); render(); toast('Content de te revoir '+nom+' 👋'); }
+      if(mode==='login'){
+        const nom=S.user.prenom||'';
+        /* Après connexion par code : proposer de (re)créer un mot de passe si demandé ou absent. */
+        if(setPwAfter || res.json.hasPassword===false){
+          flow = {type:'account', mode:'login', step:'setpw', email:flow.email, data:{}, courseId:null, canSkip:true,
+                  pwTitle:'Crée ton mot de passe', info:'Pour te reconnecter la prochaine fois sans code e-mail.', err:null};
+          renderFlow(); return;
+        }
+        flow=null; renderFlow(); render(); loadNotices(); toast('Content de te revoir '+nom+' 👋');
+      }
       else { this.proceedAfterSignup(cid); }
       return;
     }
@@ -3525,15 +3587,35 @@ const App = {
     renderFlow();
   },
   async acctResend(){
-    const email=flow.email, mode=flow.mode, d=flow.data||{}, cid=flow.courseId;
+    const email=flow.email, mode=flow.mode, d=flow.data||{}, cid=flow.courseId, setPwAfter=flow.setPwAfter;
     flow.step='wait'; flow.waitMsg='Renvoi du code…'; flow.err=null; renderFlow();
     try{
       if(mode==='login') await acctFetch('/api/auth/request', {email});
-      else await acctFetch('/api/signup', {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, prefix:d.prefix||'+225', email});
+      else await acctFetch('/api/signup', {prenom:d.prenom, nom:d.nom, whatsapp:d.whatsapp, prefix:d.prefix||'+225', email, password:d.password});
     }catch(e){}
-    flow = {type:'account', mode, step:'code', email, data:d, courseId:cid, info:'Nouveau code envoyé à '+email+'.'};
+    flow = {type:'account', mode, step:'code', email, data:d, courseId:cid, setPwAfter, info:'Nouveau code envoyé à '+email+'.'};
     renderFlow();
   },
+  /* Créer / changer son mot de passe (depuis le profil, ou après une connexion par code). */
+  openPassword(){
+    if(API.mode!=='live'){ toast('Disponible une fois l\'app en ligne.'); return; }
+    if(!S.token){ toast('Connecte-toi d\'abord.'); return; }
+    flow = {type:'account', mode:'setpw', step:'setpw', email:S.user?S.user.email:'', data:{}, courseId:null, canSkip:true,
+            pwTitle:'Ton mot de passe', info:'Choisis un nouveau mot de passe (au moins 6 caractères).', err:null};
+    renderFlow();
+  },
+  async savePassword(){
+    const pi=$('#fpass'); const pw=(pi?pi.value:'');
+    if(pw.length<6){ flow.err='Au moins 6 caractères.'; const e=$('#ferr'); if(e) e.textContent=flow.err; pi&&pi.focus(); return; }
+    const canSkip=flow.canSkip;
+    flow.step='wait'; flow.waitMsg='Enregistrement…'; flow.err=null; renderFlow();
+    let res; try{ res = await acctFetch('/api/me/password', {password:pw}); }catch(e){ res={status:0, json:{}}; }
+    if(res.status===200){ if(res.json&&res.json.user) applyAccount(res.json); flow=null; renderFlow(); render(); toast('Mot de passe enregistré ✓'); return; }
+    flow = {type:'account', mode:'setpw', step:'setpw', email:flow.email, data:{}, courseId:null, canSkip,
+            err: res.status===401 ? 'Session expirée — reconnecte-toi.' : (res.json&&res.json.message)||'Enregistrement impossible. Réessaie.'};
+    renderFlow();
+  },
+  skipPassword(){ flow=null; renderFlow(); render(); },
   finishEnroll(cid, pay){
     S.enrolled[cid] = {at:Date.now(), paid:!!pay, op:pay?pay.op:null, ref:pay?pay.ref:null};
     if(!S.done[cid]) S.done[cid]={};

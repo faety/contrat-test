@@ -74,6 +74,16 @@ const server = http.createServer(async (req, res) => {
       let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
       return send(res, await H.authVerify(input));
     }
+    if (req.method === 'POST' && url.pathname === '/api/auth/login') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.authLogin(input));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/me/password') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.setPassword(req.headers['authorization'] || '', input));
+    }
     if (req.method === 'GET' && url.pathname === '/api/me') {
       return send(res, await H.me(req.headers['authorization'] || ''));
     }

@@ -75,7 +75,14 @@ De vrais comptes côté serveur (Neon) : un apprenant retrouve ses cours (gratui
 
 - **Inscription fluide** : e-mail nouveau → compte + session créés immédiatement
   (`POST /api/signup`), aucun code à saisir.
-- **Connexion sur un autre appareil** : `POST /api/auth/request` envoie un **code à
+- **Mot de passe** : à l'inscription, le membre choisit un mot de passe (min 6 caractères,
+  haché en **scrypt + sel**, jamais stocké ni renvoyé en clair). Connexion directe par
+  `POST /api/auth/login` (e-mail + mot de passe) — plus besoin de code e-mail au quotidien.
+  `POST /api/me/password` (connecté) crée/modifie le mot de passe.
+- **Mot de passe oublié / compte sans mot de passe** : `POST /api/auth/login` renvoie `409`
+  si le compte n'a pas de mot de passe → repli sur le **code e-mail** ci-dessous, qui peut
+  aussi en définir un (champ `password` accepté par `/api/auth/verify`).
+- **Connexion sur un autre appareil (secours)** : `POST /api/auth/request` envoie un **code à
   6 chiffres** par e-mail (Resend), `POST /api/auth/verify` le vérifie et ouvre une session.
 - **Anti-usurpation** : s'inscrire avec un e-mail déjà utilisé exige le code (`needsCode`).
 - **Session** : jeton opaque (32 octets) envoyé au client, stocké **haché** en base
@@ -152,6 +159,8 @@ WAVE_API_KEY=… WAVE_WEBHOOK_SECRET=… DATABASE_URL=… APP_URL=https://TON-DO
 - `node test-wave.js` : faux serveur Wave local + parcours navigateur complet (checkout →
   redirection → webhook **signé** → reçu → accès au cours). 9 vérifications.
 - `node test-coupon.js` : valide les coupons (aperçu, checkout à montant serveur, admin).
+- `node test-password.js` : valide le mot de passe (hachage scrypt, connexion, mauvais
+  identifiants, compte sans mot de passe → 409, changement, « mot de passe oublié »).
 - `node test-announce.js` : valide les annonces (publication admin, liste publique, diffusion
   e-mail optionnelle, marquage « lu » synchronisé au compte).
 - `node test-notif-ui.js` : parcours navigateur des notifications (cloche, badge, centre,
