@@ -106,7 +106,7 @@ const server = http.createServer(async (req, res) => {
 
     /* ---- Annonces (notifications) ---- */
     if (req.method === 'GET' && url.pathname === '/api/announcements') {
-      return send(res, await H.announcements());
+      return send(res, await H.announcements(req.headers['authorization'] || '', req.headers['x-admin-key'] || ''));
     }
     if (req.method === 'POST' && url.pathname === '/api/admin/announce') {
       const raw = await H.readRawBody(req);

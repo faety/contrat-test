@@ -43,13 +43,12 @@ const email = `awa${Date.now()}@test.local`;
   };
 
   try {
-    /* ---------- Cloche présente, pas de badge au départ ---------- */
+    /* ---------- Visiteur non connecté : AUCUNE cloche (annonces réservées aux membres) ---------- */
     await boot();
-    if (!(await p.$('.iconbtn.bell'))) throw new Error('cloche absente de l\'en-tête');
-    if (await p.$('.iconbtn.bell .dot')) throw new Error('badge affiché alors qu\'aucune annonce');
-    ok('cloche présente dans l\'en-tête, sans badge au départ');
+    if (await p.$('.iconbtn.bell')) throw new Error('cloche visible pour un visiteur non connecté');
+    ok('visiteur non connecté : aucune cloche (annonces masquées)');
 
-    /* ---------- Crée un compte (pour le marquage « lu » serveur) ---------- */
+    /* ---------- Crée un compte → devient membre ---------- */
     await p.click('.ccard:has-text("Comprendre l\'IA")');
     await p.click('.ctabar .btn');
     await p.fill('#finput', 'Awa'); await p.keyboard.press('Enter');

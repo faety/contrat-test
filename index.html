@@ -3411,17 +3411,21 @@ async function hydrateAccount(){
 }
 
 /* ================= Notifications (annonces de l'équipe) ================= */
-let notices = [];                 // [{id, title, body, at}] — annonces serveur
+let notices = [];                 // [{id, title, body, at}] — annonces serveur (membres connectés uniquement)
 function unreadCount(){ const s=S.notifSeenAt||0; return notices.filter(n=>(n.at||0)>s).length; }
+/* Les annonces sont réservées aux membres connectés : on ne les charge que si on a
+   une session, et le serveur exige aussi ce jeton (aucune fuite côté visiteur). */
 async function loadNotices(){
-  if(!/^https?:$/.test(location.protocol)) return;
+  if(!/^https?:$/.test(location.protocol) || !S.token){ notices=[]; return; }
   try{
-    const r = await fetch('/api/announcements', {cache:'no-store'});
+    const r = await fetch('/api/announcements', {headers:authHeaders(), cache:'no-store'});
     if(r.ok){ const j=await r.json(); notices = Array.isArray(j.announcements)?j.announcements:[]; render(); }
+    else { notices=[]; }
   }catch(e){}
 }
-/* Cloche de notifications (badge = annonces non lues). */
+/* Cloche de notifications (badge = annonces non lues) — visible uniquement une fois connecté. */
 function bellBtn(){
+  if(!S.user) return '';
   const n = unreadCount();
   return `<button class="iconbtn bell" onclick="App.openNotifs()" aria-label="Notifications${n?` (${n} non lues)`:''}" title="Notifications">
     ${I.bell}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}
@@ -3514,6 +3518,7 @@ const App = {
     renderFlow();
   },
   proceedAfterSignup(cid){
+    loadNotices();   // membre connecté : initialise la cloche (sans badge pour les annonces antérieures)
     if(cid && courseById(cid) && courseById(cid).price>0){
       flow = {type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix||'+225', phone:S.user.whatsapp}};
       renderFlow();
@@ -3837,7 +3842,7 @@ const App = {
   },
   async adminLoadAnnounces(){
     if(!ADMIN.key) return;
-    try{ const r=await fetch('/api/announcements',{cache:'no-store'});
+    try{ const r=await fetch('/api/announcements',{headers:{'x-admin-key':ADMIN.key},cache:'no-store'});
       if(r.ok){ ADMIN.notices=(await r.json()).announcements||[]; } else { ADMIN.notices=[]; }
     }catch(e){ ADMIN.notices=[]; }
     if(ADMIN.tab==='announce') render();

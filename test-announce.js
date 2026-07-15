@@ -47,23 +47,42 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   assert.ok(sent.every(m => /nouveau cours/i.test(m.subject)), 'sujet reprend le titre');
   ok('publication avec e-mail : un envoi par membre (2)');
 
-  /* Liste publique : plus récente en tête */
-  const pub = await H.announcements();
+  /* Réservé aux membres : un visiteur non connecté ne voit AUCUNE annonce */
+  const anon = await H.announcements('', '');
+  assert.strictEqual(anon.status, 401, 'visiteur non connecté → 401');
+  assert.deepStrictEqual(anon.body.announcements, [], 'aucune annonce renvoyée à un visiteur');
+  ok('annonces réservées : visiteur non connecté → 401, liste vide');
+
+  /* Liste pour un membre connecté (jeton) : plus récente en tête */
+  const pub = await H.announcements('Bearer ' + s1.body.token, '');
   assert.strictEqual(pub.status, 200);
   assert.strictEqual(pub.body.announcements.length, 2);
   assert.strictEqual(pub.body.announcements[0].title, 'Nouveau cours', 'ordre antéchronologique');
-  ok('liste publique ordonnée (plus récente en tête)');
+  ok('membre connecté : liste ordonnée (plus récente en tête)');
 
-  /* Non-lus : au départ notifSeenAt=0, tout est neuf ; après /me/seen, plus rien */
+  /* L'admin peut aussi lister (clé admin), sans compte membre */
+  const asAdmin = await H.announcements('', KEY);
+  assert.strictEqual(asAdmin.status, 200);
+  assert.strictEqual(asAdmin.body.announcements.length, 2);
+  ok('admin : liste accessible via la clé admin');
+
+  /* s1 a été créé AVANT les annonces → il a des non-lus ; après /me/seen, plus rien */
+  const list = pub.body.announcements;
   const me0 = await H.me('Bearer ' + s1.body.token);
-  assert.strictEqual(me0.body.notifSeenAt, 0, 'aucune annonce lue au départ');
+  const unreadBefore = list.filter(x => x.at > (me0.body.notifSeenAt || 0)).length;
+  assert.ok(unreadBefore >= 1, 'membre antérieur : des annonces non lues au départ');
   const seen = await H.meSeen('Bearer ' + s1.body.token);
   assert.strictEqual(seen.status, 200);
   assert.ok(seen.body.notifSeenAt > 0, 'horodatage « lu » enregistré');
-  const list = pub.body.announcements;
-  const unread = list.filter(x => x.at > seen.body.notifSeenAt).length;
-  assert.strictEqual(unread, 0, 'plus aucune annonce non lue après marquage');
+  const unreadAfter = list.filter(x => x.at > seen.body.notifSeenAt).length;
+  assert.strictEqual(unreadAfter, 0, 'plus aucune annonce non lue après marquage');
   ok('marquage « lu » synchronisé au compte (multi-appareils)');
+
+  /* Un membre qui s'inscrit APRÈS les annonces ne voit pas les anciennes comme non lues */
+  const s3 = await H.signup({ prenom: 'Cyr', nom: 'K', whatsapp: '0700000002', email: 'cyr@test.local' });
+  const unreadNew = list.filter(x => x.at > (s3.body.notifSeenAt || 0)).length;
+  assert.strictEqual(unreadNew, 0, 'nouveau membre : aucune annonce antérieure en non-lu');
+  ok('nouveau membre : pas de badge pour les annonces d\'avant son inscription');
 
   /* meSeen exige une session */
   assert.strictEqual((await H.meSeen('')).status, 401);
