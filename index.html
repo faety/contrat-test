@@ -345,6 +345,21 @@ a.lplayer{text-decoration:none;cursor:pointer}
 .copycard .cc-btn:active{transform:scale(.96)}
 .copycard pre{white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.3px;line-height:1.5;margin:0}
 
+/* ---- Quiz de leçon & réponse à révéler ---- */
+.quiz{border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.quiz .qz-q{font-weight:700;font-size:14.5px;line-height:1.45}
+.qopt{text-align:left;border:1.5px solid var(--line);background:var(--surface-2);border-radius:10px;padding:10px 13px;font-size:14px;color:var(--ink);cursor:pointer;transition:border-color .15s}
+.qopt:not(:disabled):hover{border-color:var(--primary)}
+.qopt:disabled{cursor:default}
+.qopt.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent);font-weight:700}
+.qopt.bad{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,transparent)}
+.qz-fb{display:none;font-size:13.5px;color:var(--muted);line-height:1.5}
+.qz-fb.show{display:block}
+.reveal{display:flex;flex-direction:column;gap:8px}
+.rv-btn{align-self:flex-start;border:1.5px solid var(--primary);background:var(--primary-soft);color:var(--primary-deep);font-weight:700;font-size:13.5px;padding:9px 15px;border-radius:10px;cursor:pointer}
+[data-theme="dark"] .rv-btn{color:var(--primary)}
+.rv-body{background:var(--surface-2);border-left:3px solid var(--primary);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6}
+
 /* ---- Cloche & notifications ---- */
 .hdact{display:flex;align-items:center;gap:9px;flex:none}
 .iconbtn.bell{position:relative}
@@ -1110,447 +1125,616 @@ Astuce de pro : après chaque bon résultat, colle l'e-mail final sous ta consig
    ]},
 
   /* ---------- PAYANT · IA · Claude ---------- */
-  {id:'claude', title:"Claude au travail : rédiger et analyser comme un pro", cat:'IA', price:5000, g:3,
-   instr:'Équipe Boyia Institute', instrRole:'Formation IA pour le travail', dur:'2 h 50',
-   desc:"Claude excelle sur les textes longs, l'analyse de documents et le ton juste. Fais-en ton assistant pour les documents pros, les rapports et l'analyse.",
-   learn:["Accéder à Claude et comprendre ses points forts","Faire analyser et résumer de longs documents","Produire des documents professionnels soignés (Artifacts)","Travailler en confiance : confidentialité et vérification","Repartir avec 10 consignes + 4 modèles de documents réutilisables","Suivre un plan de 7 jours pour en faire un réflexe quotidien"],
+  {id:'claude', title:"Maîtriser Claude pour le travail", cat:'IA', price:5000, g:3,
+   instr:'Équipe Boyia Institute', instrRole:'Cours pratique — méthode, exercices et quiz', dur:'~3 h',
+   desc:"Le cours complet pour faire de Claude ton meilleur collègue : écrire, analyser, décider et préparer plus vite — avec des quiz, des exercices corrigés et des consignes prêtes à copier à chaque leçon.",
+   learn:["Écrire e-mails, rapports et messages délicats en quelques minutes","Résumer et analyser n'importe quel document long","Comparer des options et préparer des décisions solides","Préparer réunions, entretiens et présentations","Travailler en anglais sans stress","Repartir avec 15 consignes prêtes + un plan de 7 jours"],
    modules:[
-     {t:'Prendre Claude en main', l:[
-       ["C'est quoi Claude, et ses points forts",'8 min',
-`🎯 **Objectif :** comprendre pour quoi Claude est particulièrement fort, et quand le choisir.
 
-Claude est un assistant IA conçu par l'entreprise **Anthropic**. Comme les autres, tu lui écris en langage normal et il te répond. Mais il a une réputation bien précise.
+     {t:'Démarrer fort', l:[
+       ["Bienvenue — ta feuille de route",'6 min',
+`🎯 Objectif : savoir exactement ce que ce cours va t'apporter, et comment en tirer le maximum.
 
-## Les 4 points forts de Claude
+Bienvenue ! Tu viens d'investir dans une compétence qui te servira tous les jours. Voici le contrat.
 
-- **Les textes longs** — lire, résumer, analyser un rapport de 20 ou 50 pages.
-- **L'analyse de documents** — comprendre un contrat, un compte rendu, un dossier.
-- **La nuance** — trouver le ton juste pour un message délicat.
-- **Un rendu naturel et professionnel** — des textes qui ne sonnent pas « robot ».
+## Ce que tu sauras faire à la fin
+- Écrire un e-mail, une note ou un rapport propre en quelques minutes.
+- Résumer un document de 30 pages et en tirer les décisions.
+- Préparer une réunion, un entretien ou une présentation deux fois plus vite.
+- Travailler en anglais sans blocage.
 
-Concrètement : si tu dois **lire un long document**, **rédiger une note soignée**, ou **reformuler un message sensible** avec le bon équilibre, Claude est un excellent choix.
+## Comment ce cours fonctionne
+1. Chaque leçon dure moins de 10 minutes et se termine par un exercice réel.
+2. Les consignes « 📋 à copier » se collent directement dans Claude : teste-les pendant la leçon.
+3. Les mini-quiz 🧠 vérifient que tu as capté l'essentiel — réponds avant d'avancer.
+4. Les boutons « 👀 Voir un exemple de réponse » te donnent un corrigé après avoir essayé.
 
-## Le principe reste le même
+💡 La règle d'or du cours : ne lis jamais une leçon sans ouvrir Claude à côté. On apprend en faisant, pas en lisant.
 
-Comme pour tout assistant IA, la méthode ne change pas : une **bonne demande**, du **contexte**, et des **allers-retours**. Tout ce que tu apprends ici te resservira avec ChatGPT ou Copilot.
+[QUIZ] Quelle est la meilleure façon de suivre ce cours ?
+- Lire toutes les leçons d'un coup, puis pratiquer plus tard
+- Lire une leçon en testant chaque consigne dans Claude au fur et à mesure *
+- Regarder uniquement les exemples de réponse
+> C'est la pratique immédiate qui ancre la compétence : une leçon + un essai réel, chaque jour.
 
-💡 **Astuce :** garde en tête « **document long ou ton délicat → Claude** ». C'est le réflexe qui te fera choisir le bon outil au bon moment.
+✅ À retenir : 10 minutes par jour avec Claude ouvert à côté — c'est tout ce qu'il faut.
 
-✅ **À retenir :**
-- Claude (Anthropic) : fort sur **textes longs, analyse, nuance, ton naturel**.
-- Idéal pour lire un rapport, rédiger une note soignée, un message sensible.
-- Même méthode que les autres IA.
+À toi de jouer : ouvre claude.ai dans un autre onglet (ou l'app Claude), et garde-le ouvert pour toute la suite du cours.`,null],
 
-À toi de jouer : note un **document long** que tu dois traiter bientôt (rapport, contrat, compte rendu). Ce sera ton terrain d'entraînement pour tout le cours.`,null],
-       ["Y accéder : gratuit ou payant",'7 min',
-`🎯 **Objectif :** créer ton accès à Claude et repérer le geste le plus important : joindre un fichier.
+       ["Installe Claude et fais le tour",'7 min',
+`🎯 Objectif : avoir un compte Claude qui marche, et connaître les 4 zones de l'écran qui te serviront.
 
-## Créer ton compte
+## Créer ton compte (gratuit)
+1. Va sur claude.ai (navigateur) ou installe l'app Claude (App Store / Play Store).
+2. Inscris-toi avec ton adresse e-mail ou ton compte Google.
+3. C'est tout — la version gratuite suffit largement pour ce cours.
 
-1. Va sur **claude.ai** (ou installe l'application **Claude**, éditée par Anthropic).
-2. Inscris-toi avec ton e-mail ou ton compte Google.
-3. Tu arrives sur une interface épurée : une **zone de message** en bas, la **conversation** au centre.
+## Les 4 zones à connaître
+- **La zone de saisie** en bas : c'est là que tu écris tes demandes. Le bouton 📎 permet de joindre un document ou une photo.
+- **La conversation** au centre : Claude se souvient de TOUT ce qui a été dit dans la conversation en cours. Tu peux enchaîner les demandes.
+- **Les conversations** à gauche : chaque sujet mérite sa conversation. Retrouve-les par leur titre.
+- **Nouveau chat** : commence une nouvelle conversation quand tu changes complètement de sujet.
 
-## Gratuit ou payant ?
+⚠️ Piège classique : tout faire dans une seule conversation interminable. Quand tu changes de sujet, ouvre un nouveau chat — les réponses restent précises.
 
-- **Version gratuite** — permet déjà beaucoup : discuter, **analyser des documents**, rédiger. Suffit pour découvrir et pour un usage régulier.
-- **Version payante** — limites plus hautes, modèles les plus performants, et les **Projets** (regrouper le contexte d'un même sujet de travail au même endroit).
+## Ton premier message
 
-Commence en **gratuit** ; passe au payant seulement si tu traites de gros volumes chaque jour.
+[COPIER] Bonjour Claude ! Je suis [ton métier] à [ta ville]. Présente-toi en 3 phrases et dis-moi les 3 façons dont tu peux m'aider dans mon travail au quotidien.
 
-## Le bouton à repérer tout de suite
+[QUIZ] Tu as discuté avec Claude d'un rapport de ventes, et tu veux maintenant préparer un entretien d'embauche. Que fais-tu ?
+- Je continue dans la même conversation
+- J'ouvre un nouveau chat pour le nouveau sujet *
+- Je supprime mon compte et j'en recrée un
+> Un sujet = une conversation. Claude reste concentré et tu retrouves facilement tes échanges.
 
-Cherche l'icône **trombone** (📎) dans la zone de message : c'est par là que tu **joins un fichier** (PDF, Word, tableau). C'est le geste qui fait toute la valeur de Claude — on le voit à la leçon suivante.
+✅ À retenir : compte gratuit + un chat par sujet + le trombone 📎 pour joindre des documents.
 
-✅ **À retenir :**
-- Accès sur **claude.ai** ou l'appli **Claude** (Anthropic).
-- Le **gratuit** analyse déjà des documents.
-- Repère le **trombone** pour joindre un fichier.
+À toi de jouer : envoie le message ci-dessus à Claude, et lis sa réponse. Bienvenue dans ton nouveau quotidien.`,null],
 
-À toi de jouer : crée ton compte et repère le bouton **trombone** pour joindre un fichier. Tu t'en serviras dès la prochaine leçon.`,null],
-       ["Joindre un document et poser une question",'8 min',
-`🎯 **Objectif :** maîtriser le geste le plus utile de Claude — joindre un document et poser ta question dessus.
+       ["La formule magique : Tâche + Contexte + Format",'10 min',
+`🎯 Objectif : maîtriser LA compétence qui change tout — écrire une demande qui donne une excellente réponse du premier coup.
 
-C'est **le** super-pouvoir de Claude au travail. Au lieu de lui demander de deviner, tu lui **donnes la matière** : il lit ton document et répond en s'appuyant dessus.
+La différence entre « l'IA c'est gadget » et « je gagne 1 h par jour », c'est la qualité de la demande. Voici la formule.
 
-## Comment faire, en 3 étapes
+## La formule T + C + F
+1. **La Tâche** : ce que tu veux, avec un verbe précis. « Rédige », « Résume », « Compare », « Corrige ».
+2. **Le Contexte** : la situation, le destinataire, l'enjeu. C'est ce qui rend la réponse SUR MESURE.
+3. **Le Format** : longueur, ton, structure. « 5 lignes, ton courtois, termine par une question. »
 
-1. Clique sur le **trombone** (📎) et sélectionne ton fichier (PDF, Word, texte, tableau).
-2. Écris ta question **sur ce document**.
-3. Envoie — Claude lit tout et répond.
+## Vois la différence
+Demande faible : « Écris une lettre de relance. »
 
-## Des questions qui marchent
+Demande forte :
 
-[COPIER] Résume ce document en 5 points clés, puis liste séparément les risques mentionnés et ce qui reste flou.
+[COPIER] Rédige une relance pour un devis de 450 000 FCFA envoyé il y a 8 jours à M. Koné, gérant d'une boutique à Cocody, resté sans réponse. C'est un bon client, je ne veux pas le braquer. 5 lignes maximum, ton chaleureux mais professionnel, termine par une question simple qui l'invite à répondre.
 
-Autres exemples selon le document :
+Colle les deux dans Claude et compare : la deuxième réponse est prête à envoyer, la première est générique.
 
-- « **Que dit ce contrat** sur les délais de paiement et les pénalités ? »
-- « Quelles sont les **décisions** prises dans ce compte rendu, et qui fait quoi ? »
-- « **Compare** ces deux devis que je te joins. »
+💡 Astuce : tu peux aussi donner un rôle à Claude — « Agis comme un expert-comptable ivoirien » — pour orienter son regard.
 
-## Pourquoi c'est plus fiable
+[QUIZ] Quel élément manque à cette demande : « Résume ce rapport pour ma direction » ?
+- La tâche
+- Le contexte
+- Le format *
+> La tâche (résumer) et le contexte (pour la direction) y sont. Il manque le format : combien de lignes ? sous quelle forme ? Ex. « en 10 lignes avec 3 points clés ».
 
-Quand Claude s'appuie sur **ton** document, il invente beaucoup moins : la réponse vient de ta matière, pas de sa mémoire. Tu gardes quand même le réflexe de vérifier un chiffre important à la source (voir module 4).
+✅ À retenir :
+- Tâche = verbe précis.
+- Contexte = situation + destinataire + enjeu.
+- Format = longueur + ton + structure.
 
-💡 **Astuce :** tu peux joindre **plusieurs** fichiers à la fois et demander une synthèse ou une comparaison. Parfait pour dépouiller des offres ou des candidatures.
-
-✅ **À retenir :**
-- **Joins** le fichier, puis pose ta question dessus.
-- Bien plus fiable que de le laisser deviner.
-- Plusieurs fichiers = synthèse ou comparaison.
-
-À toi de jouer : joins un document que tu connais bien et demande un résumé en 5 points. Vérifie qu'il a saisi l'essentiel.`,null],
-       ["Ta première demande utile",'7 min',
-`🎯 **Objectif :** réussir ta première rédaction avec Claude, sur une tâche réelle.
-
-Commence par une **tâche concrète**, pas une question vague. Copie celle-ci pour voir :
-
-[COPIER] Rédige une note interne d'une demi-page pour annoncer à l'équipe un changement d'horaires à partir de lundi (ouverture à 8 h au lieu de 9 h). Ton clair et rassurant, explique la raison en une phrase, et termine sur une note positive.
-
-Tu obtiens une note soignée en quelques secondes.
-
-## Puis tu affines
-
-Comme toujours, la première réponse est un **brouillon** que tu améliores par petites touches :
-
-- « Ajoute une phrase de remerciement pour l'équipe. »
-- « Rends-le plus bref. »
-- « Ton un peu plus chaleureux. »
-
-💡 **Astuce :** Claude est réputé pour son **ton naturel**. Profite-en dès cette première note : demande « que ça sonne humain, pas administratif ».
-
-✅ **À retenir :**
-- Démarre par une **tâche concrète**.
-- Le premier jet est une **base** à affiner.
-- Exploite le ton naturel de Claude.
-
-À toi de jouer : fais rédiger une note interne réelle dont tu as besoin, puis demande une version plus courte et plus chaleureuse.`,null],
+À toi de jouer : prends une vraie tâche d'écriture de ta semaine et écris ta demande en T + C + F. Envoie-la à Claude et note le temps gagné.`,null],
      ]},
-     {t:'Bien demander : la compétence clé', l:[
-       ["La recette d'une bonne consigne",'9 min',
-`🎯 **Objectif :** écrire une consigne complète — et exploiter le fait que Claude adore le contexte détaillé.
 
-La recette est la même que pour toute IA : **Rôle + Tâche + Contexte + Format**.
+     {t:'Écrire comme un pro', l:[
+       ["L'e-mail parfait en 2 minutes",'9 min',
+`🎯 Objectif : produire des e-mails professionnels impeccables — premier jet par Claude, touche finale par toi.
 
-[COPIER] Tu es responsable RH. Rédige un message pour féliciter l'équipe après un trimestre difficile mais réussi. En 8 lignes, ton chaleureux et sincère, sans en faire trop, avec un remerciement concret pour les efforts fournis.
+L'e-mail est la tâche d'écriture la plus fréquente au travail. Automatise le premier jet, garde le contrôle du dernier mot.
 
-- **Rôle** : « Tu es responsable RH. »
-- **Tâche** : « Rédige un message. »
-- **Contexte** : « après un trimestre difficile mais réussi. »
-- **Format** : « 8 lignes, ton chaleureux et sincère. »
+## La méthode en 3 temps
+1. **Brief** : donne la situation en 2 phrases (à qui, pourquoi, enjeu).
+2. **Jet** : Claude produit une version complète en 10 secondes.
+3. **Ajustement** : tu modifies 1 ou 2 détails (un prénom, une date, une nuance) et tu envoies.
 
-## La particularité de Claude : donne-lui BEAUCOUP de contexte
+## Trois briefs prêts à l'emploi
 
-Contrairement à ce qu'on croit, tu ne dois pas être avare de détails. Claude gère **très bien les consignes longues et détaillées** — c'est même là qu'il excelle. Plus le contexte est riche et précis, plus le résultat est juste.
+[COPIER] Rédige un e-mail pour annoncer à un client que sa commande aura 3 jours de retard à cause d'un problème de livraison. Présente des excuses sans te justifier longuement, donne la nouvelle date, et propose un geste commercial simple. Ton professionnel et rassurant, 8 lignes max.
 
-N'hésite donc pas à ajouter : l'historique de la situation, ce que tu veux éviter, des exemples, le public exact. Là où d'autres IA se perdent, Claude tient le fil.
+[COPIER] Rédige un e-mail de candidature spontanée pour un poste de [poste] chez [entreprise]. Mets en avant : [tes 2 forces]. Ton confiant sans arrogance, 10 lignes, termine en proposant un échange téléphonique.
 
-💡 **Astuce :** pour un message important, écris un vrai paragraphe de contexte avant ta demande. « Voici la situation : … Voici ce que je veux éviter : … Maintenant, rédige… ». La qualité fait un bond.
+[COPIER] Rédige une réponse polie mais ferme à un client qui demande une réduction que je ne peux pas accorder. Explique la valeur de ce qu'il reçoit, propose une alternative (facilité de paiement), et garde la relation. 6 lignes.
 
-✅ **À retenir :**
-- **Rôle + Tâche + Contexte + Format**.
-- Claude **adore** le contexte détaillé — donnes-en généreusement.
-- Précise ce que tu veux **éviter**, pas seulement ce que tu veux.
+💡 Toujours relire avant d'envoyer : c'est TOI qui signes. Change ce qui ne sonne pas comme toi — Claude s'adapte si tu lui dis « plus direct » ou « plus chaleureux ».
 
-À toi de jouer : écris une consigne complète (4 morceaux) pour un message que tu dois envoyer cette semaine, avec un vrai paragraphe de contexte.`,null],
-       ["Donner un exemple et régler le ton",'8 min',
-`🎯 **Objectif :** obtenir exactement le bon ton — le domaine où Claude est le plus fort.
+[QUIZ] Claude t'a écrit un e-mail correct mais trop formel pour ton client habituel. Que fais-tu ?
+- J'envoie quand même, tant pis
+- Je réécris tout moi-même de zéro
+- Je réponds « rends-le plus chaleureux et tutoie le client » *
+> C'est la force de la conversation : tu affines en une phrase au lieu de tout refaire.
 
-## Montre un exemple pour ton style
+✅ À retenir : brief court → jet complet → TA touche finale. Jamais d'envoi sans relecture.
 
-Le plus rapide pour obtenir ton style : **colle un document dont tu es fier** et dis « Écris dans ce style ». Claude capte la structure, la longueur, la façon de saluer.
+À toi de jouer : reprends le dernier e-mail difficile que tu as dû écrire. Refais-le avec la méthode en 3 temps et compare avec ta version d'origine.`,null],
 
-## Règle le ton avec des nuances fines
+       ["Messages délicats : trouver le ton juste",'10 min',
+`🎯 Objectif : gérer les messages sensibles — mauvaise nouvelle, relance ferme, recadrage — sans casser la relation.
 
-Claude est réputé pour **capter la nuance**. Tu peux lui demander des dosages précis que d'autres IA ratent :
+C'est dans les messages délicats que Claude brille le plus : il trouve les mots quand l'émotion brouille les tiens.
 
-- « Plus **diplomate**. »
-- « Plus **direct**, sans être sec. »
-- « **Chaleureux** mais professionnel. »
-- « **Ferme** sur le fond, respectueux sur la forme. »
+## La technique des 2 versions
+Demande TOUJOURS deux versions d'un message sensible : une directe, une diplomate. Tu choisis, ou tu mélanges.
 
-C'est précieux pour les messages sensibles — annonce difficile, réponse à une plainte, recadrage bienveillant — où **le ton fait tout**.
+[COPIER] Je dois annoncer à mon équipe que la prime de fin d'année sera réduite de moitié cette année à cause des résultats. Rédige 2 versions du message : une version directe et factuelle, une version plus diplomate qui reconnaît la déception. Les deux doivent rester honnêtes, expliquer la raison en une phrase, et finir sur une perspective positive crédible.
 
-[COPIER] Rédige une réponse à ce client mécontent : reconnais son problème, reste ferme sur notre position (pas de remboursement total), mais garde un ton respectueux qui préserve la relation. [colle son message]
+## Le test du destinataire
+Avant d'envoyer un message sensible, retourne la situation :
 
-💡 **Astuce :** demande souvent **2 versions** — « une plus douce, une plus ferme ». Tu choisis selon ton ressenti de la situation, et tu apprends à sentir le bon curseur.
+[COPIER] Voici le message que je compte envoyer : [colle ton message]. Mets-toi à la place du destinataire : comment ce message risque-t-il d'être perçu ? Y a-t-il une phrase qui pourrait blesser ou être mal interprétée ? Propose une correction si besoin.
 
-✅ **À retenir :**
-- **Montre un exemple** pour ton style.
-- Claude gère les **nuances fines** de ton.
-- Pour un message délicat : demande 2 versions, douce et ferme.
+C'est comme faire relire par un collègue très diplomate — avant qu'il ne soit trop tard.
 
-À toi de jouer : fais rédiger un message délicat, puis demande une version « plus diplomate ». Compare.`,null],
-       ["Itérer sur un long texte",'8 min',
-`🎯 **Objectif :** améliorer un document long avec un contrôle fin, sans tout casser d'un coup.
+⚠️ Ne délègue jamais la décision : Claude t'aide à DIRE les choses, mais c'est toi qui décides QUOI dire. Une mauvaise nouvelle reste ta responsabilité.
 
-Sur un texte court, tu peux dire « améliore tout ». Sur un **document long**, c'est une erreur : tu perds le contrôle. La méthode pro, c'est de travailler **section par section**.
+[QUIZ] Tu dois recadrer un collaborateur qui arrive en retard. Quelle est la meilleure demande ?
+- « Écris un message pour engueuler quelqu'un »
+- « Rédige un recadrage bienveillant : 3 retards cette semaine, c'est un bon élément, je veux corriger sans démotiver. Ton ferme mais respectueux, 5 lignes. » *
+- « Écris un message de licenciement »
+> Contexte + intention (« corriger sans démotiver ») + format : Claude calibre exactement le ton demandé.
 
-## Travaille par morceaux
+✅ À retenir : 2 versions pour choisir le ton + le test du destinataire avant d'envoyer.
 
-- « Améliore **seulement l'introduction**. »
-- « **Raccourcis la partie 2** de moitié. »
-- « **Uniformise le ton** sur tout le document. »
-- « Reformule **ce paragraphe** en plus clair : [colle-le]. »
+À toi de jouer : pense au message le plus délicat que tu aies dû envoyer ces derniers mois. Refais-le avec la technique des 2 versions. Lequel aurais-tu envoyé ?`,null],
 
-Tu gardes ainsi la maîtrise : chaque changement est ciblé et visible.
+       ["Notes, comptes rendus et rapports",'10 min',
+`🎯 Objectif : produire des documents structurés — note interne, compte rendu, rapport — à partir de tes idées en vrac.
 
-## Les demandes qui font gagner du temps
+## Du vrac au document propre
+Ta matière première, ce sont tes notes brutes : idées en désordre, points de réunion griffonnés, vocal transcrit. Claude les transforme en document structuré.
 
-- « **Relis et signale les incohérences** ou répétitions. »
-- « Propose un **titre** et un **résumé exécutif** en tête. »
-- « Vérifie que le **plan** est logique et suggère un meilleur ordre. »
+[COPIER] Transforme ces notes en compte rendu de réunion professionnel : [colle tes notes en vrac]. Structure : participants, points discutés, décisions prises, prochaines actions avec responsable et échéance. Style neutre et concis.
 
-Claude, à l'aise sur les textes longs, garde le fil du document entier pendant que tu travailles un détail.
+## La note interne qui passe bien
 
-💡 **Astuce :** finis toujours par « **relis l'ensemble** et assure-toi que les parties s'enchaînent bien ». C'est la touche finale qui fait un document cohérent.
+[COPIER] Rédige une note interne d'une demi-page pour annoncer [le changement] à l'équipe à partir du [date]. Structure : ce qui change, pourquoi (une phrase), ce que ça implique concrètement pour chacun, qui contacter en cas de question. Ton clair et rassurant.
 
-✅ **À retenir :**
-- Document long = **section par section**.
-- Demande incohérences, titre, résumé exécutif.
-- Termine par une **relecture d'ensemble**.
+## Le rapport en deux étapes
+Pour un rapport plus long, ne demande pas tout d'un coup :
+1. D'abord le plan : « Propose un plan en 4 parties pour un rapport sur [sujet], destiné à [qui]. »
+2. Puis partie par partie : « Rédige la partie 1 en t'appuyant sur ces éléments : [tes données]. »
 
-À toi de jouer : prends un texte long et fais améliorer **une seule section** à la fois, puis demande une relecture d'ensemble.`,null],
+Tu gardes la main sur la structure, et chaque partie est plus soignée.
+
+💡 Donne toujours tes VRAIES données (chiffres, dates, noms) : Claude structure et rédige, mais il ne connaît pas ton entreprise. Ce que tu ne donnes pas, il ne peut pas l'inventer — et il ne doit pas.
+
+[QUIZ] Pour un rapport de 5 pages, quelle approche donne le meilleur résultat ?
+- Demander les 5 pages d'un coup
+- Demander d'abord un plan, puis rédiger partie par partie *
+- Écrire tout soi-même puis demander une correction
+> Le plan d'abord te laisse valider la structure, et chaque partie rédigée séparément est plus précise et plus dense.
+
+✅ À retenir : notes en vrac → document structuré. Long document = plan d'abord, puis partie par partie.
+
+À toi de jouer : prends les notes de ta dernière réunion (même 5 lignes griffonnées) et transforme-les en compte rendu avec la première consigne.`,null],
+
+       ["Faire réécrire et améliorer tes textes",'8 min',
+`🎯 Objectif : utiliser Claude comme relecteur-correcteur : zéro faute, plus clair, plus percutant.
+
+Tu écris déjà des textes. Claude peut les rendre meilleurs en 10 secondes — sans changer ta voix.
+
+## Les 3 niveaux de retouche
+1. **Corriger** : orthographe et grammaire uniquement, sans toucher au style.
+
+[COPIER] Corrige uniquement les fautes d'orthographe et de grammaire de ce texte, sans changer le style ni les formulations : [colle ton texte]
+
+2. **Clarifier** : rendre plus lisible.
+
+[COPIER] Réécris ce texte pour le rendre plus clair et plus fluide, en gardant toutes les informations et à peu près la même longueur : [colle ton texte]
+
+3. **Muscler** : rendre plus convaincant.
+
+[COPIER] Rends ce texte plus percutant et convaincant : phrases plus courtes, verbes d'action, bénéfices concrets mis en avant. Garde un ton professionnel : [colle ton texte]
+
+## Demande le pourquoi
+Ajoute « explique-moi en 3 points ce que tu as changé et pourquoi » : tu apprends en même temps, et tes propres textes s'améliorent semaine après semaine.
+
+💡 Pour garder TA voix : « garde mon style, corrige seulement ce qui est incorrect ». Claude sait faire la différence entre corriger et réécrire.
+
+[QUIZ] Ton texte est bon mais tu veux juste enlever les fautes. Quelle consigne ?
+- « Réécris ce texte »
+- « Corrige uniquement les fautes, sans changer le style » *
+- « Rends ce texte plus percutant »
+> « Réécris » change tout ; la consigne précise limite l'intervention à ce que tu veux.
+
+✅ À retenir : corriger, clarifier ou muscler — trois consignes différentes pour trois besoins. Demande toujours « ce que tu as changé et pourquoi » pour progresser.
+
+À toi de jouer : prends un texte que tu as écrit récemment (e-mail, publication, note) et passe-le aux 3 niveaux. Observe ce qui change à chaque étape.`,null],
      ]},
-     {t:'Cas d\'usage réels au travail', l:[
-       ["Analyser un long rapport",'10 min',
-`🎯 **Objectif :** transformer « je dois lire 30 pages » en « j'ai l'essentiel en 2 minutes » — le point fort absolu de Claude.
 
-Joins un rapport ou un compte rendu volumineux (📎) et demande une **lecture structurée**. Voici la consigne complète à copier :
+     {t:'Analyser comme un consultant', l:[
+       ["Résumer un long document en 30 secondes",'9 min',
+`🎯 Objectif : ne plus jamais lire 30 pages pour en retenir 10 lignes — extraire l'essentiel de n'importe quel document.
 
-[COPIER] Analyse ce document et donne-moi : 1) un résumé en une page, 2) les décisions et les actions avec les responsables, 3) les 3 risques principaux et les solutions proposées, 4) ce qui manque ou reste flou et mériterait une question.
+C'est LA force de Claude : il digère des documents très longs (rapports, contrats, articles) et t'en ressort l'essentiel.
 
-## Pourquoi c'est un game-changer
+## Comment donner le document
+- **Fichier** : clique 📎 et joins le PDF ou le Word directement.
+- **Copier-coller** : sélectionne le texte et colle-le dans le message.
+- **Photo** : sur mobile, photographie un document papier — Claude le lit.
 
-Claude est **particulièrement à l'aise** sur ce travail d'analyse de longs documents. Tu passes de « je dois bloquer une heure pour lire ça » à « j'ai les points clés en 2 minutes, et je vais vérifier les 3 qui comptent ».
+## Le résumé qui sert vraiment
+Un bon résumé dépend de POURQUOI tu lis. Précise-le :
 
-## Va plus loin
+[COPIER] Résume ce document en 10 lignes maximum. Je suis [ton rôle] et je dois décider [ta décision]. Structure ta réponse en 3 parties : l'essentiel en 2 phrases, les 5 points clés, et ce qui demande mon attention ou ma prudence.
 
-- « **Prépare-moi 5 questions** à poser en réunion sur ce rapport. »
-- « Qu'est-ce qui **contredit** ce qu'on avait décidé le mois dernier ? » (joins les deux)
-- « Explique-moi la **partie 3** comme si je débutais sur le sujet. »
+## Puis creuse en discutant
+Le résumé n'est que le début. Enchaîne :
+- « Que dit le document sur [point précis] ? »
+- « Y a-t-il des chiffres qui contredisent la conclusion ? »
+- « Quelles questions devrais-je poser à l'auteur ? »
 
-⚠️ **Vérifie les points qui engagent.** Sur un chiffre ou une clause importante, retourne au passage d'origine dans le document (Claude te dit où). L'IA te fait lire vite ; la décision reste la tienne.
+C'est comme interroger quelqu'un qui vient de lire le document pour toi.
 
-✅ **À retenir :**
-- Joins le document, demande **résumé + décisions + risques + flous**.
-- Le terrain où Claude est **le plus fort**.
-- Vérifie à la source ce qui engage.
+⚠️ Pour un document engageant (contrat, offre), le résumé t'oriente mais ne remplace pas la lecture des clauses clés ni l'avis d'un professionnel.
 
-À toi de jouer : joins un long document réel et demande les décisions, les actions et les risques. Vérifie un point clé dans le texte d'origine.`,null],
-       ["Produire un document soigné avec les Artifacts",'9 min',
-`🎯 **Objectif :** produire de vrais livrables réutilisables (modèles, tableaux, procédures) grâce aux Artifacts.
+[QUIZ] Tu reçois un rapport de 40 pages avant une réunion dans 20 minutes. Le meilleur réflexe ?
+- Lire en diagonale et espérer
+- Le joindre à Claude avec ta situation et demander l'essentiel + les points d'attention *
+- Annuler la réunion
+> En 2 minutes tu as l'essentiel structuré POUR ta réunion — et tu peux creuser les points sensibles en discutant.
 
-## C'est quoi un Artifact ?
+✅ À retenir : joins le document + dis pourquoi tu le lis + creuse en posant des questions.
 
-Quand tu demandes à Claude de créer un **vrai document** — une note, un tableau, un modèle de lettre, une procédure — il l'affiche dans un **Artifact** : un **panneau à côté** de la conversation où le document prend forme proprement. Tu peux le **copier** ou le **télécharger** d'un clic, et le faire évoluer par simples instructions.
+À toi de jouer : prends le document le plus long qui traîne dans tes affaires (rapport, notice, contrat déjà signé) et fais-le résumer avec la consigne ci-dessus.`,null],
 
-## Ce que ça change
+       ["Analyser un rapport et en tirer des décisions",'10 min',
+`🎯 Objectif : passer du résumé à l'analyse — forces, faiblesses, risques et recommandations.
 
-Au lieu d'une réponse noyée dans le chat, tu obtiens un **livrable propre**, prêt à l'emploi. Exemples à copier :
+Résumer, c'est comprendre. Analyser, c'est préparer une décision. Claude sait faire les deux.
 
-[COPIER] Crée un modèle de compte rendu de réunion réutilisable : en-tête (date, participants, objet), points discutés, décisions, tableau des actions (qui / quoi / quand), points reportés. Format sobre et professionnel.
+## La grille d'analyse express
 
-[COPIER] Fais un tableau comparatif clair de ces 3 offres que je te joins : prix, délais, garanties, risques, puis une recommandation en 3 lignes.
+[COPIER] Analyse ce document comme un consultant expérimenté : [joins le document]. Donne-moi : 1. Les 3 conclusions les plus importantes. 2. Les forces et faiblesses de l'argumentation. 3. Ce que l'auteur ne dit pas ou minimise. 4. Les risques si on suit ses recommandations. 5. Les 3 questions à poser avant de décider.
 
-Puis tu affines : « ajoute une colonne budget », « rends l'en-tête plus compact » — l'Artifact se met à jour.
+Le point 3 est précieux : « ce que l'auteur ne dit pas » révèle souvent l'essentiel.
 
-💡 **Astuce pro :** fais-toi une petite **bibliothèque de modèles** (compte rendu, e-mail type, checklist qualité, note de service). Chaque document que tu produis part ensuite d'une base prête → 20 minutes gagnées à chaque fois.
+## Analyser des chiffres
+Claude lit aussi les tableaux (collés ou en photo) :
 
-✅ **À retenir :**
-- Artifact = un **livrable propre** à côté du chat, copiable/téléchargeable.
-- Idéal pour **modèles**, tableaux, procédures.
-- Construis ta **bibliothèque de modèles** réutilisables.
+[COPIER] Voici mes ventes des 6 derniers mois : [colle ton tableau]. Analyse : la tendance générale, le meilleur et le moins bon produit, tout ce qui te semble anormal ou intéressant, et 2 actions concrètes que tu recommandes.
 
-À toi de jouer : demande un **modèle réutilisable** (compte rendu, e-mail type ou checklist) et adapte-le à ton équipe. Garde-le.`,null],
-       ["Rédiger des e-mails et messages justes",'8 min',
-`🎯 **Objectif :** rédiger des e-mails et messages au ton parfaitement juste — la spécialité de Claude.
+## Le contre-avis
+Avant une décision importante, demande l'avis inverse :
 
-Comme tout assistant IA, Claude rédige et répond aux e-mails. Sa force particulière : le **ton naturel et humain**. C'est précieux quand le message est délicat.
+[COPIER] Je penche pour [ta décision]. Joue l'avocat du diable : donne-moi les 3 meilleurs arguments CONTRE cette décision, et ce qui devrait me faire changer d'avis.
 
-## Répondre à un e-mail difficile
+Si ta décision résiste au contre-avis, elle est solide.
 
-[COPIER] Voici un e-mail reçu : [colle-le]. Rédige une réponse ferme mais courtoise qui refuse la remise demandée, sans casser la relation. Reconnais sa demande, explique brièvement, propose une alternative.
+[QUIZ] Pourquoi demander à Claude « ce que l'auteur ne dit pas » ?
+- Pour critiquer l'auteur gratuitement
+- Parce que les omissions cachent souvent les vrais risques d'une décision *
+- Pour rallonger la réponse
+> Un rapport met en avant ce qui l'arrange. Les angles morts — coûts cachés, hypothèses fragiles — sont là où se nichent les mauvaises surprises.
 
-## Écrire à ton équipe
+✅ À retenir : analyse en 5 points + contre-avis systématique avant les décisions importantes.
 
-[COPIER] Rédige un message d'équipe pour remotiver après une semaine difficile. Chaleureux et sincère, sans en faire trop, 6 lignes, avec un remerciement concret.
+À toi de jouer : prends une décision que tu dois prendre en ce moment (achat, embauche, investissement) et fais l'exercice du contre-avis. Note ce qui t'avait échappé.`,null],
 
-Tu relis, tu ajustes un mot, tu envoies.
+       ["Comparer des options et trancher",'9 min',
+`🎯 Objectif : structurer un choix difficile — fournisseurs, offres, candidats — et décider avec méthode.
 
-## Le réflexe « deux versions »
+Face à plusieurs options, on tourne en rond. La méthode : faire construire la comparaison par Claude, puis décider toi-même.
 
-Pour un message sensible, demande « une version plus douce et une plus ferme ». Tu choisis selon la personne et la situation — et tu développes ton propre jugement du bon ton.
+## Le tableau comparatif
 
-💡 **Astuce :** dis à Claude **pour qui** est le message (« pour un client fidèle mais tendu », « pour un collègue susceptible »). Il ajuste le ton bien plus finement quand il connaît le destinataire.
+[COPIER] Aide-moi à choisir entre ces options : [décris chaque option avec ses infos : prix, délais, avantages, inconvénients]. Construis un tableau comparatif avec les critères qui comptent le plus dans ma situation : [ta situation et tes priorités]. Termine par ta recommandation argumentée en 3 phrases.
 
-✅ **À retenir :**
-- Claude excelle sur le **ton juste**.
-- Précise la **situation** et le **destinataire**.
-- Deux versions (douce / ferme) pour choisir.
+Plus tu donnes de vraies informations, plus la comparaison est utile.
 
-À toi de jouer : fais rédiger une réponse à un e-mail difficile en gardant une bonne relation, puis demande une version plus ferme.`,null],
-       ["Traduire et adapter au public",'7 min',
-`🎯 **Objectif :** traduire ET adapter un message au niveau de ton lecteur — pas seulement changer de langue.
+## Pondérer ce qui compte
+Tous les critères ne se valent pas. Précise tes priorités :
+« Pour moi, le prix compte pour 50 %, le délai pour 30 %, la réputation pour 20 %. Refais la comparaison avec cette pondération. »
 
-Traduire, c'est facile. **Adapter au public**, c'est ce qui fait la différence — et Claude gère très bien les registres.
+## Le test du regret
+Une dernière question puissante avant de trancher :
 
-## Traduire proprement
+[COPIER] J'hésite encore entre [option A] et [option B]. Pour chaque option, décris la situation dans 6 mois si tout se passe bien, et si ça se passe mal. Quelle option a le pire scénario le plus supportable ?
 
-[COPIER] Traduis ce message en anglais professionnel, naturel et poli, en gardant le sens exact : [colle ton texte].
+Souvent, la bonne décision est celle dont le pire scénario reste gérable.
 
-## Adapter au niveau du lecteur
+[QUIZ] Claude te recommande l'option A mais ton intuition dit B. Que fais-tu ?
+- Je suis Claude, il a forcément raison
+- Je suis mon intuition sans réfléchir
+- Je demande à Claude les meilleurs arguments pour B et je vois s'ils tiennent *
+> Claude structure et éclaire, mais la décision t'appartient. Confronter ton intuition aux arguments est exactement le bon usage.
 
-C'est le vrai super-pouvoir. Un même contenu, deux publics :
+✅ À retenir : tableau comparatif + pondération de TES priorités + test du regret. Claude éclaire, tu décides.
 
-[COPIER] Réécris ce texte technique pour un public non spécialiste : garde le sens exact, mais rends-le accessible à quelqu'un qui ne connaît pas le sujet, avec des mots simples et une image concrète.
-
-Utile pour communiquer avec des clients étrangers, vulgariser un sujet technique pour ta direction, ou expliquer une procédure à un nouveau.
-
-💡 **Astuce :** demande « explique ça à trois niveaux : pour un expert, pour un collègue, pour un débutant ». Tu vois immédiatement la version qui convient à ton lecteur.
-
-⚠️ Pour une traduction qui engage (contrat, mentions légales), fais-la **relire** par quelqu'un qui parle la langue. L'IA t'amène à 95 %, l'humain sécurise les 5 % qui comptent.
-
-✅ **À retenir :**
-- Traduire **+** adapter au public, c'est deux choses.
-- « Garde le sens, rends accessible à un non-spécialiste. »
-- Fais relire les traductions qui engagent.
-
-À toi de jouer : fais adapter un texte technique « pour un public non spécialiste », puis compare avec l'original.`,null],
+À toi de jouer : applique le tableau comparatif à un vrai choix en cours (fournisseur, forfait, équipement). Donne tes vraies contraintes.`,null],
      ]},
-     {t:'Fiable et responsable', l:[
-       ["Vérifier les faits",'8 min',
-`🎯 **Objectif :** garder le bon réflexe de vérification, même quand Claude s'appuie sur tes documents.
 
-Comme toute IA, Claude peut se tromper sur un fait précis. Bonne nouvelle : quand il analyse **un document que tu as fourni**, il est **plus fiable**, car il s'appuie sur ta matière au lieu d'inventer. Mais la vigilance reste de mise.
+     {t:'Ton assistant au quotidien', l:[
+       ["Préparer réunions et entretiens",'9 min',
+`🎯 Objectif : arriver deux fois mieux préparé à chaque réunion, entretien ou négociation.
 
-## Ce qu'il faut vérifier à la source
+La préparation fait 80 % du résultat. Claude te la divise par quatre.
 
-- Les **chiffres** cités (montants, pourcentages, totaux).
-- Les **citations** et les références à des passages précis.
-- Les **dates** et les **clauses** d'un contrat.
+## Avant une réunion que tu animes
 
-Pour tout ce qui **engage** (un montant client, une date limite, une clause), **relis toi-même le passage d'origine** dans le document. Claude peut d'ailleurs t'indiquer où regarder.
+[COPIER] Je dois animer une réunion de [durée] sur [sujet] avec [participants]. Objectif : [ce que tu veux obtenir]. Prépare : un ordre du jour minuté, les 3 messages clés à faire passer, les objections probables avec une réponse pour chacune, et une phrase de conclusion qui engage à l'action.
 
-## La bonne façon de voir Claude
+## Avant un entretien d'embauche (candidat)
 
-L'IA t'aide à **lire vite** et à repérer l'essentiel. Mais la **décision reste la tienne**. Tu ne délègues pas ton jugement — tu délègues le temps de lecture.
+[COPIER] Je passe un entretien pour le poste de [poste] chez [entreprise]. Mon profil : [2-3 phrases sur toi]. Prépare : les 8 questions qu'on va probablement me poser avec une bonne réponse personnalisée pour chacune, et 3 questions intelligentes à poser à la fin.
 
-💡 **Astuce :** après un résumé, demande « **cite les passages exacts** sur lesquels tu bases les 3 points les plus importants ». Tu vérifies en un coup d'œil, sans relire tout le document.
+## S'entraîner en conditions réelles
+Le plus puissant : la simulation. Claude joue l'autre partie.
 
-✅ **À retenir :**
-- Plus fiable sur **tes** documents, mais vérifie quand même.
-- Contrôle chiffres, citations, dates, clauses **qui engagent**.
-- L'IA lit vite ; **tu** décides.
+[COPIER] Joue le rôle du recruteur (exigeant mais correct) pour le poste de [poste]. Pose-moi les questions une par une et attends ma réponse à chaque fois. Après ma réponse, donne-moi un retour rapide (ce qui était bien, ce qui peut s'améliorer), puis passe à la question suivante.
 
-À toi de jouer : après un résumé, retrouve dans le document d'origine un **chiffre cité** et vérifie-le.`,null],
-       ["Confidentialité et données",'9 min',
-`🎯 **Objectif :** analyser des documents avec Claude sans exposer de données sensibles.
+Tu peux simuler de la même façon une négociation ou une conversation difficile.
 
-Comme Claude est doué pour analyser des documents, la tentation est de tout lui joindre. Attention : certains documents contiennent des données que ton organisation veut garder **privées**.
+[QUIZ] Quel est l'avantage de la simulation par rapport à la simple liste de questions ?
+- Il n'y en a pas, c'est pareil
+- On s'entraîne à formuler ses réponses à voix haute / par écrit et on reçoit un retour immédiat *
+- C'est plus rapide
+> Lire des questions ≠ savoir y répondre. La simulation crée le réflexe, comme un entraînement sportif.
 
-## Ce qu'on ne joint pas sans précaution
+✅ À retenir : ordre du jour minuté + objections anticipées + simulation pour les moments importants.
 
-- Données **personnelles de clients** (noms, coordonnées, numéros).
-- **Contrats confidentiels**, données financières internes.
-- Dossiers **RH** ou **médicaux**.
+À toi de jouer : prends ton prochain rendez-vous important et lance la simulation. Fais au moins 4 questions-réponses.`,null],
 
-Renseigne-toi sur ce qui est **autorisé chez toi** (la version entreprise offre plus de garanties que la version grand public).
+       ["Trouver des idées et bâtir des plans",'8 min',
+`🎯 Objectif : ne plus jamais partir d'une page blanche — pour un projet, un produit, un événement ou un contenu.
 
-## La bonne pratique : anonymiser
+## La règle du volume
+Ne demande jamais UNE idée : demande-en VINGT. Les 5 premières sont évidentes, les vraies pépites arrivent après.
 
-Tu peux quand même analyser ces documents, en les préparant :
+[COPIER] Donne-moi 20 idées de [ce que tu cherches : promotion pour ma boutique, nom pour mon entreprise, contenu pour ma page...]. Contexte : [ton activité, ta clientèle, tes moyens]. Varie les styles : des idées classiques sûres, des idées originales, et 2-3 idées audacieuses. Présente chaque idée en une ligne.
 
-1. **Remplace** les noms et montants sensibles : « Client A », « Société B », « X FCFA ».
-2. Fais **analyser** la version anonyme par Claude.
-3. **Réintègre** les vraies valeurs dans le livrable final, chez toi.
+Puis creuse : « Développe les idées 7 et 12 » — c'est l'entonnoir : large d'abord, précis ensuite.
 
-💡 **Le test simple :** « Serais-je à l'aise si ce document sortait de l'entreprise ? » Si non, anonymise, ou utilise la version pro autorisée, ou abstiens-toi.
+## Du rêve au plan d'action
+Une idée sans plan reste un rêve :
 
-⚠️ En cas de doute sur un document très sensible, **demande à ton responsable** avant. Mieux vaut une question de trop qu'une fuite.
+[COPIER] Je veux [ton projet : ouvrir un deuxième point de vente, lancer une formation, créer ma chaîne...]. Mes moyens : [budget, temps disponible, compétences]. Construis un plan d'action en étapes : pour chaque étape, l'objectif, les actions concrètes, la durée estimée et le principal piège à éviter. Commence par ce que je peux faire cette semaine.
 
-✅ **À retenir :**
-- Ne joins pas de **données privées** sans précaution.
-- **Anonymise** (Client A, X FCFA), analyse, réintègre.
-- Doute → demande avant.
+💡 « Commence par ce que je peux faire cette semaine » : c'est la phrase qui transforme un plan théorique en démarrage réel.
 
-À toi de jouer : prépare une **version anonymisée** d'un document avant de l'analyser avec Claude.`,null],
-       ["Esprit critique et bonnes habitudes",'8 min',
-`🎯 **Objectif :** garder ton esprit critique et prendre les habitudes qui font durer le gain de temps.
+[QUIZ] Pourquoi demander 20 idées plutôt que 3 ?
+- Pour perdre du temps
+- Parce que les premières idées sont les plus évidentes — l'originalité vient dans la profondeur de la liste *
+- Parce que Claude ne sait pas en faire moins
+> C'est une technique de créativité éprouvée : la quantité d'abord, le tri ensuite. Toi seul sais reconnaître la pépite pour TON contexte.
 
-## L'esprit critique d'abord
+✅ À retenir : 20 idées → tu creuses les meilleures → plan d'action qui commence cette semaine.
 
-Respecte les règles de ton organisation sur l'IA (outils permis, données interdites, relecture obligatoire). Et surtout : **l'IA propose, tu décides**. Pour un livrable qui **sort de l'entreprise** — offre commerciale, contrat, communication officielle — la relecture humaine est **indispensable**. L'IA ne porte pas la responsabilité ; toi oui.
+À toi de jouer : lance la consigne des 20 idées sur un vrai sujet (développer ta clientèle, un cadeau, un nom). Souligne les 3 qui te surprennent.`,null],
 
-## Les 3 habitudes qui font durer
+       ["L'anglais sans stress",'9 min',
+`🎯 Objectif : lire, écrire et répondre en anglais professionnellement — même avec un niveau moyen.
 
-1. **Garde tes meilleures consignes** dans un fichier, réutilise-les.
-2. **Travaille par conversations thématiques** (une par sujet) pour garder le contexte.
-3. **Exploite les Artifacts** pour bâtir ta bibliothèque de modèles réutilisables.
+L'anglais ne doit plus jamais te faire perdre une opportunité. Claude est le meilleur pont entre les deux langues.
 
-## La régularité gagne
+## Comprendre ce qu'on te dit
 
-Comme pour tout, ce n'est pas la perfection qui compte, mais la constance. Un document long traité chaque semaine avec Claude, c'est **une heure gagnée** à chaque fois — et une compétence qui te distingue au bureau.
+[COPIER] Traduis ce message en français, puis explique-moi en 2 phrases le ton et l'intention de la personne (elle est contente ? pressée ? mécontente ?) : [colle le message en anglais]
 
-🎯 **Ton objectif de la semaine :** traiter **un** document long avec Claude (résumé + décisions + risques) et gagner une heure. Le module suivant, « Ta boîte à outils », te donne 10 consignes prêtes et 4 modèles pour démarrer.
+La traduction du TON est aussi importante que celle des mots.
 
-✅ **À retenir :**
-- **L'IA propose, tu décides** — relecture humaine sur ce qui sort.
-- Consignes gardées, sujets séparés, Artifacts réutilisés.
-- **Régularité > perfection**.
+## Répondre comme un pro
 
-À toi de jouer : choisis un **document long récurrent** dans ton travail, et crée le modèle (Artifact) qui te fera gagner du temps à chaque fois.`,null],
+[COPIER] Voici ce que je veux répondre, en français : [écris ta réponse en français]. Traduis en anglais professionnel, naturel et courtois. Puis donne-moi la version française de ce que tu as écrit, pour que je sois sûr de ce que j'envoie.
+
+⚠️ La double vérification (retraduction) est le filet de sécurité : tu n'envoies jamais un texte que tu ne comprends pas.
+
+## Progresser en même temps
+Ajoute cette ligne à tes demandes de traduction : « Souligne 3 expressions utiles de ta traduction que je devrais retenir, avec leur sens. » En 1 mois, tu auras appris 50 tournures professionnelles sans effort.
+
+## En réunion ou au téléphone
+Prépare-toi avant un échange oral :
+« Je vais parler avec un client anglophone de [sujet]. Prépare-moi les 10 phrases que je vais probablement devoir dire, en anglais simple, avec la prononciation approximative en français. »
+
+[QUIZ] Pourquoi demander la retraduction en français de ta réponse anglaise ?
+- Pour faire travailler Claude deux fois
+- Pour vérifier que le message envoyé dit exactement ce que tu veux dire *
+- Ce n'est pas utile
+> Ne jamais envoyer un texte qu'on ne comprend pas soi-même : la retraduction élimine les mauvaises surprises.
+
+✅ À retenir : traduire le ton + double vérification + 3 expressions à retenir à chaque fois.
+
+À toi de jouer : écris en français une réponse à un vrai message anglais (ou imagine une demande de prix d'un client étranger) et fais l'aller-retour complet.`,null],
      ]},
+
+     {t:'Passer au niveau supérieur', l:[
+       ["Les conversations longues : itérer comme un chef de projet",'9 min',
+`🎯 Objectif : utiliser la conversation comme un vrai travail d'équipe — préciser, corriger, améliorer jusqu'au résultat parfait.
+
+Les débutants font une demande et prennent la première réponse. Les pros font PRÉCISER. C'est toute la différence.
+
+## Le réflexe de l'itération
+La première réponse est un point de départ. Améliore-la :
+- « Plus court. »
+- « Le paragraphe 2 est trop technique, simplifie-le. »
+- « Donne un exemple concret pour le point 3. »
+- « Reprends, mais pour un lecteur qui ne connaît rien au sujet. »
+
+Chaque instruction affine. En 3 allers-retours, tu passes de « correct » à « exactement ce qu'il me fallait ».
+
+## Donner un modèle
+Le raccourci le plus puissant : montrer un exemple de ce que tu aimes.
+
+[COPIER] Voici un e-mail dont j'aime le style : [colle un exemple]. Rédige mon message sur [sujet] dans exactement ce style.
+
+Claude imite remarquablement bien un style à partir d'un exemple.
+
+## Mémoriser le contexte d'un projet
+Pour un projet qui dure, ouvre UNE conversation dédiée et démarre-la par un brief complet :
+
+[COPIER] Voici le contexte de mon projet, garde-le en mémoire pour toute la conversation : [décris ton projet, ton entreprise, tes objectifs, tes contraintes]. Confirme que tu as compris en 3 lignes, puis attends mes demandes.
+
+Ensuite, chaque demande dans cette conversation bénéficie de tout le contexte — sans le répéter.
+
+[QUIZ] La réponse de Claude est bonne mais trop longue et trop formelle. Le meilleur réflexe ?
+- Recommencer dans un nouveau chat
+- Copier la réponse et la raccourcir à la main
+- Répondre « réduis de moitié et rends le ton plus simple » *
+> L'itération est plus rapide et Claude apprend tes préférences au fil de la conversation.
+
+✅ À retenir : itère au lieu d'accepter · donne des modèles de style · une conversation-projet avec brief initial.
+
+À toi de jouer : reprends une réponse de Claude d'une leçon précédente et améliore-la avec 3 instructions successives. Constate la progression.`,null],
+
+       ["Vérifier, sécuriser : les 5 règles d'or",'8 min',
+`🎯 Objectif : utiliser Claude avec professionnalisme — savoir ce qu'on vérifie, ce qu'on partage, et ce qu'on ne délègue jamais.
+
+Un outil puissant s'utilise avec des règles. Voici les 5 qui te protègent.
+
+## Les 5 règles d'or
+1. **Vérifie les faits précis.** Chiffres, dates, lois, tarifs : Claude peut se tromper avec assurance. Tout fait important se vérifie à la source avant d'être utilisé.
+2. **Protège les données sensibles.** Ne colle jamais : numéros de compte, mots de passe, données médicales, informations confidentielles de clients. Anonymise : « M. K » suffit.
+3. **Relis avant d'envoyer.** Tout texte qui part avec ta signature doit être passé par tes yeux. Tu es responsable, pas l'outil.
+4. **Garde les décisions.** Claude éclaire les choix, il ne les fait pas. Embauche, investissement, engagement : la décision reste humaine.
+5. **Reste transparent quand ça compte.** Pour un document officiel ou évalué (mémoire, candidature), renseigne-toi sur les règles d'usage de l'IA avant.
+
+## Le bon réflexe face au doute
+
+[COPIER] Sur ta dernière réponse : quels éléments es-tu sûr de connaître, et lesquels devrais-je vérifier par moi-même ? Sois honnête sur tes limites.
+
+Claude sait dire ce dont il n'est pas sûr — encore faut-il lui demander.
+
+[QUIZ] Claude te donne le montant exact d'une taxe à payer pour ton commerce. Que fais-tu ?
+- Je paie ce montant, Claude sait tout
+- Je vérifie auprès de la source officielle avant d'agir *
+- Je demande à Claude de confirmer
+> Règle 1 : les faits précis (montants, lois, dates) se vérifient à la source. Claude t'a fait gagner du temps en t'orientant — la vérification te protège.
+
+✅ À retenir :
+- Vérifier les faits, protéger les données, relire, décider soi-même, rester transparent.
+- En cas de doute : demander à Claude ce qu'il faut vérifier.
+
+À toi de jouer : repense à tes usages depuis le début du cours. Y a-t-il une règle que tu as déjà frôlée ? Note ton point de vigilance personnel.`,null],
+
+       ["Quiz final : valide ta maîtrise",'6 min',
+`🎯 Objectif : vérifier que tu maîtrises l'essentiel du cours — réponds sans revenir en arrière, puis vérifie.
+
+Réponds aux 5 questions. Si tu en réussis 4 ou plus, tu es prêt pour le plan d'action final. 💪
+
+[QUIZ] Quelle demande suit correctement la formule T + C + F ?
+- « Écris quelque chose pour mon client »
+- « Rédige une relance pour la facture n°218 impayée depuis 15 jours, client fidèle, ton courtois mais ferme, 5 lignes » *
+- « Fais un e-mail professionnel »
+> Tâche (relance) + Contexte (facture, délai, type de client) + Format (ton, longueur) : tout y est.
+
+[QUIZ] Pour un message délicat, la meilleure pratique est…
+- Demander 2 versions (directe et diplomate) puis choisir *
+- Envoyer la première version sans relire
+- Éviter d'envoyer le message
+> Les 2 versions te donnent le choix du ton, et c'est toujours toi qui relis et décides.
+
+[QUIZ] Tu reçois un rapport de 40 pages. Le meilleur usage de Claude ?
+- Le joindre, demander l'essentiel orienté selon ta décision, puis creuser en questionnant *
+- Demander « résume » sans contexte
+- Lire les 40 pages puis demander un résumé
+> Le résumé orienté (« je dois décider X ») + les questions de suivi font tout le travail d'un analyste.
+
+[QUIZ] Claude te donne un chiffre précis (tarif, loi, montant). Tu…
+- L'utilises directement dans ton document officiel
+- Le vérifies à la source officielle avant de l'utiliser *
+- Le partages sur les réseaux
+> Les faits précis se vérifient toujours : c'est la règle d'or n°1.
+
+[QUIZ] La première réponse de Claude est moyenne. Le réflexe pro ?
+- Abandonner : l'IA ne marche pas pour ça
+- Accepter la réponse telle quelle
+- Itérer : préciser, corriger, redemander jusqu'au bon résultat *
+> La différence entre débutant et pro tient à l'itération. La première réponse est un brouillon de travail.
+
+✅ À retenir : si tu as 4/5 ou plus, tu maîtrises la méthode. Sinon, retourne voir la leçon concernée — 8 minutes suffisent.
+
+À toi de jouer : marque cette leçon comme terminée et passe à ta boîte à outils — elle t'attend juste après.`,null],
+     ]},
+
      {t:'Ta boîte à outils (à copier-coller)', l:[
-       ["10 consignes prêtes à copier (documents et analyse)",'12 min',
-`Ta bibliothèque de départ, spécialisée documents et analyse — le terrain où Claude excelle. Copie-la dans ton téléphone, remplace les [crochets], joins ton document quand c'est indiqué.
+       ["15 consignes prêtes pour ton quotidien",'12 min',
+`🎯 Objectif : repartir avec un arsenal de consignes testées, à copier telles quelles. Garde cette leçon en favori — c'est ta caisse à outils.
 
-**1. Lire un rapport à ta place** : joins le document + « Résume ce rapport en une page : contexte, points clés, chiffres importants, conclusion. Puis liste ce qui reste flou ou manquant. »
+## ✉️ Écrire
 
-**2. Décisions et actions** : joins le compte rendu + « Extrais les décisions prises et les actions à faire, sous forme de tableau : action, responsable, échéance. »
+[COPIER] Rédige un e-mail professionnel pour [objectif]. Destinataire : [qui]. Contexte : [situation]. Ton [courtois/ferme/chaleureux], [X] lignes maximum, termine par [une question / un appel à l'action].
 
-**3. Lire un contrat** : joins le contrat + « Que dit ce document sur [les délais de paiement / la résiliation / les pénalités] ? Cite le passage exact à chaque fois. »
+[COPIER] Rédige 2 versions d'un message annonçant [la nouvelle difficile] : une directe, une diplomate. Honnêtes toutes les deux, avec la raison en une phrase et une fin constructive.
 
-**4. Synthèse pour la direction** : joins le document + « Prépare une synthèse en 5 lignes pour un directeur pressé : la situation, le chiffre clé, la recommandation. »
+[COPIER] Transforme ces notes en compte rendu structuré (participants, décisions, actions, échéances) : [tes notes]
 
-**5. Comparer des offres** : joins les documents + « Compare ces offres dans un tableau : prix, délais, garanties, risques. Termine par une recommandation argumentée en 3 lignes. »
+[COPIER] Corrige uniquement les fautes de ce texte sans changer mon style : [texte]
 
-**6. Note interne soignée** : « Rédige une note interne d'une demi-page pour annoncer [le sujet] : contexte, ce qui change, calendrier, qui contacter. Ton clair et rassurant. »
+[COPIER] Rends ce texte plus percutant : phrases courtes, verbes d'action, bénéfices concrets : [texte]
 
-**7. Procédure réutilisable** : « Crée une procédure étape par étape pour [la tâche], compréhensible par un nouveau collègue : prérequis, étapes numérotées, erreurs fréquentes à éviter. »
+## 🔍 Analyser
 
-**8. Réponse à une plainte** : « Voici la plainte reçue : [colle le message]. Rédige une réponse qui reconnaît le problème, garde un ton respectueux, et propose [la solution], sans promettre l'impossible. »
+[COPIER] Résume ce document en 10 lignes : l'essentiel en 2 phrases, 5 points clés, points d'attention. Contexte : je suis [rôle] et je dois [décision]. [joins le document]
 
-**9. Préparer une réunion** : joins le dossier + « Prépare-moi pour cette réunion : les 3 points essentiels du dossier, les questions qu'on risque de me poser (avec des éléments de réponse), et les 2 questions que je devrais poser. »
+[COPIER] Analyse ce document comme un consultant : conclusions majeures, faiblesses de l'argumentation, ce qui n'est pas dit, risques, 3 questions à poser. [joins le document]
 
-**10. Améliorer un long texte** : joins ton texte + « Relis ce document : signale les incohérences, propose un meilleur titre, et améliore l'introduction et la conclusion sans changer le fond. »
+[COPIER] Voici mes chiffres : [tableau]. Tendance, anomalies, meilleur/moins bon élément, 2 actions recommandées.
 
-À toi de jouer : copie ces 10 consignes maintenant, et utilise la n°1 ou la n°2 sur un vrai document aujourd'hui.`,null],
-       ["4 modèles à générer une fois, réutiliser pour toujours",'10 min',
-`La force des Artifacts : tu fais créer un modèle une fois, tu le gardes, tu le réutilises chaque semaine. Voici les 4 modèles qui servent dans presque tous les métiers — demande-les à Claude tels quels.
+[COPIER] Je penche pour [décision]. Avocat du diable : les 3 meilleurs arguments CONTRE, et ce qui devrait me faire changer d'avis.
 
-**Modèle de compte rendu** : « Crée un modèle de compte rendu de réunion réutilisable : en-tête (date, participants, objet), points discutés, décisions, tableau des actions (qui / quoi / quand), points reportés. Format sobre et professionnel. »
+## 🗓️ Préparer
 
-**Modèle de note interne** : « Crée un modèle de note interne : objet, contexte en 2 lignes, corps structuré, prochaines étapes, contact. Avec des instructions entre crochets pour me guider à chaque section. »
+[COPIER] Prépare ma réunion de [durée] sur [sujet] : ordre du jour minuté, 3 messages clés, objections probables + réponses, conclusion qui engage.
 
-**Checklist qualité avant envoi** : « Crée une checklist de relecture avant d'envoyer un document important : orthographe, chiffres vérifiés, destinataires, pièces jointes, ton, mentions confidentielles. Format à cocher. »
+[COPIER] Joue le rôle de [recruteur/client/négociateur] pour [situation]. Pose-moi les questions une par une, attends ma réponse, donne un retour, puis continue.
 
-**Tableau de bord hebdo** : « Crée un modèle de point hebdomadaire : ce qui a avancé, ce qui bloque, priorités de la semaine suivante, indicateurs clés. Une page maximum. »
+[COPIER] Donne-moi 20 idées de [besoin]. Contexte : [activité, clientèle, moyens]. Varie : classiques, originales, audacieuses. Une ligne par idée.
 
-Garde ces modèles dans un dossier (ou un Projet Claude si tu as la version payante). Chaque fois que tu en utilises un, tu pars d'une structure prête au lieu d'une page blanche : 20 minutes gagnées à chaque document.
+## 🌍 Anglais
 
-À toi de jouer : fais générer le modèle qui te servira le plus, adapte-le à ton équipe, et range-le dans ton dossier « Modèles ».`,null],
-       ["Ton plan d'action : 7 jours pour en faire un réflexe",'10 min',
-`Une semaine pour installer l'habitude — objectif : plus jamais lire 30 pages sans aide, plus jamais partir d'une page blanche.
+[COPIER] Traduis en français + explique le ton et l'intention : [message anglais]
 
-**Jour 1** : joins un vrai document long (rapport, contrat) et utilise les consignes 1 et 3. Note le temps gagné. **Jour 2** : fais extraire décisions et actions d'un compte rendu (consigne 2), envoie le résultat à ton équipe. **Jour 3** : génère ton premier modèle réutilisable (leçon précédente). **Jour 4** : traite un message délicat (consigne 8) ou une synthèse direction (consigne 4). **Jour 5** : prépare une vraie réunion avec la consigne 9 — tu verras la différence en séance. **Jours 6-7** : bilan — mets à jour ton fichier de consignes, garde tes gagnantes, génère un deuxième modèle.
+[COPIER] Traduis ma réponse en anglais professionnel, puis redonne-moi la version française pour vérification : [ta réponse en français]
 
-**Règle d'or à retenir** : tout document que tu fournis à Claude rend sa réponse plus fiable. Joins toujours ta matière (document, notes, exemple) plutôt que de le laisser deviner — et vérifie les chiffres cités dans la source avant de t'en servir.
+## 🚀 Projet
 
-**Ensuite** : chaque document de plus de 5 pages qui arrive, réflexe « Claude d'abord » : résumé, points clés, risques. Tu lis ensuite en connaissance de cause, deux fois plus vite.
+[COPIER] Contexte de mon projet, à garder en mémoire pour toute la conversation : [brief complet]. Confirme en 3 lignes puis attends mes demandes.
 
-À toi de jouer : bloque 15 minutes par jour cette semaine dans ton agenda, intitulées « Claude au travail ». Et partage ta première victoire dans la communauté — un document de 20 pages lu en 3 minutes, ça inspire.`,null],
+✅ À retenir : chaque consigne se personnalise en remplaçant les [crochets]. Plus tes crochets sont précis, meilleure est la réponse.
+
+À toi de jouer : choisis les 3 consignes qui correspondent le plus à ton quotidien et teste-les aujourd'hui avec de vrais contenus.`,null],
+
+       ["Ton plan d'action 7 jours",'8 min',
+`🎯 Objectif : transformer ce cours en habitude — 7 jours pour que Claude devienne un réflexe quotidien.
+
+La compétence ne vient pas de la connaissance, mais de la répétition. Voici ta semaine de mise en pratique : 15 minutes par jour.
+
+## Ta semaine
+1. **Jour 1 — L'e-mail.** Écris ton prochain vrai e-mail avec la méthode T+C+F. Compare avec ce que tu aurais écrit seul.
+2. **Jour 2 — La retouche.** Passe un texte existant aux 3 niveaux : corriger, clarifier, muscler.
+3. **Jour 3 — Le résumé.** Fais résumer un vrai document long, puis pose 3 questions de suivi.
+4. **Jour 4 — Le message délicat.** Technique des 2 versions sur un message sensible (même fictif).
+5. **Jour 5 — La préparation.** Prépare ta prochaine réunion ou un entretien avec la simulation.
+6. **Jour 6 — Les idées.** 20 idées pour développer ton activité, creuse les 2 meilleures en plan d'action.
+7. **Jour 7 — Ton bilan.** Demande à Claude : « Voici comment je t'ai utilisé cette semaine : [liste]. Quelles autres tâches de mon métier de [métier] pourrais-tu accélérer ? »
+
+💡 Mets un rappel quotidien « 15 min Claude » sur ton téléphone, à l'heure où tu traites tes messages.
+
+## Après la semaine
+- Garde la leçon « 15 consignes » en favori — c'est ton document de référence.
+- Reviens vers la communauté Boyia : partage ta plus belle victoire dans « Victoires » 🏆 et pose tes questions dans « Entraide ».
+- Le réflexe final : devant CHAQUE tâche d'écriture, d'analyse ou de préparation, demande-toi « est-ce que Claude peut faire le premier jet ? ». La réponse est presque toujours oui.
+
+[QUIZ] Quelle est la meilleure façon d'ancrer ce que tu as appris ?
+- Relire le cours tous les jours
+- 15 minutes de pratique réelle par jour pendant 7 jours *
+- Attendre d'avoir une grosse tâche pour tout appliquer
+> C'est la pratique quotidienne sur de VRAIES tâches qui crée le réflexe. La régularité bat l'intensité.
+
+✅ À retenir : 7 jours, 15 minutes, de vraies tâches. Au bout d'une semaine, tu ne reviendras plus en arrière.
+
+Félicitations, tu as terminé le cours ! 🎓 Marque cette dernière leçon comme terminée — et raconte-nous ta première victoire dans la communauté.
+
+À toi de jouer : programme ton rappel quotidien maintenant, et fais le Jour 1 aujourd'hui — ton prochain e-mail t'attend.`,null],
      ]},
    ]},
 
@@ -2416,6 +2600,23 @@ function fmtBody(txt){
     if(p.startsWith('[COPIER]')){
       const body = p.replace(/^\[COPIER\]\s*/,'');
       return `<div class="copycard"><div class="cc-h"><span class="cc-t">📋 Consigne à copier</span><button class="cc-btn" onclick="App.copyText(this)">Copier</button></div><pre>${esc(body)}</pre></div>`;
+    }
+    /* Quiz interactif : 1re ligne = question, lignes « - » = choix (bonne réponse
+       marquée d'une * finale), ligne « > » = explication affichée après la réponse. */
+    if(p.startsWith('[QUIZ]')){
+      const ls = p.replace(/^\[QUIZ\]\s*/,'').split('\n').map(l=>l.trim()).filter(Boolean);
+      const q = ls.length?ls[0]:'';
+      const expl = ls.filter(l=>l.startsWith('>')).map(l=>l.replace(/^>\s*/,'')).join(' ');
+      const opts = ls.slice(1).filter(l=>/^[-•]\s/.test(l)).map(l=>l.replace(/^[-•]\s*/,''));
+      return `<div class="quiz"><div class="qz-q">🧠 Mini-quiz — ${inl(q)}</div>${opts.map(o=>{
+        const good=/\*$/.test(o), label=o.replace(/\s*\*$/,'');
+        return `<button class="qopt" data-good="${good?1:0}" onclick="App.quizPick(this)">${inl(label)}</button>`;
+      }).join('')}<div class="qz-fb"${expl?` data-expl="${esc(expl)}"`:''}></div></div>`;
+    }
+    /* Réponse modèle masquée : l'apprenant essaie d'abord, puis compare. */
+    if(p.startsWith('[SOLUTION]')){
+      const body = p.replace(/^\[SOLUTION\]\s*/,'');
+      return `<div class="reveal"><button class="rv-btn" onclick="App.reveal(this)">👀 Voir un exemple de réponse</button><div class="rv-body" hidden>${inl(body).replace(/\n/g,'<br>')}</div></div>`;
     }
     const cal = cals.find(c=>p.startsWith(c[0]));
     if(cal) return `<div class="cal ${cal[1]}">${innerCallout(lines)}</div>`;
@@ -3453,6 +3654,19 @@ const App = {
     const done = ()=>{ btn.textContent='Copié ✓'; toast('Consigne copiée — colle-la dans ton outil ✨'); setTimeout(()=>{ if(btn) btn.textContent='Copier'; },1800); };
     try{ navigator.clipboard.writeText(t).then(done, ()=>fallbackCopy(t,done)); }catch(e){ fallbackCopy(t,done); }
   },
+  /* Quiz de leçon : réponse unique, feedback immédiat, la bonne réponse s'affiche. */
+  quizPick(btn){
+    const quiz = btn.closest('.quiz'); if(!quiz || quiz.dataset.done) return;
+    quiz.dataset.done='1';
+    const good = btn.dataset.good==='1';
+    quiz.querySelectorAll('.qopt').forEach(b=>{ b.disabled=true; if(b.dataset.good==='1') b.classList.add('good'); });
+    if(!good) btn.classList.add('bad');
+    const fb = quiz.querySelector('.qz-fb');
+    fb.innerHTML = (good?'<b>✅ Bonne réponse !</b>':'<b>Presque !</b> La bonne réponse est en vert.')
+      + (fb.dataset.expl?` ${esc(fb.dataset.expl)}`:'');
+    fb.classList.add('show');
+  },
+  reveal(btn){ const b=btn.nextElementSibling; if(b){ b.hidden=false; btn.remove(); } },
 
   /* --- Inscription / enrôlement --- */
   enroll(cid){
