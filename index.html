@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Boyia Institute — Cours en ligne &amp; communauté</title>
-<meta name="description" content="Apprends des compétences pratiques, paie par mobile money, échange avec la communauté.">
+<meta name="description" content="Boyia Institute — apprends l'IA et l'anglais professionnel, simplement et en français. Parcours courts, exercices pratiques, paiement Wave. Commence gratuitement.">
 <style>
 :root{
   --ground:#F4F6FB; --surface:#FFFFFF; --surface-2:#E9EEF8;
@@ -359,6 +359,45 @@ a.lplayer{text-decoration:none;cursor:pointer}
 .rv-btn{align-self:flex-start;border:1.5px solid var(--primary);background:var(--primary-soft);color:var(--primary-deep);font-weight:700;font-size:13.5px;padding:9px 15px;border-radius:10px;cursor:pointer}
 [data-theme="dark"] .rv-btn{color:var(--primary)}
 .rv-body{background:var(--surface-2);border-left:3px solid var(--primary);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6}
+
+/* ---- Accueil : hero, parcours, comment ça marche, FAQ ---- */
+.hero-home{padding:10px 18px 6px;display:flex;flex-direction:column;gap:10px}
+.hero-home h1{font-size:25px;line-height:1.18;letter-spacing:-.01em}
+.hero-home p{color:var(--muted);font-size:14.5px;max-width:34ch}
+.hero-home .btn{margin-top:2px}
+.hero-home .proof{font-size:12.5px;color:var(--muted);text-align:center;margin-top:2px}
+.resume,.pathcard{display:flex;align-items:center;gap:12px;padding:13px 14px;width:100%;text-align:left;margin-top:10px}
+.resume .thumb,.pathcard .thumb{flex:none;width:48px;height:48px;border-radius:13px;display:grid;place-items:center;color:#fff;font-size:20px}
+.resume .thumb svg{width:22px;height:22px}
+.resume .inf,.pathcard .inf{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.resume .inf b,.pathcard .inf b{font-size:14.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.r-lab{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--primary)}
+.resume>svg,.pathcard>svg{flex:none;width:19px;height:19px;color:var(--muted)}
+.pathlist{display:flex;flex-direction:column;gap:0;padding-bottom:4px}
+.pathstep{display:flex;align-items:center;gap:12px;padding:13px 14px;width:100%;text-align:left;margin-top:10px}
+.pathstep .inf{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.pathstep>svg{flex:none;width:18px;height:18px;color:var(--muted)}
+.pathstep.done{opacity:.75}
+.howto{padding:6px 4px}
+.hrow{display:flex;gap:13px;padding:12px 14px;align-items:flex-start}
+.hrow+.hrow{border-top:1px solid var(--line)}
+.hn{flex:none;width:30px;height:30px;border-radius:9px;background:var(--primary-soft);color:var(--primary-deep);font-weight:800;display:grid;place-items:center;font-size:14px}
+[data-theme="dark"] .hn{color:var(--primary)}
+.pathstep .hn{background:linear-gradient(150deg,var(--primary-deep),var(--primary));color:#fff}
+.hrow b{font-size:14.5px;display:block}
+.hrow span{font-size:13px;color:var(--muted)}
+.freecta{padding:16px;display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.freecta b{font-size:15px}
+.freecta span{font-size:13.5px;color:var(--muted)}
+.freecta .btn{margin-top:4px}
+.faq{display:flex;flex-direction:column;gap:9px;padding-bottom:8px}
+.faq details{padding:0}
+.faq summary{padding:14px 15px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.faq summary::after{content:'+';font-size:19px;color:var(--primary);font-weight:600;flex:none}
+.faq details[open] summary::after{content:'–'}
+.faq summary::-webkit-details-marker{display:none}
+.faq details p{padding:0 15px 14px;font-size:14px;color:var(--muted);line-height:1.6;margin:0}
+.diagopts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
 
 /* ---- Cloche & notifications ---- */
 .hdact{display:flex;align-items:center;gap:9px;flex:none}
@@ -2407,6 +2446,86 @@ Poste une phrase en anglais par semaine dans Entraide — on te corrige avec bie
 ];
 
 const CATS = ['Tout','IA','Anglais'];
+
+/* ===== Parcours : des suites de cours ordonnées vers un résultat concret.
+   Les cours sont référencés par id (aucune duplication de contenu). ===== */
+const PATHS = [
+  {id:'chatgpt-pro', title:'ChatGPT pour les professionnels', g:1,
+   outcome:'Gagner du temps chaque jour : e-mails, documents et idées deux fois plus vite.',
+   level:'Débutant bienvenu', courses:['ia','chatgpt'],
+   skills:['Formuler des demandes efficaces','E-mails et documents pro','Résumés et idées']},
+  {id:'claude-pro', title:'Claude : analyser et rédiger comme un pro', g:3,
+   outcome:'Maîtriser l\'analyse de documents, les écrits délicats et la préparation de décisions.',
+   level:'Débutant bienvenu', courses:['ia','claude'],
+   skills:['Analyse de rapports','Messages sensibles','Comparer et décider']},
+  {id:'copilot-bureau', title:'Copilot au bureau', g:4,
+   outcome:'Utiliser l\'IA directement dans Word, Excel et Outlook au quotidien.',
+   level:'Débutant bienvenu', courses:['ia','copilot'],
+   skills:['Word & documents','Excel & analyses','Outlook & e-mails']},
+  {id:'ia-complet', title:'L\'IA au travail — parcours complet', g:0,
+   outcome:'Devenir la personne qui maîtrise l\'IA dans son équipe, sur tous les outils.',
+   level:'Du débutant au confirmé', courses:['ia','chatgpt','claude','copilot'],
+   skills:['ChatGPT, Claude et Copilot','Méthode complète','Boîtes à outils prêtes']},
+  {id:'anglais-pro', title:'Anglais professionnel : les bases solides', g:2,
+   outcome:'Te présenter, comprendre et écrire des messages professionnels en anglais.',
+   level:'Grand débutant bienvenu', courses:['en'],
+   skills:['Se présenter','Messages & e-mails','Vocabulaire utile']},
+  {id:'emploi', title:'Booster ta recherche d\'emploi', g:5,
+   outcome:'CV amélioré, entretiens préparés avec l\'IA, et bases d\'anglais qui rassurent.',
+   level:'Débutant bienvenu', courses:['ia','chatgpt','en'],
+   skills:['CV et candidatures','Simulation d\'entretien','Anglais des bases']},
+];
+const pathById = id => PATHS.find(p=>p.id===id);
+/* Minutes estimées par cours (affichage durée de parcours). */
+const COURSE_MIN = {ia:35, chatgpt:120, claude:180, copilot:120, en:75};
+function pathMinutes(p){ return p.courses.reduce((a,c)=>a+(COURSE_MIN[c]||60),0); }
+function pathProgress(p){
+  const per = p.courses.map(cid=>{ const c=courseById(cid); return c?courseProgress(c):0; });
+  return Math.round(per.reduce((a,x)=>a+x,0)/Math.max(1,per.length));
+}
+/* Prochaine action d'un parcours : premier cours non terminé (inscrit ou non). */
+function pathNext(p){
+  for(const cid of p.courses){ const c=courseById(cid); if(c && courseProgress(c)<100) return c; }
+  return null;
+}
+
+/* ===== Diagnostic : 6 questions, 1 par écran, moteur de recommandation
+   DÉTERMINISTE (règles simples, honnêtes et testables). ===== */
+const DIAG_QS = [
+  {key:'objectif', label:'Quel est ton objectif principal ?', opts:[
+    ['temps','Gagner du temps au travail'],['emploi','Trouver un emploi'],
+    ['activite','Développer mon activité'],['chatgpt','Maîtriser ChatGPT'],
+    ['copilot','Maîtriser Microsoft Copilot'],['anglais','Améliorer mon anglais pro'],
+    ['contenu','Créer du contenu avec l\'IA'],['redaction','Analyser et rédiger avec l\'IA']]},
+  {key:'metier', label:'Quel est ton domaine ?', opts:[
+    ['bureau','Bureau / administration'],['commerce','Commerce / vente'],
+    ['etudiant','Étudiant·e / jeune diplômé·e'],['entrepreneur','Entrepreneur / freelance'],
+    ['recherche','En recherche d\'emploi'],['autre','Autre']]},
+  {key:'niveauIA', label:'Ton niveau avec l\'IA (ChatGPT, etc.) ?', opts:[
+    ['zero','Jamais utilisé'],['peu','Essayé une ou deux fois'],['regulier','J\'utilise déjà un peu']]},
+  {key:'niveauEN', label:'Ton niveau en anglais ?', opts:[
+    ['debutant','Débutant'],['moyen','Je me débrouille'],['bon','À l\'aise']]},
+  {key:'minutes', label:'Combien de minutes par jour peux-tu consacrer ?', opts:[
+    ['10','10 min'],['15','15 min'],['20','20 min'],['30','30 min ou plus']]},
+  {key:'style', label:'Comment préfères-tu apprendre ?', opts:[
+    ['pratique','En pratiquant (exercices)'],['lecture','En lisant à mon rythme'],['video','Avec des vidéos']]},
+];
+/* Règles objectif → parcours. Simple, lisible, modifiable. */
+function diagRecommend(a){
+  const map = {chatgpt:'chatgpt-pro', copilot:'copilot-bureau', anglais:'anglais-pro',
+               emploi:'emploi', redaction:'claude-pro', contenu:'chatgpt-pro',
+               activite:'chatgpt-pro', temps:null};
+  let pid = map[a.objectif] || 'chatgpt-pro';
+  if(a.objectif==='temps') pid = (a.minutes==='30') ? 'ia-complet' : 'chatgpt-pro';
+  if(a.objectif!=='anglais' && a.niveauEN==='debutant' && a.objectif==='emploi') pid='emploi';
+  const p = pathById(pid);
+  const min = parseInt(a.minutes||'15',10);
+  const days = Math.max(5, Math.ceil(pathMinutes(p)/min));
+  /* Première action : si l'IA est déjà connue, on saute l'intro gratuite. */
+  let first = p.courses[0];
+  if(a.niveauIA==='regulier' && first==='ia' && p.courses.length>1) first = p.courses[1];
+  return {pathId:pid, minutes:min, days, firstCourse:first};
+}
 const COMMU_CATS = ['Général','Entraide','Victoires','Annonces'];
 /* Catégories qu'un membre peut choisir en publiant. « Annonces » est réservé à
    l'équipe Boyia (envoyées depuis l'espace admin, diffusées en notification). */
@@ -2473,6 +2592,10 @@ function baseState(){
     theme:null,              // null=auto | 'light' | 'dark'
     notifSeenAt:0,           // horodatage des annonces déjà lues (badge notifications)
     hasPassword:false,       // le compte serveur a-t-il un mot de passe défini
+    diag:null,               // {answers, pathId, minutes, days} — résultat du diagnostic
+    path:null,               // parcours actif (id)
+    last:null,               // {cid, k} — dernière leçon ouverte (bouton « Reprendre »)
+    activity:{},             // 'AAAA-MM-JJ' -> nb de leçons terminées (série de jours)
   };
 }
 let S = baseState();
@@ -2572,6 +2695,28 @@ function courseById(id){ return COURSES.find(c=>c.id===id); }
 function lessonCount(c){ return c.modules.reduce((a,m)=>a+m.l.length,0); }
 function doneCount(c){ return Object.keys(S.done[c.id]||{}).length; }
 function courseProgress(c){ return Math.round(100*doneCount(c)/lessonCount(c)); }
+/* ---- Activité & série de jours (leçons terminées, par date locale) ---- */
+function dayKey(d){ const x=d||new Date(); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+function bumpActivity(){ const k=dayKey(); S.activity=S.activity||{}; S.activity[k]=(S.activity[k]||0)+1; save(); }
+function streakDays(){
+  const a=S.activity||{}; let n=0; const d=new Date();
+  if(!a[dayKey(d)]) d.setDate(d.getDate()-1);           // la série tient jusqu'à minuit du jour suivant
+  while(a[dayKey(d)]){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+function weekLessons(){
+  const a=S.activity||{}; let n=0; const d=new Date();
+  for(let i=0;i<7;i++){ n+=a[dayKey(d)]||0; d.setDate(d.getDate()-1); }
+  return n;
+}
+/* Reprise : dernière leçon ouverte encore non terminée, sinon prochaine leçon d'un cours entamé. */
+function resumeTarget(){
+  if(S.last && S.enrolled[S.last.cid]){ const c=courseById(S.last.cid); if(c && courseProgress(c)<100) return {c, k:S.last.k}; }
+  for(const c of COURSES){ if(S.enrolled[c.id] && courseProgress(c)<100){
+    let li=0; for(const m of c.modules) for(const l of m.l){ const k='l'+(li++); if(!(S.done[c.id]&&S.done[c.id][k])) return {c,k}; }
+  }}
+  return null;
+}
 /* Rendu enrichi d'une leçon (compatible avec l'ancien format = simples paragraphes).
    Balises de bloc (un bloc = séparé par une ligne vide) :
      ## Titre            → sous-titre
@@ -2701,6 +2846,7 @@ function screenCatalog(){
         ${S.user?`<button class="avatar" style="width:42px;height:42px" onclick="App.tab('profil')" aria-label="Profil">${initials(S.user.prenom+' '+S.user.nom)}</button>`:''}
       </div>
     </header>
+    ${homeTop()}
     <div class="search">
       ${I.search}
       <input type="search" placeholder="Chercher un cours…" value="${esc(filters.q)}"
@@ -2712,7 +2858,83 @@ function screenCatalog(){
     <div class="courselist">
       ${list.length ? list.map(courseCard).join('') : `<div class="empty">${I.search}<b>Aucun cours trouvé</b><span>Essaie un autre mot-clé ou une autre catégorie.</span></div>`}
     </div>
+    ${homeBottom()}
   </div>`;
+}
+
+/* ---- Accueil : zone du haut (hero visiteur OU reprise + parcours membre) ---- */
+function homeTop(){
+  const rec = S.diag && pathById(S.diag.pathId);
+  const resume = resumeTarget();
+  /* Membre avec un cours entamé : la reprise d'abord, c'est l'action n°1. */
+  if(S.user && resume){
+    const found = lessonByKey(resume.c, resume.k);
+    return `<div class="px" style="padding-top:4px">
+      <button class="card resume" onclick="App.openLesson('${resume.c.id}','${resume.k}')">
+        <span class="thumb" style="background:${GRADS[resume.c.g]}">${I.play}</span>
+        <span class="inf"><span class="r-lab">Reprendre là où tu t'es arrêté</span>
+          <b>${esc(found?found.l[0]:resume.c.title)}</b>
+          <span class="pbar"><i style="width:${courseProgress(resume.c)}%"></i></span></span>
+        ${I.arrowr}
+      </button>
+      ${S.path&&pathById(S.path)?pathCard(pathById(S.path),'Ton parcours'):(rec?pathCard(rec,'Parcours recommandé pour toi'):'')}
+    </div>`;
+  }
+  /* Visiteur (ou membre sans cours) : hero orienté résultat. */
+  return `<div class="hero-home">
+    <h1>Développe les compétences qui font avancer ta carrière</h1>
+    <p>Des parcours courts et pratiques pour maîtriser l'IA et l'anglais professionnel, à ton rythme.</p>
+    <button class="btn" onclick="App.startDiag()">Trouver mon parcours ${I.arrowr}</button>
+    <button class="btn ghost" onclick="App.scrollCourses()">Explorer les cours</button>
+    <div class="proof">Leçons courtes · Exercices pratiques · Quiz interactifs · Paiement Wave</div>
+    ${rec?pathCard(rec,'Parcours recommandé pour toi'):''}
+  </div>`;
+}
+/* ---- Carte parcours (réutilisée accueil / résultat diagnostic) ---- */
+function pathCard(p, label){
+  const pct = pathProgress(p);
+  return `<button class="card pathcard" onclick="App.openPath('${p.id}')">
+    <span class="thumb" style="background:${GRADS[p.g]}">🧭</span>
+    <span class="inf"><span class="r-lab">${esc(label||'Parcours')}</span>
+      <b>${esc(p.title)}</b>
+      <span class="muted" style="font-size:12.5px">${p.courses.length} cours · ~${Math.round(pathMinutes(p)/60*10)/10} h${pct?` · ${pct} %`:''}</span>
+      ${pct?`<span class="pbar"><i style="width:${pct}%"></i></span>`:''}</span>
+    ${I.arrowr}
+  </button>`;
+}
+/* ---- Accueil : bas de page (parcours, comment ça marche, FAQ) ---- */
+function homeBottom(){
+  const faq = [
+    ['Qu\'est-ce que Boyia Institute ?','Une plateforme de formation en ligne, en français, pour apprendre l\'IA (ChatGPT, Claude, Copilot) et l\'anglais professionnel. Tout fonctionne depuis ton téléphone.'],
+    ['Comment payer ?','Par Wave, directement dans l\'app, en toute sécurité. Les cours gratuits ne demandent aucun paiement. Chaque cours payant est un achat unique : pas d\'abonnement, pas de renouvellement automatique.'],
+    ['Que reçois-je après un achat ?','L\'accès complet et à vie au cours, un reçu par e-mail, et ta progression sauvegardée sur ton compte — retrouvable sur n\'importe quel appareil.'],
+    ['Je peux apprendre depuis mon téléphone ?','Oui, tout est pensé mobile d\'abord : leçons courtes, faible consommation de données, reprise là où tu t\'es arrêté.'],
+    ['Puis-je utiliser mon compte sur plusieurs appareils ?','Oui : connecte-toi avec ton e-mail et ton mot de passe, tes cours et ta progression te suivent.'],
+    ['Et si je débute complètement ?','C\'est prévu : commence par le cours gratuit « Comprendre l\'IA en 30 minutes », sans jargon, puis avance à ton rythme.'],
+  ];
+  return `
+    <div class="sect">Les parcours</div>
+    <p class="muted px" style="font-size:13.5px;padding-top:0">Un parcours = plusieurs cours dans le bon ordre, vers un résultat concret.</p>
+    <div class="px pathlist">${PATHS.map(p=>pathCard(p)).join('')}</div>
+    <div class="sect">Comment ça marche</div>
+    <div class="px">
+      <div class="card howto">
+        <div class="hrow"><span class="hn">1</span><div><b>Réponds à 6 questions</b><span>Ton parcours personnalisé est prêt en 2 minutes.</span></div></div>
+        <div class="hrow"><span class="hn">2</span><div><b>Apprends à ton rythme</b><span>Leçons courtes, exercices réels et quiz — sur mobile ou ordinateur.</span></div></div>
+        <div class="hrow"><span class="hn">3</span><div><b>Applique dès le premier jour</b><span>Consignes prêtes à copier dans tes outils, résultats immédiats au travail.</span></div></div>
+      </div>
+    </div>
+    ${S.user?'':`<div class="px" style="margin-top:14px">
+      <div class="card freecta">
+        <b>🎁 Commence gratuitement</b>
+        <span>Le cours « Comprendre l'IA en 30 minutes » est offert — sans carte, sans engagement.</span>
+        <button class="btn" onclick="App.openCourse('ia')">Découvrir le cours gratuit</button>
+      </div>
+    </div>`}
+    <div class="sect">Questions fréquentes</div>
+    <div class="px faq">
+      ${faq.map(([q,a])=>`<details class="card"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}
+    </div>`;
 }
 
 function screenCourse(){
@@ -2764,6 +2986,52 @@ function screenCourse(){
   </div>`;
 }
 
+/* ================= Écran : Parcours ================= */
+function screenPath(){
+  const p = pathById(V.p.id); if(!p) return screenCatalog();
+  const pct = pathProgress(p);
+  const next = pathNext(p);
+  const active = S.path===p.id;
+  return `<div class="screen" style="padding-bottom:96px">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('cours')" aria-label="Retour">${I.back}</button>
+      <h1>Parcours</h1>
+    </div>
+    <div class="hero" style="background:${GRADS[p.g]};border-radius:var(--r);margin:0 14px">
+      <span class="init">🧭</span>
+    </div>
+    <h1 class="dtitle">${esc(p.title)}</h1>
+    <p class="muted" style="padding:2px 18px;font-size:14.5px">${esc(p.outcome)}</p>
+    <div class="statrow">
+      <div class="stat"><b class="num">${p.courses.length}</b><span>cours</span></div>
+      <div class="stat"><b>~${Math.round(pathMinutes(p)/60*10)/10} h</b><span>au total</span></div>
+      <div class="stat"><b>${esc(p.level)}</b><span>niveau</span></div>
+      <div class="stat"><b class="num">${pct} %</b><span>terminé</span></div>
+    </div>
+    ${pct?`<div class="px"><div class="pbar" style="margin-top:4px"><i style="width:${pct}%"></i></div></div>`:''}
+    <div class="sect">Compétences développées</div>
+    <ul class="learnlist">${p.skills.map(s=>`<li>${I.checkc}<span>${esc(s)}</span></li>`).join('')}</ul>
+    <div class="sect">Les cours, dans l'ordre</div>
+    <div class="px pathlist">
+      ${p.courses.map((cid,i)=>{ const c=courseById(cid); if(!c) return '';
+        const cp=courseProgress(c); const enr=S.enrolled[cid];
+        return `<button class="card pathstep ${cp===100?'done':''}" onclick="App.openCourse('${cid}')">
+          <span class="hn">${cp===100?'✓':i+1}</span>
+          <span class="inf"><b>${esc(c.title)}</b>
+            <span class="muted" style="font-size:12.5px">${c.price?fcfa(c.price):'Gratuit'} · ${c.dur}${enr?` · ${cp} %`:''}</span>
+            ${enr?`<span class="pbar"><i style="width:${cp}%"></i></span>`:''}</span>
+          ${I.arrowr}
+        </button>`; }).join('')}
+    </div>
+    <div class="ctabar">
+      <div class="p"><b>${next?esc(next.title.split(':')[0]):'Parcours terminé 🎓'}</b><span>${next?'prochaine étape':'félicitations !'}</span></div>
+      ${next
+        ? `<button class="btn" onclick="App.startPath('${p.id}')">${active?'Continuer':'Commencer'} ${I.arrowr}</button>`
+        : `<button class="btn" onclick="App.tab('mescours')">Mes cours</button>`}
+    </div>
+  </div>`;
+}
+
 /* ================= Écran : lecture leçon ================= */
 function lessonByKey(c, key){
   let li=0;
@@ -2776,10 +3044,15 @@ function screenLesson(){
   const done = S.done[c.id] && S.done[c.id][V.p.k];
   const total = lessonCount(c);
   const nextKey = found.idx+1<total ? 'l'+(found.idx+1) : null;
+  const prevKey = found.idx>0 ? 'l'+(found.idx-1) : null;
+  /* Estimation du temps restant : somme des durées des leçons non terminées. */
+  let remainMin=0; { let li=0; for(const m of c.modules) for(const l of m.l){ const k='l'+(li++);
+    if(!(S.done[c.id]&&S.done[c.id][k])) remainMin += parseInt(l[1],10)||0; } }
   return `<div class="screen" style="padding-bottom:20px">
     <div class="subhead">
       <button class="iconbtn" onclick="App.openLearn('${c.id}')" aria-label="Retour au cours">${I.back}</button>
       <h1>Leçon ${found.idx+1} / ${total}</h1>
+      <span class="muted num" style="margin-left:auto;font-size:12.5px;padding-right:14px">${remainMin>0?`~${remainMin} min restantes`:'cours terminé 🎓'}</span>
     </div>
     ${found.l[3] ? `
     <a class="lplayer" style="background:${GRADS[c.g]}" href="https://www.youtube.com/watch?v=${found.l[3]}" target="_blank" rel="noopener" aria-label="Regarder la vidéo de la leçon sur YouTube">
@@ -2800,6 +3073,7 @@ function screenLesson(){
         ? `<button class="btn soft" disabled>${I.check} Leçon terminée</button>`
         : `<button class="btn" onclick="App.completeLesson('${c.id}','${V.p.k}')">${I.check} Marquer comme terminée</button>`}
       ${nextKey?`<button class="btn ghost" onclick="App.openLesson('${c.id}','${nextKey}')">Leçon suivante ${I.arrowr}</button>`:''}
+      ${prevKey?`<button class="btn soft" style="margin-top:9px" onclick="App.openLesson('${c.id}','${prevKey}')">${I.back} Leçon précédente</button>`:''}
     </div>
   </div>`;
 }
@@ -2837,20 +3111,51 @@ function screenLearn(){
 /* ================= Écran : Mes cours ================= */
 function screenMyCourses(){
   const mine = COURSES.filter(c=>S.enrolled[c.id]);
+  const doneCourses = mine.filter(c=>courseProgress(c)===100).length;
+  const resume = resumeTarget();
+  const streak = streakDays();
+  const week = weekLessons();
+  const activePath = S.path && pathById(S.path);
+  const hello = S.user ? `Salut ${esc(S.user.prenom)} 👋` : 'Mes cours';
   return `<div class="screen">
-    <header class="apphead"><div class="brand" style="font-size:22px">Mes cours</div></header>
+    <header class="apphead"><div style="flex:1"><div class="brand" style="font-size:22px">${hello}</div>
+      ${mine.length?`<div class="tagline" style="padding:0">${resume?'Continue sur ta lancée !':'Beau travail — tout est à jour.'}</div>`:''}</div>
+      <div class="hdact">${bellBtn()}</div>
+    </header>
     ${mine.length===0
-      ? `<div class="empty">${I.book}<b>Aucun cours pour l'instant</b><span>Inscris-toi à un cours gratuit ou payant pour commencer à apprendre.</span>
-         <button class="btn" style="width:auto;padding:12px 22px" onclick="App.tab('cours')">Voir les cours</button></div>`
-      : `<div class="courselist">${mine.map(c=>{
-          const pct = courseProgress(c);
-          return `<button class="card mccard" onclick="App.openLearn('${c.id}')">
-            <span class="thumb" style="background:${GRADS[c.g]}">${esc(c.title[0])}</span>
-            <span class="inf"><b>${esc(c.title)}</b>
-              <span class="pbar"><i style="width:${pct}%"></i></span>
-              <span class="pct">${pct===100?'Terminé 🎓':pct+' % · '+esc(c.instr)}</span>
-            </span>
-          </button>`;}).join('')}</div>`}
+      ? `<div class="empty">${I.book}<b>Aucun cours pour l'instant</b><span>Fais le diagnostic pour trouver ton parcours, ou explore les cours — le premier est gratuit.</span>
+         <button class="btn" style="width:auto;padding:12px 22px" onclick="App.startDiag()">Trouver mon parcours</button>
+         <button class="btn ghost" style="width:auto;padding:12px 22px;margin-top:10px" onclick="App.tab('cours')">Voir les cours</button></div>`
+      : `
+    ${resume?`<div class="px" style="padding-top:2px">
+      <button class="card resume" onclick="App.openLesson('${resume.c.id}','${resume.k}')">
+        <span class="thumb" style="background:${GRADS[resume.c.g]}">${I.play}</span>
+        <span class="inf"><span class="r-lab">Continuer</span>
+          <b>${esc((lessonByKey(resume.c,resume.k)||{l:[resume.c.title]}).l[0])}</b>
+          <span class="pbar"><i style="width:${courseProgress(resume.c)}%"></i></span></span>
+        ${I.arrowr}
+      </button></div>`:''}
+    <div class="pstats" style="margin-top:10px">
+      <div class="stat"><b class="num" style="color:var(--accent)">${streak>0?'🔥 '+streak:'—'}</b><span>jour${streak>1?'s':''} de suite</span></div>
+      <div class="stat"><b class="num">${week}</b><span>leçons / 7 jours</span></div>
+      <div class="stat"><b class="num">${doneCourses}</b><span>cours terminés</span></div>
+    </div>
+    ${activePath?`<div class="px" style="margin-top:12px">${pathCard(activePath,'Ton parcours en cours')}</div>`:''}
+    <div class="sect">Mes cours</div>
+    <div class="courselist">${mine.map(c=>{
+        const pct = courseProgress(c);
+        return `<button class="card mccard" onclick="App.openLearn('${c.id}')">
+          <span class="thumb" style="background:${GRADS[c.g]}">${esc(c.title[0])}</span>
+          <span class="inf"><b>${esc(c.title)}</b>
+            <span class="pbar"><i style="width:${pct}%"></i></span>
+            <span class="pct">${pct===100?'Terminé 🎓':pct+' %'}</span>
+          </span>
+        </button>`;}).join('')}</div>
+    ${(()=>{ /* Recommandation : le prochain cours du parcours actif, sinon du diagnostic. */
+      const src = activePath || (S.diag&&pathById(S.diag.pathId));
+      const nxt = src && pathNext(src);
+      return (nxt && !S.enrolled[nxt.id]) ? `<div class="sect">Recommandé pour toi</div><div class="courselist">${courseCard(nxt)}</div>` : '';
+    })()}`}
   </div>`;
 }
 
@@ -3379,6 +3684,52 @@ function renderFlow(){
     return;
   }
 
+  /* ---- Diagnostic : 6 questions → parcours recommandé (règles simples) ---- */
+  if(flow.type==='diag'){
+    let inner='', foot='';
+    if(flow.step==='result'){
+      const p = pathById(flow.rec.pathId);
+      const first = courseById(flow.rec.firstCourse);
+      inner = `
+        <div class="bigcheck">🧭</div>
+        <h2 class="qlabel" style="text-align:center;margin-top:14px">Ton parcours est prêt !</h2>
+        <p class="qhelp" style="text-align:center">D'après tes réponses, voici ce qu'on te recommande :</p>
+        <div class="card" style="padding:16px;margin-top:12px">
+          <b style="font-size:16.5px">${esc(p.title)}</b>
+          <p class="muted" style="font-size:13.5px;margin:6px 0 10px">${esc(p.outcome)}</p>
+          <div class="recap" style="margin:0">
+            <div class="row"><span>Niveau</span><b>${esc(p.level)}</b></div>
+            <div class="row"><span>Cours</span><b class="num">${p.courses.length}</b></div>
+            <div class="row"><span>Rythme</span><b class="num">${flow.rec.minutes} min / jour</b></div>
+            <div class="row"><span>Durée estimée</span><b class="num">~${flow.rec.days} jours</b></div>
+          </div>
+          <p class="muted" style="font-size:13px;margin:10px 0 0">🚀 Première action : ${esc(first?first.title:'')} ${first&&!first.price?'(gratuit)':''}</p>
+        </div>`;
+      foot = `<button class="btn" onclick="App.diagStart()">Voir mon parcours ${I.arrowr}</button>
+        <button class="btn ghost" style="margin-top:9px" onclick="App.flowClose()">Plus tard</button>`;
+    } else {
+      const q = DIAG_QS[flow.step];
+      inner = `
+        <div class="qnum">${flow.step+1} / ${DIAG_QS.length}</div>
+        <h2 class="qlabel">${esc(q.label)}</h2>
+        <div class="diagopts">
+          ${q.opts.map(([v,l])=>`<button class="qopt ${flow.answers[q.key]===v?'good':''}" onclick="App.diagPick('${q.key}','${v}')">${esc(l)}</button>`).join('')}
+        </div>`;
+    }
+    const pct = flow.step==='result'?100:Math.round(100*flow.step/DIAG_QS.length);
+    ov.innerHTML = `<div class="flow" role="dialog" aria-modal="true" aria-label="Diagnostic">
+      <div class="progress"><i style="width:${pct}%"></i></div>
+      <div class="flowhead">
+        <button class="iconbtn" onclick="${flow.step===0?'App.flowClose()':'App.diagBack()'}" aria-label="${flow.step===0?'Fermer':'Précédent'}">${flow.step===0?I.x:I.back}</button>
+        <span class="muted" style="font-size:13px">Trouve ton parcours · 2 min</span>
+        <span style="width:42px"></span>
+      </div>
+      <div class="flowbody center">${inner}</div>
+      ${foot?`<div class="flowfoot">${foot}</div>`:''}
+    </div>`;
+    return;
+  }
+
   /* ---- Compte : connexion / vérification par code ---- */
   if(flow.type==='account'){
     let inner='', foot='';
@@ -3642,9 +3993,39 @@ const App = {
   cat(c){ filters.cat=c; render(); },
   commuCat(c){ filters.commu=c; render(); },
   openCourse(id){ go('cours','course',{id}); },
+  /* --- Parcours & diagnostic --- */
+  openPath(id){ go('cours','path',{id}); },
+  scrollCourses(){ const el=document.querySelector('.courselist'); if(el) el.scrollIntoView({behavior:'smooth'}); },
+  startPath(pid){
+    const p=pathById(pid); if(!p) return;
+    S.path=pid; save();
+    const next=pathNext(p);
+    if(!next){ this.tab('mescours'); return; }
+    if(S.enrolled[next.id]){ const r=resumeTarget(); if(r&&r.c.id===next.id){ this.openLesson(r.c.id,r.k); return; }
+      let li=0; for(const m of next.modules) for(const l of m.l){ const k='l'+(li++); if(!(S.done[next.id]&&S.done[next.id][k])){ this.openLesson(next.id,k); return; } } }
+    this.enroll(next.id);          // pas encore inscrit : gratuit → compte/inscription ; payant → paiement
+  },
+  startDiag(){ flow={type:'diag', step:0, answers:{}}; renderFlow(); },
+  diagPick(key,val){
+    flow.answers[key]=val;
+    if(flow.step<DIAG_QS.length-1){ flow.step++; }
+    else {
+      const rec=diagRecommend(flow.answers);
+      S.diag={answers:flow.answers, ...rec}; save();
+      flow.step='result'; flow.rec=rec;
+    }
+    renderFlow();
+  },
+  diagBack(){ if(flow.step==='result'){ flow.step=DIAG_QS.length-1; } else if(flow.step>0){ flow.step--; } else { flow=null; } renderFlow(); },
+  diagStart(){
+    const rec=flow.rec||S.diag; flow=null; renderFlow();
+    if(rec&&rec.pathId){ this.openPath(rec.pathId); }
+    render();
+  },
   openLearn(id){ if(!S.enrolled[id]){ this.openCourse(id); return; } go('mescours','learn',{id}); },
   openLesson(cid,k){
     if(!S.enrolled[cid]){ this.enroll(cid); return; }
+    S.last={cid,k}; save();
     go('mescours','lesson',{id:cid,k});
   },
   toast(m){ toast(m); },
@@ -3941,7 +4322,7 @@ const App = {
   completeLesson(cid,k){
     if(!S.done[cid]) S.done[cid]={};
     if(!S.done[cid][k]){
-      S.done[cid][k]=true; save();
+      S.done[cid][k]=true; bumpActivity(); save();
       if(API.mode==='live' && S.token){
         /* Le serveur fait foi pour les points (non falsifiables) ; on affiche le gain tout de suite. */
         toast('+10 points — leçon terminée');
@@ -4139,7 +4520,7 @@ function render(){
   const screens = {
     catalog:screenCatalog, course:screenCourse, learn:screenLearn, lesson:screenLesson,
     feed:screenFeed, post:screenPost, leader:screenLeader, compose:screenCompose,
-    my:screenMyCourses, profil:screenProfile, admin:screenAdmin, notifs:screenNotifs,
+    my:screenMyCourses, profil:screenProfile, admin:screenAdmin, notifs:screenNotifs, path:screenPath,
   };
   /* Communauté verrouillée tant que l'utilisateur n'a pas de compte. */
   const commuScreens = {feed:1, post:1, leader:1, compose:1};

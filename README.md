@@ -31,6 +31,8 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
 - **Espace d'apprentissage** : leçons par module, « marquer comme terminée », progression par cours.
 - **Communauté** (inspirée de Skool) : fil avec catégories (Général, Entraide, Victoires, Annonces), publications, j'aime, commentaires, classement par points (+10 leçon terminée, +5 publication, +2 commentaire). Les membres publient dans Général / Entraide / Victoires ; la catégorie **Annonces est réservée à l'équipe** (publiée depuis l'admin).
 - **Notifications** : cloche 🔔 dans l'en-tête avec badge de non-lus. L'admin publie une annonce → chaque membre la voit dans ses notifications et dans le fil, et peut la recevoir par e-mail. Le marquage « lu » est synchronisé au compte (multi-appareils).
+- **Parcours & diagnostic** : 6 parcours (suites de cours ordonnées vers un résultat), diagnostic de 6 questions (1 par écran) avec moteur de recommandation **déterministe** (règles simples dans `diagRecommend`), page parcours avec progression, accueil orienté résultat (hero, « comment ça marche », FAQ), reprise « là où tu t'es arrêté ».
+- **Tableau de bord « Mes cours »** : salut personnalisé, bouton Continuer, série de jours 🔥, leçons des 7 derniers jours, parcours actif, recommandation du prochain cours. Leçons : navigation précédente/suivante + temps restant estimé.
 - **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
 
 ## Paiement réel avec Wave Côte d'Ivoire (déploiement Vercel + Neon)
