@@ -97,6 +97,14 @@ const server = http.createServer(async (req, res) => {
       let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
       return send(res, await H.meProgress(req.headers['authorization'] || '', input));
     }
+    if (req.method === 'POST' && url.pathname === '/api/me/certificate') {
+      const raw = await H.readRawBody(req);
+      let input; try { input = JSON.parse(raw || '{}'); } catch (e) { return send(res, { status: 400, body: { error: 'json' } }); }
+      return send(res, await H.meCertificate(req.headers['authorization'] || '', input));
+    }
+    if (req.method === 'GET' && url.pathname === '/api/cert') {
+      return send(res, await H.certVerify(url.searchParams.get('id') || ''));
+    }
     if (req.method === 'POST' && url.pathname === '/api/me/seen') {
       return send(res, await H.meSeen(req.headers['authorization'] || ''));
     }

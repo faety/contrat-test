@@ -33,6 +33,11 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
 - **Notifications** : cloche 🔔 dans l'en-tête avec badge de non-lus. L'admin publie une annonce → chaque membre la voit dans ses notifications et dans le fil, et peut la recevoir par e-mail. Le marquage « lu » est synchronisé au compte (multi-appareils).
 - **Parcours & diagnostic** : 6 parcours (suites de cours ordonnées vers un résultat), diagnostic de 6 questions (1 par écran) avec moteur de recommandation **déterministe** (règles simples dans `diagRecommend`), page parcours avec progression, accueil orienté résultat (hero, « comment ça marche », FAQ), reprise « là où tu t'es arrêté ».
 - **Tableau de bord « Mes cours »** : salut personnalisé, bouton Continuer, série de jours 🔥, leçons des 7 derniers jours, parcours actif, recommandation du prochain cours. Leçons : navigation précédente/suivante + temps restant estimé.
+- **Certificats de complétion** : délivrés par le serveur quand TOUTES les leçons sont validées (`POST /api/me/certificate`, table `certificates`, `COURSE_LESSONS` comme référence). Vérification publique `GET /api/cert?id=…` + page `#verif=ID`, impression PDF, partage LinkedIn. Libellé honnête : « certificat de complétion », pas un diplôme.
+- **Défis & motivation** : Défi IA 7 jours, ChatGPT 14 jours, Anglais 21 jours (une action par jour, jamais de blocage artificiel — les leçons terminées valident automatiquement les jours correspondants), objectif quotidien réglable (5–20 min), badges sobres calculés depuis l'activité réelle.
+- **Atelier de prompts** : rédiger ses consignes (checklist Tâche + Contexte + Format en direct), sauvegarder, copier en un geste.
+- **Communauté** : publication taguée par cours (optionnel) + règles visibles.
+- **Pack IA complet** : les 3 cours payants en un achat Wave unique (12 000 F au lieu de 15 000 F), `PRICES.pack` côté serveur, déblocage des 3 cours au paiement (`PACK_COURSES`). Pas d'abonnement, pas de renouvellement automatique.
 - **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
 
 ## Paiement réel avec Wave Côte d'Ivoire (déploiement Vercel + Neon)
