@@ -399,6 +399,13 @@ a.lplayer{text-decoration:none;cursor:pointer}
 .faq details p{padding:0 15px 14px;font-size:14px;color:var(--muted);line-height:1.6;margin:0}
 .diagopts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
 
+/* ---- Audio de leçon ---- */
+.audiocard{margin:0 14px;border-radius:var(--r);padding:16px 15px;color:#fff;display:flex;flex-direction:column;gap:10px}
+.audiocard .au-h{display:flex;align-items:baseline;gap:8px;font-size:15px}
+.audiocard .au-h span{font-size:11.5px;opacity:.85;font-weight:500}
+.audiocard audio{width:100%;height:40px;border-radius:999px}
+.audiocard .au-note{font-size:12.5px;opacity:.9;margin:0}
+
 /* ---- Communauté : tag de cours sur une publication ---- */
 .pcourse{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;color:var(--primary);background:var(--primary-soft);border-radius:7px;padding:3px 9px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -2641,6 +2648,13 @@ const PREFIXES = [
   ['+237','Cameroun'],['+233','Ghana'],['+243','RD Congo'],['+241','Gabon'],
 ];
 
+/* Audio de leçon (enregistré par l'équipe) : courseId -> lessonKey -> fichier.
+   Servi statiquement (repo /audio) ; preload léger pour économiser les données. */
+const LESSON_AUDIO = {
+  en: { l0: '/audio/en-l0.mp3' },
+};
+function lessonAudio(cid,k){ return (LESSON_AUDIO[cid]||{})[k]||null; }
+
 const LESSON_BODY = [
   "Dans cette leçon, on va droit au but : tu découvres la méthode, tu vois un exemple réel, puis tu passes à l'action avec un exercice simple.",
   "Prends de quoi noter (le bloc-notes de ton téléphone suffit). L'objectif n'est pas de tout retenir, mais d'appliquer une chose concrète dès aujourd'hui.",
@@ -3304,7 +3318,13 @@ function screenLesson(){
       <h1>Leçon ${found.idx+1} / ${total}</h1>
       <span class="muted num" style="margin-left:auto;font-size:12.5px;padding-right:14px">${remainMin>0?`~${remainMin} min restantes`:'cours terminé 🎓'}</span>
     </div>
-    ${found.l[3] ? `
+    ${lessonAudio(c.id,V.p.k) ? `
+    <div class="audiocard" style="background:${GRADS[c.g]}">
+      <div class="au-h">🎧 <b>Écoute la leçon</b><span>audio enregistré par l'équipe Boyia</span></div>
+      <audio controls preload="metadata" src="${lessonAudio(c.id,V.p.k)}" aria-label="Audio de la leçon"></audio>
+      <p class="au-note">Écoute d'abord, puis lis la leçon en dessous pour ancrer les phrases 👇</p>
+    </div>`
+    : found.l[3] ? `
     <a class="lplayer" style="background:${GRADS[c.g]}" href="https://www.youtube.com/watch?v=${found.l[3]}" target="_blank" rel="noopener" aria-label="Regarder la vidéo de la leçon sur YouTube">
       <span class="playbtn"><svg viewBox="0 0 24 24" fill="currentColor" style="width:26px;height:26px;margin-left:3px"><polygon points="6 4 20 12 6 20 6 4"/></svg></span>
     </a>

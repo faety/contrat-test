@@ -147,6 +147,16 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.adminCoupons(req.method, body, req.headers['x-admin-key'] || ''));
     }
 
+    /* Fichiers audio des leçons (en production, Vercel les sert statiquement). */
+    if (req.method === 'GET' && /^\/audio\/[\w.-]+\.mp3$/.test(url.pathname)) {
+      const fp = path.join(__dirname, url.pathname);
+      if (fs.existsSync(fp)) {
+        res.writeHead(200, { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=86400', 'Content-Length': fs.statSync(fp).size });
+        return fs.createReadStream(fp).pipe(res);
+      }
+      return send(res, { status: 404, body: { error: 'not-found' } });
+    }
+
     if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.startsWith('/boyiaadmin'))) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
       return res.end(fs.readFileSync(INDEX));
