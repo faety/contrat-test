@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4A2FBD">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Echo · Apprends l'anglais par le shadowing</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EE; --card:#FFFFFF; --ink:#231A3D; --muted:#7A7290;
+  --primary:#5B3DD6; --primary-soft:#EEE9FF; --accent:#FF8A3D; --accent-soft:#FFF0E4;
+  --green:#1FA97C; --green-soft:#E2F7EF; --red:#E5484D;
+  --radius:22px; --shadow:0 6px 24px rgba(35,26,61,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+.screen{max-width:560px;margin:0 auto;padding-bottom:90px}
+.hidden{display:none!important}
+
+/* ---------- HERO ---------- */
+.hero{background:linear-gradient(150deg,#3A1F9E 0%,#5B3DD6 45%,#9A55E8 72%,#FF8A3D 130%);
+  color:#fff;padding:26px 22px 30px;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%);border-radius:50%}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.brand .logo{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(4px)}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:.3px}
+.brand span{font-size:12px;opacity:.85;display:block;font-weight:500;margin-top:1px}
+.lesson-tag{display:inline-block;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:99px;
+  font-size:12px;font-weight:600;margin-bottom:10px;backdrop-filter:blur(4px)}
+.hero h2{font-size:26px;font-weight:800;line-height:1.15}
+.hero .fr-title{font-size:14px;opacity:.85;margin-top:4px;font-weight:500}
+.hero .speaker{display:flex;align-items:center;gap:10px;margin-top:14px}
+.hero .avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+.hero .speaker div b{font-size:14px;display:block}
+.hero .speaker div small{font-size:11.5px;opacity:.8}
+.theme-quote{margin-top:16px;font-size:13.5px;line-height:1.45;background:rgba(255,255,255,.13);
+  border-left:3px solid #FFD9A8;padding:10px 14px;border-radius:10px;font-weight:500}
+.global-progress{margin-top:18px}
+.global-progress .row{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:6px}
+.gbar{height:10px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden}
+.gbar div{height:100%;background:linear-gradient(90deg,#FFD9A8,#FF8A3D);border-radius:99px;transition:width .6s ease}
+
+/* ---------- METHOD ---------- */
+.method-btn{margin:16px 22px 0;width:calc(100% - 44px);background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:15px 18px;display:flex;align-items:center;gap:13px;text-align:left}
+.method-btn .ic{width:42px;height:42px;border-radius:14px;background:var(--accent-soft);display:flex;
+  align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.method-btn b{font-size:14.5px;display:block}
+.method-btn small{font-size:12px;color:var(--muted)}
+.method-btn .chev{margin-left:auto;color:var(--muted);font-size:18px}
+
+/* ---------- PART CARDS ---------- */
+.parts{padding:18px 22px 10px;display:flex;flex-direction:column;gap:12px}
+.section-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1.2px;margin:6px 22px 0}
+.pcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;
+  display:flex;align-items:center;gap:14px;text-align:left;width:100%;transition:transform .12s ease}
+.pcard:active{transform:scale(.98)}
+.pcard .emoji{width:50px;height:50px;border-radius:16px;background:var(--primary-soft);
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.pcard.done .emoji{background:var(--green-soft)}
+.pcard .info{flex:1;min-width:0}
+.pcard .info b{font-size:15.5px;display:block;line-height:1.2}
+.pcard .info small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+.pcard .meta{font-size:11px;color:var(--muted);margin-top:6px;display:flex;gap:10px}
+.ring{width:44px;height:44px;flex-shrink:0;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:700;color:var(--primary)}
+.pcard.done .pct{color:var(--green)}
+
+/* ---------- PART SCREEN ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#3A1F9E,#5B3DD6 60%,#7B4CE0);
+  color:#fff;padding:14px 16px 12px;border-radius:0 0 24px 24px;box-shadow:0 4px 20px rgba(58,31,158,.25)}
+.topbar .row1{display:flex;align-items:center;gap:10px}
+.back-btn{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.topbar .titles{flex:1;min-width:0}
+.topbar .titles b{font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .titles small{font-size:11.5px;opacity:.85}
+.topbar .count{font-size:12px;font-weight:700;background:rgba(255,255,255,.15);
+  padding:5px 10px;border-radius:99px;flex-shrink:0}
+.controls{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.controls .row2{display:flex;gap:8px;width:100%}
+.play-all{flex-shrink:0;background:#fff;color:var(--primary);font-weight:700;font-size:13.5px;
+  padding:9px 16px;border-radius:99px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.play-all.playing{background:var(--accent);color:#fff}
+.seg{display:flex;background:rgba(255,255,255,.14);border-radius:99px;padding:3px;flex:1;justify-content:space-around}
+.seg button{font-size:11.5px;font-weight:600;padding:6px 10px;border-radius:99px;color:rgba(255,255,255,.8);white-space:nowrap}
+.seg button.on{background:#fff;color:var(--primary)}
+.steps-banner{margin:14px 18px 0;background:var(--accent-soft);border-radius:16px;padding:11px 15px;
+  font-size:12.5px;line-height:1.5;color:#8A4B12;font-weight:500}
+.steps-banner b{color:#6E3400}
+
+/* ---------- SENTENCE CARDS ---------- */
+.sentences{padding:14px 16px;display:flex;flex-direction:column;gap:11px}
+.scard{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 16px;
+  border:2px solid transparent;transition:border-color .25s, background .25s}
+.scard.active{border-color:var(--accent);background:#FFFBF6}
+.scard.completed{border-color:#BFE9D9}
+.scard .head{display:flex;align-items:flex-start;gap:12px}
+.snum{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);
+  padding:4px 9px;border-radius:99px;flex-shrink:0;margin-top:2px}
+.scard.completed .snum{background:var(--green-soft);color:var(--green)}
+.stext{flex:1;font-size:16px;line-height:1.45;font-weight:500}
+.scard.active .stext{color:#3A2A00}
+.play-s{width:42px;height:42px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .1s}
+.play-s:active{transform:scale(.92)}
+.play-s.playing{background:var(--accent);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,138,61,.45)}50%{box-shadow:0 0 0 9px rgba(255,138,61,0)}}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip-btn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:99px;background:var(--bg);
+  color:var(--muted);display:flex;align-items:center;gap:5px}
+.chip-btn.on{background:var(--primary-soft);color:var(--primary)}
+.chip-btn.rec-on{background:#FDE8E8;color:var(--red);animation:pulse-red 1s infinite}
+@keyframes pulse-red{0%,100%{opacity:1}50%{opacity:.6}}
+.chip-btn.done-btn.on{background:var(--green-soft);color:var(--green)}
+.fr-block{margin-top:12px;background:var(--primary-soft);border-radius:14px;padding:11px 14px;
+  font-size:14px;line-height:1.5;color:#4A3A8F;font-weight:500}
+.vocab{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.vchip{font-size:11.5px;background:#fff;border:1px solid #DCD3F5;border-radius:99px;padding:4px 10px;color:#5B3DD6}
+.vchip b{font-weight:700}
+.rec-panel{margin-top:12px;background:var(--accent-soft);border-radius:14px;padding:11px 14px;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rec-panel span{font-size:12px;font-weight:700;color:#8A4B12;width:100%}
+.rp-btn{font-size:12px;font-weight:700;padding:8px 14px;border-radius:99px;background:#fff;color:#8A4B12;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);display:flex;align-items:center;gap:5px}
+.rp-btn.model{color:var(--primary)}
+
+/* ---------- MODAL / CONFETTI / TOAST ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(20,12,40,.55);z-index:100;display:flex;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.modal{background:#fff;width:100%;max-width:560px;border-radius:28px 28px 0 0;padding:26px 24px 34px;
+  max-height:82vh;overflow-y:auto;animation:slideup .3s ease}
+@keyframes slideup{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-size:20px;font-weight:800;margin-bottom:4px}
+.modal .sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+.step .n{width:34px;height:34px;border-radius:12px;background:var(--primary-soft);color:var(--primary);
+  font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.step b{font-size:14.5px;display:block}
+.step p{font-size:13px;color:var(--muted);line-height:1.5;margin-top:2px}
+.close-modal{width:100%;background:var(--primary);color:#fff;font-weight:700;font-size:15px;
+  padding:14px;border-radius:16px;margin-top:6px}
+.congrats{text-align:center;padding:10px 0}
+.congrats .big{font-size:54px;margin-bottom:8px}
+.confetti{position:fixed;top:-20px;z-index:200;font-size:22px;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.7}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+  font-size:13px;font-weight:600;padding:11px 20px;border-radius:99px;z-index:150;box-shadow:0 6px 20px rgba(0,0,0,.25);
+  animation:slideup .25s ease}
+footer{padding:26px 22px;text-align:center;font-size:11.5px;color:var(--muted);line-height:1.6}
+</style>
+</head>
+<body>
+<script>
+/* Accès réservé aux abonnés Boyia Institute (abonnement Echo actif).
+   Même origine que l'app principale : on lit la même sauvegarde locale. */
+(function(){
+  try{
+    var S=JSON.parse(localStorage.getItem('kalan-v1')||'{}');
+    var e=S.enrolled&&S.enrolled.echo;
+    var ok=e&&e.paid&&(!e.expiresAt||e.expiresAt>Date.now());
+    if(ok) return;
+    var lock=function(){
+      var d=document.createElement('div');
+      d.style.cssText='position:fixed;inset:0;z-index:9999;background:#0F1524;color:#EDF1FB;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;gap:14px;font-family:system-ui,sans-serif';
+      d.innerHTML='<div style="font-size:44px">🎧</div>'
+        +'<h2 style="margin:0;font-size:22px">Echo est r\u00e9serv\u00e9 aux abonn\u00e9s</h2>'
+        +'<p style="color:#93A1C4;max-width:300px;margin:0;font-size:14.5px;line-height:1.6">'
+        +(e?'Ton abonnement Echo a expir\u00e9. Prolonge ton acc\u00e8s pour continuer ton entra\u00eenement.':'Abonne-toi depuis Boyia Institute pour acc\u00e9der \u00e0 l\u2019entra\u00eenement complet de shadowing.')
+        +'</p>'
+        +'<a href="/#echo" style="background:#3D63AE;color:#fff;text-decoration:none;padding:14px 24px;border-radius:12px;font-weight:700">'
+        +(e?'Prolonger mon acc\u00e8s':'D\u00e9couvrir Echo')+'</a>';
+      document.body.appendChild(d);
+    };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',lock); else lock();
+  }catch(err){}
+})();
+</script>
+
+<div id="home" class="screen"></div>
+<div id="part" class="screen hidden"></div>
+<div id="modal-root"></div>
+<audio id="player" preload="auto"></audio>
+
+<script src="data.js"></script>
+<script>
+/* ================= STATE ================= */
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem('echo-v1')||'{}'); }catch(e){ return this._m||{}; } },
+  set(d){ this._m=d; try{ localStorage.setItem('echo-v1', JSON.stringify(d)); }catch(e){} }
+};
+let state = Object.assign({completed:{}, speed:1, mode:'normal'}, store.get());
+const save = ()=> store.set(state);
+
+const lesson = window.LESSONS[0];
+const player = document.getElementById('player');
+const $ = s=>document.querySelector(s);
+let currentPart = null;
+let playSession = 0;          // token to cancel async play loops
+let recorders = {};           // sentenceKey -> {blob,url}
+let activeRec = null;
+
+const totalSentences = lesson.parts.reduce((a,p)=>a+p.sentences.length,0);
+const doneCount = p => p.sentences.filter((_,i)=>state.completed[p.id+':'+i]).length;
+const fmtDur = s => Math.round(s/60*10)/10 >= 1 ? `${Math.floor(s/60)} min ${Math.round(s%60)} s` : `${Math.round(s)} s`;
+
+/* ================= HOME ================= */
+function renderHome(){
+  const done = Object.keys(state.completed).filter(k=>state.completed[k]).length;
+  const pct = Math.round(done/totalSentences*100);
+  $('#home').innerHTML = `
+  <div class="hero">
+    <div class="brand">
+      <div class="logo">🎧</div>
+      <div><h1>Echo</h1><span>Apprends l'anglais par le shadowing</span></div>
+    </div>
+    <div class="lesson-tag">📚 Leçon ${lesson.num} · ${lesson.source}</div>
+    <h2>${lesson.title}</h2>
+    <div class="fr-title">${lesson.titleFr}</div>
+    <div class="speaker">
+      <div class="avatar">EF</div>
+      <div><b>${lesson.speaker}</b><small>${lesson.role}</small></div>
+    </div>
+    <div class="theme-quote">💛 ${lesson.theme}</div>
+    <div class="global-progress">
+      <div class="row"><span>Ma progression</span><span>${done} / ${totalSentences} phrases</span></div>
+      <div class="gbar"><div style="width:${pct}%"></div></div>
+    </div>
+  </div>
+  <button class="method-btn" onclick="showMethod()">
+    <div class="ic">🗣️</div>
+    <div><b>C'est quoi, le shadowing ?</b><small>La méthode en 4 étapes — commence ici !</small></div>
+    <div class="chev">›</div>
+  </button>
+  <div class="section-label" style="margin-top:20px">Les 8 parties de la leçon</div>
+  <div class="parts">
+    ${lesson.parts.map(p=>{
+      const d = doneCount(p), n = p.sentences.length, pc = Math.round(d/n*100);
+      const R=19, C=2*Math.PI*R;
+      return `<button class="pcard ${d===n?'done':''}" onclick="openPart('${p.id}')">
+        <div class="emoji">${d===n?'✅':p.emoji}</div>
+        <div class="info"><b>Partie ${p.num} · ${p.title}</b><small>${p.sub}</small>
+          <div class="meta"><span>💬 ${n} phrases</span><span>⏱ ${fmtDur(p.dur)}</span></div>
+        </div>
+        <div class="ring">
+          <svg width="44" height="44"><circle cx="22" cy="22" r="${R}" fill="none" stroke="#EFEBFA" stroke-width="4.5"/>
+          <circle cx="22" cy="22" r="${R}" fill="none" stroke="${d===n?'#1FA97C':'#5B3DD6'}" stroke-width="4.5"
+            stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pc/100)}"/></svg>
+          <div class="pct">${pc}%</div>
+        </div>
+      </button>`;
+    }).join('')}
+  </div>
+  <footer>Discours « ${lesson.title} » — ${lesson.speaker}, ${lesson.source}.<br>
+  Audio et texte © Intellectual Reserve, Inc. Utilisé à des fins pédagogiques.</footer>`;
+}
+
+/* ================= METHOD MODAL ================= */
+function showMethod(){
+  openModal(`
+    <h3>🗣️ La méthode du shadowing</h3>
+    <div class="sub">La technique des interprètes pour parler avec un accent naturel</div>
+    <div class="step"><div class="n">1</div><div><b>Écoute d'abord 👂</b>
+      <p>Écoute la phrase une ou deux fois. Lis le texte en même temps. Vérifie le sens avec la traduction si besoin.</p></div></div>
+    <div class="step"><div class="n">2</div><div><b>Répète PENDANT l'audio 🗣️</b>
+      <p>Rejoue la phrase et parle en même temps que la voix, comme une ombre (« shadow »). Imite la mélodie, le rythme et les émotions — pas seulement les mots !</p></div></div>
+    <div class="step"><div class="n">3</div><div><b>Enregistre-toi 🎙️</b>
+      <p>Appuie sur le micro, dis la phrase, puis compare ta voix avec l'originale. C'est comme ça qu'on progresse le plus vite.</p></div></div>
+    <div class="step"><div class="n">4</div><div><b>Valide et avance ✅</b>
+      <p>Quand tu te sens à l'aise, marque la phrase « maîtrisée ». Un peu chaque jour vaut mieux que beaucoup une seule fois : vise 1 partie par jour !</p></div></div>
+    <div class="step"><div class="n">💡</div><div><b>Astuces</b>
+      <p>Utilise la vitesse 🐢 0.7 au début, puis accélère. Le mode <b>Écho</b> laisse un silence après chaque phrase pour que tu répètes. Le mode <b>Boucle</b> répète la phrase sans t'arrêter.</p></div></div>
+    <button class="close-modal" onclick="closeModal()">C'est parti ! 🚀</button>`);
+}
+
+function openModal(html){ $('#modal-root').innerHTML = `<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`; }
+function closeModal(){ $('#modal-root').innerHTML=''; }
+
+/* ================= PART SCREEN ================= */
+function openPart(pid){
+  currentPart = lesson.parts.find(p=>p.id===pid);
+  stopAll();
+  if(!player.src || !player.src.includes(currentPart.audio)){ player.src = currentPart.audio; player.load(); }
+  renderPart();
+  $('#home').classList.add('hidden');
+  $('#part').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function goHome(){ stopAll(); renderHome(); $('#part').classList.add('hidden'); $('#home').classList.remove('hidden'); window.scrollTo(0,0); }
+
+function renderPart(){
+  const p = currentPart;
+  $('#part').innerHTML = `
+  <div class="topbar">
+    <div class="row1">
+      <button class="back-btn" onclick="goHome()">‹</button>
+      <div class="titles"><b>${p.emoji} ${p.title}</b><small>Partie ${p.num} / 8 · ${p.sub}</small></div>
+      <div class="count" id="pcount">${doneCount(p)}/${p.sentences.length}</div>
+    </div>
+    <div class="controls">
+      <div class="row2">
+        <button class="play-all" id="playall" onclick="togglePlayAll()">▶ Tout</button>
+        <div class="seg" id="modeseg">
+          <button data-m="normal" onclick="setMode('normal')">Normal</button>
+          <button data-m="loop" onclick="setMode('loop')">🔁 Boucle</button>
+          <button data-m="echo" onclick="setMode('echo')">🗣 Écho</button>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="seg" id="speedseg" style="width:100%">
+          <button data-s="0.7" onclick="setSpeed(0.7)" style="flex:1">🐢 Lent 0.7</button>
+          <button data-s="0.85" onclick="setSpeed(0.85)" style="flex:1">0.85</button>
+          <button data-s="1" onclick="setSpeed(1)" style="flex:1">1× Normal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="steps-banner"><b>1.</b> Écoute 👂 &nbsp;<b>2.</b> Répète en même temps 🗣️ &nbsp;<b>3.</b> Enregistre-toi 🎙️ &nbsp;<b>4.</b> Valide ✅</div>
+  <div class="sentences">
+    ${p.sentences.map((s,i)=>{
+      const key = p.id+':'+i, comp = !!state.completed[key];
+      return `<div class="scard ${comp?'completed':''}" id="sc${i}">
+        <div class="head">
+          <div class="snum">${comp?'✓':i+1}</div>
+          <div class="stext">${s.en}</div>
+          <button class="play-s" id="ps${i}" onclick="playSentence(${i})">▶</button>
+        </div>
+        <div class="actions">
+          <button class="chip-btn" id="tr${i}" onclick="toggleFr(${i})">👁 Traduction</button>
+          <button class="chip-btn" id="rec${i}" onclick="toggleRec(${i})">🎙 M'enregistrer</button>
+          <button class="chip-btn done-btn ${comp?'on':''}" id="dn${i}" onclick="toggleDone(${i})">${comp?'✅ Maîtrisée !':'✓ Je maîtrise'}</button>
+        </div>
+        <div class="fr-block hidden" id="fr${i}">
+          ${s.fr}
+          ${s.vocab.length?`<div class="vocab">${s.vocab.map(v=>`<span class="vchip"><b>${v[0]}</b> = ${v[1]}</span>`).join('')}</div>`:''}
+        </div>
+        <div class="rec-panel hidden" id="rp${i}"></div>
+      </div>`;
+    }).join('')}
+  </div>
+  <footer>💪 Astuce : répète chaque phrase 3 fois avant de passer à la suivante.</footer>`;
+  syncSeg();
+}
+function syncSeg(){
+  document.querySelectorAll('#modeseg button').forEach(b=>b.classList.toggle('on', b.dataset.m===state.mode));
+  document.querySelectorAll('#speedseg button').forEach(b=>b.classList.toggle('on', parseFloat(b.dataset.s)===state.speed));
+}
+function setMode(m){ state.mode=m; save(); syncSeg(); toast(m==='normal'?'Mode normal : lecture simple':(m==='loop'?'Mode boucle : la phrase se répète 🔁':'Mode écho : un silence après chaque phrase pour répéter 🗣')); }
+function setSpeed(s){ state.speed=s; save(); player.playbackRate=s; syncSeg(); }
+
+/* ================= AUDIO ENGINE ================= */
+function stopAll(){ playSession++; player.pause(); clearHighlights(); const pa=$('#playall'); if(pa){pa.textContent='▶ Tout'; pa.classList.remove('playing');} }
+function clearHighlights(){ document.querySelectorAll('.scard.active').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.play-s.playing').forEach(e=>{e.classList.remove('playing');e.textContent='▶';}); }
+
+function playRange(s, e, session){
+  return new Promise(res=>{ (async()=>{
+    if(player.readyState < 1){
+      await new Promise(r=>{ player.addEventListener('loadedmetadata', r, {once:true}); setTimeout(r, 6000); });
+      if(session!==playSession) return res(false);
+    }
+    player.currentTime = s;
+    if(Math.abs(player.currentTime - s) > 0.5){
+      await new Promise(r=>{ player.addEventListener('seeked', r, {once:true}); setTimeout(r, 5000); });
+      if(session!==playSession) return res(false);
+    }
+    player.playbackRate = state.speed;
+    try{ await player.play(); }catch(err){ return res(false); }
+    const check = ()=>{
+      if(session!==playSession){ res(false); return; }
+      if(player.currentTime >= e - 0.03 || player.ended){ player.pause(); res(true); return; }
+      requestAnimationFrame(check);
+    };
+    requestAnimationFrame(check);
+  })(); });
+}
+const wait = (ms,session)=>new Promise(r=>{ const t0=performance.now();
+  const c=()=>{ if(session!==playSession) return r(false); if(performance.now()-t0>=ms) return r(true); requestAnimationFrame(c); }; c(); });
+
+async function playSentence(i){
+  const p = currentPart, s = p.sentences[i];
+  const wasPlaying = document.getElementById('ps'+i).classList.contains('playing');
+  stopAll();
+  if(wasPlaying) return;                       // tap again = stop
+  const session = playSession;
+  highlight(i, false);
+  const dur = (s.e - s.s)/state.speed*1000;
+  do{
+    const ok = await playRange(s.s, s.e, session);
+    if(!ok) return;
+    if(state.mode==='echo'){ setEchoUI(i,true); const w = await wait(dur+400, session); setEchoUI(i,false); if(!w) return; }
+  } while(state.mode!=='normal' && session===playSession);
+  if(session===playSession) clearHighlights();
+}
+
+function setEchoUI(i,on){ const b=document.getElementById('ps'+i); if(b) b.textContent = on?'🗣':'⏸'; }
+function highlight(i, scroll){
+  clearHighlights();
+  const card = document.getElementById('sc'+i), btn = document.getElementById('ps'+i);
+  if(card){ card.classList.add('active'); if(scroll) card.scrollIntoView({block:'center',behavior:'smooth'}); }
+  if(btn){ btn.classList.add('playing'); btn.textContent='⏸'; }
+}
+
+async function togglePlayAll(){
+  const pa = $('#playall');
+  if(pa.classList.contains('playing')){ stopAll(); return; }
+  stopAll();
+  const session = playSession;
+  pa.textContent='⏸ Stop'; pa.classList.add('playing');
+  const p = currentPart;
+  for(let i=0;i<p.sentences.length;i++){
+    if(session!==playSession) return;
+    const s = p.sentences[i];
+    highlight(i, true);
+    const ok = await playRange(s.s, s.e, session);
+    if(!ok) return;
+    if(state.mode==='echo'){ setEchoUI(i,true); const w=await wait((s.e-s.s)/state.speed*1000+400, session); setEchoUI(i,false); if(!w) return; }
+    if(state.mode==='loop'){ const ok2 = await playRange(s.s, s.e, session); if(!ok2) return; }
+  }
+  if(session===playSession){ clearHighlights(); pa.textContent='▶ Tout'; pa.classList.remove('playing'); toast('Partie écoutée en entier, bravo ! 🎉'); }
+}
+
+/* ================= TRANSLATION ================= */
+function toggleFr(i){
+  const el = document.getElementById('fr'+i), b = document.getElementById('tr'+i);
+  el.classList.toggle('hidden');
+  b.classList.toggle('on', !el.classList.contains('hidden'));
+}
+
+/* ================= RECORDING ================= */
+async function toggleRec(i){
+  const btn = document.getElementById('rec'+i);
+  if(activeRec && activeRec.i===i){ activeRec.rec.stop(); return; }
+  if(activeRec) activeRec.rec.stop();
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    const mime = ['audio/mp4','audio/webm;codecs=opus','audio/webm'].find(m=>window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+    const rec = new MediaRecorder(stream, mime?{mimeType:mime}:undefined);
+    const chunks=[];
+    rec.ondataavailable = e=>chunks.push(e.data);
+    rec.onstop = ()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      const blob = new Blob(chunks,{type:mime||'audio/webm'});
+      const key = currentPart.id+':'+i;
+      if(recorders[key]) URL.revokeObjectURL(recorders[key].url);
+      recorders[key] = {url: URL.createObjectURL(blob)};
+      activeRec=null;
+      btn.classList.remove('rec-on'); btn.textContent='🎙 Refaire';
+      showRecPanel(i);
+      if(!state.completed[key]) toast('Super ! Écoute et compare ta voix 👂');
+    };
+    rec.start();
+    activeRec = {i, rec};
+    btn.classList.add('rec-on'); btn.textContent='⏹ Stop';
+    toast('Enregistrement... Dis la phrase en anglais ! 🎙');
+  }catch(err){
+    toast("Autorise le micro pour t'enregistrer 🎙");
+  }
+}
+function showRecPanel(i){
+  const key = currentPart.id+':'+i, r = recorders[key];
+  const el = document.getElementById('rp'+i);
+  el.classList.remove('hidden');
+  el.innerHTML = `<span>Compare les deux, puis réessaie ! 💪</span>
+    <button class="rp-btn model" onclick="playSentence(${i})">🔊 Le modèle</button>
+    <button class="rp-btn" onclick="playMyVoice('${key}')">🎧 Ma voix</button>`;
+}
+let myAudio = null;
+function playMyVoice(key){
+  stopAll();
+  if(myAudio){ myAudio.pause(); }
+  myAudio = new Audio(recorders[key].url);
+  myAudio.play();
+}
+
+/* ================= COMPLETION ================= */
+function toggleDone(i){
+  const key = currentPart.id+':'+i;
+  state.completed[key] = !state.completed[key];
+  save();
+  const p = currentPart;
+  const card = document.getElementById('sc'+i), btn = document.getElementById('dn'+i), num = card.querySelector('.snum');
+  const on = !!state.completed[key];
+  card.classList.toggle('completed', on);
+  btn.classList.toggle('on', on);
+  btn.textContent = on?'✅ Maîtrisée !':'✓ Je maîtrise';
+  num.textContent = on?'✓':(i+1);
+  document.getElementById('pcount').textContent = doneCount(p)+'/'+p.sentences.length;
+  if(on && doneCount(p)===p.sentences.length) celebrate(p);
+  else if(on) miniConfetti(6);
+}
+function celebrate(p){
+  miniConfetti(26);
+  const next = lesson.parts.find(x=>x.num===p.num+1);
+  openModal(`<div class="congrats">
+    <div class="big">🏆</div>
+    <h3>Partie ${p.num} terminée !</h3>
+    <div class="sub">Tu as maîtrisé les ${p.sentences.length} phrases de « ${p.title} ». Excellent travail !</div>
+    ${next?`<button class="close-modal" onclick="closeModal();openPart('${next.id}')">Partie suivante : ${next.emoji} ${next.title} →</button>
+    <button style="margin-top:10px;font-weight:600;color:var(--muted);font-size:13.5px;width:100%" onclick="closeModal();goHome()">Retour à l'accueil</button>`
+    :`<button class="close-modal" onclick="closeModal();goHome()">🎓 Leçon terminée — retour à l'accueil</button>`}
+  </div>`);
+}
+function miniConfetti(n){
+  const em = ['🎉','⭐','💜','🧡','✨','🎊'];
+  for(let k=0;k<n;k++){
+    const s = document.createElement('span');
+    s.className='confetti';
+    s.textContent = em[k%em.length];
+    s.style.left = (5+ (k*37)%90)+'vw';
+    s.style.animationDuration = (1.8+(k%5)*0.3)+'s';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 3200);
+  }
+}
+
+/* ================= TOAST ================= */
+let toastT=null;
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(e=>e.remove());
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  clearTimeout(toastT); toastT=setTimeout(()=>t.remove(), 2600);
+}
+
+renderHome();
+</script>
+</body>
+</html>

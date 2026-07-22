@@ -147,6 +147,19 @@ const server = http.createServer(async (req, res) => {
       return send(res, await H.adminCoupons(req.method, body, req.headers['x-admin-key'] || ''));
     }
 
+    /* App Echo (shadowing) — statique. En production, Vercel sert le dossier /echo. */
+    if (req.method === 'GET' && /^\/echo(\/|$)/.test(url.pathname)) {
+      const rel = url.pathname.replace(/^\/echo\/?/, '') || 'index.html';
+      if (!/^[\w.-]+$/.test(rel)) return send(res, { status: 404, body: { error: 'not-found' } });
+      const fp = path.join(__dirname, 'echo', rel);
+      if (fs.existsSync(fp)) {
+        const types = { html: 'text/html; charset=utf-8', js: 'application/javascript; charset=utf-8', svg: 'image/svg+xml', json: 'application/json' };
+        res.writeHead(200, { 'Content-Type': types[rel.split('.').pop()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+        return res.end(fs.readFileSync(fp));
+      }
+      return send(res, { status: 404, body: { error: 'not-found' } });
+    }
+
     /* Fichiers audio des leçons (en production, Vercel les sert statiquement). */
     if (req.method === 'GET' && /^\/audio\/[\w.-]+\.mp3$/.test(url.pathname)) {
       const fp = path.join(__dirname, url.pathname);

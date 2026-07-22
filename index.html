@@ -399,6 +399,16 @@ a.lplayer{text-decoration:none;cursor:pointer}
 .faq details p{padding:0 15px 14px;font-size:14px;color:var(--muted);line-height:1.6;margin:0}
 .diagopts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
 
+/* ---- Echo : cartes de tarifs (abonnement) ---- */
+.plangrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:370px){.plangrid{grid-template-columns:1fr}}
+.plancard{padding:15px 14px;display:flex;flex-direction:column;gap:5px;position:relative}
+.plancard.best{border:1.5px solid var(--accent)}
+.plancard .promo-tag{position:absolute;top:-9px;left:10px;right:10px;background:var(--accent);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:999px;text-align:center}
+.plancard b{font-size:14px;margin-top:4px}
+.plancard .pl-price{font-size:20px;font-weight:800;color:var(--primary)}
+.plancard .pl-price s{font-size:13px;font-weight:500}
+
 /* ---- Audio de leçon ---- */
 .audiocard{margin:0 14px;border-radius:var(--r);padding:16px 15px;color:#fff;display:flex;flex-direction:column;gap:10px}
 .audiocard .au-h{display:flex;align-items:baseline;gap:8px;font-size:15px}
@@ -2584,8 +2594,21 @@ const pathById = id => PATHS.find(p=>p.id===id);
    Prix recalculé côté serveur (lib/wave.js) — celui-ci n'est qu'un affichage. */
 const BUNDLE = {id:'pack', title:'Pack IA complet — ChatGPT + Claude + Copilot', price:12000, full:15000,
   includes:['chatgpt','claude','copilot'], g:0};
-/* Cours « payable » : un vrai cours ou le pack. */
-function payable(cid){ return courseById(cid) || (cid==='pack'?BUNDLE:null); }
+/* ===== Echo — l'anglais par le shadowing (accès par ABONNEMENT, renouvellement
+   manuel : aucun prélèvement automatique, tu choisis de prolonger). Les prix
+   ci-dessous sont un affichage — le serveur recalcule toujours le montant. ===== */
+const ECHO_PROMO_END = Date.UTC(2026,7,5,11,59,59);   // 5 août 2026, 11h59 GMT (Abidjan)
+const SUB_PRODUCTS = {
+  'echo-m': {id:'echo-m', title:'Echo — Abonnement mensuel', price:2000, days:31, g:2},
+  'echo-y': {id:'echo-y', title:'Echo — Abonnement annuel', price:20000, promo:10000, days:366, g:2},
+};
+function echoPlanPrice(pid){ const p=SUB_PRODUCTS[pid]; if(!p) return 0; return (p.promo && Date.now()<=ECHO_PROMO_END) ? p.promo : p.price; }
+function echoPromoOn(){ return Date.now()<=ECHO_PROMO_END; }
+function echoSub(){ const e=S.enrolled.echo; return (e && e.paid && (!e.expiresAt || e.expiresAt>Date.now())) ? e : null; }
+function echoDaysLeft(){ const e=S.enrolled.echo; return (e&&e.expiresAt) ? Math.max(0, Math.ceil((e.expiresAt-Date.now())/86400e3)) : 0; }
+
+/* Cours « payable » : un vrai cours, le pack, ou un plan d'abonnement Echo. */
+function payable(cid){ return courseById(cid) || (cid==='pack'?BUNDLE:null) || SUB_PRODUCTS[cid] || null; }
 /* Minutes estimées par cours (affichage durée de parcours). */
 const COURSE_MIN = {ia:35, chatgpt:120, claude:180, copilot:120, en:75};
 function pathMinutes(p){ return p.courses.reduce((a,c)=>a+(COURSE_MIN[c]||60),0); }
@@ -3033,6 +3056,7 @@ function screenCatalog(){
     <div class="courselist">
       ${list.length ? list.map(courseCard).join('') : `<div class="empty">${I.search}<b>Aucun cours trouvé</b><span>Essaie un autre mot-clé ou une autre catégorie.</span></div>`}
     </div>
+    ${echoCard()}
     ${bundleCard()}
     ${homeBottom()}
   </div>`;
@@ -3220,6 +3244,84 @@ function screenPath(){
         ? `<button class="btn" onclick="App.startPath('${p.id}')">${active?'Continuer':'Commencer'} ${I.arrowr}</button>`
         : `<button class="btn" onclick="App.tab('mescours')">Mes cours</button>`}
     </div>
+  </div>`;
+}
+
+/* ================= Écran : Echo (abonnement shadowing) ================= */
+function screenEcho(){
+  const sub = echoSub();
+  const days = echoDaysLeft();
+  const promo = echoPromoOn();
+  const yPrice = echoPlanPrice('echo-y');
+  const endStr = '5 août 2026 à 11h59';
+  const planCard = (pid, tag) => { const p=SUB_PRODUCTS[pid]; const price=echoPlanPrice(pid);
+    return `<div class="card plancard ${pid==='echo-y'?'best':''}">
+      ${pid==='echo-y'&&promo?`<span class="promo-tag">PROMO −50 % jusqu'au ${endStr}</span>`:''}
+      <b>${pid==='echo-m'?'Mensuel':'Annuel'}</b>
+      <div class="pl-price"><span class="num">${fcfa(price)}</span>${pid==='echo-y'&&promo?` <s class="num muted">${fcfa(p.price)}</s>`:''}</div>
+      <span class="muted" style="font-size:12.5px">${p.days} jours d'accès complet${pid==='echo-y'?` · soit ~${Math.round(price/12).toLocaleString('fr-FR')} F/mois`:''}</span>
+      <button class="btn" style="margin-top:10px" onclick="App.subscribe('${pid}')">${sub?'Prolonger':'S\'abonner'} ${I.arrowr}</button>
+    </div>`; };
+  return `<div class="screen" style="padding-bottom:28px">
+    <div class="subhead">
+      <button class="iconbtn" onclick="App.tab('cours')" aria-label="Retour">${I.back}</button>
+      <h1>Echo · Shadowing</h1>
+    </div>
+    <div class="hero" style="background:${GRADS[2]};border-radius:var(--r);margin:0 14px;min-height:120px">
+      <span class="init">🎧</span>
+      <span class="pill" style="background:rgba(255,255,255,.92);color:#201D19">Abonnement</span>
+    </div>
+    <h1 class="dtitle">Echo — L'anglais par le shadowing</h1>
+    <p class="muted" style="padding:2px 18px;font-size:14.5px">La méthode des interprètes : tu écoutes un discours réel en anglais et tu répètes EN MÊME TEMPS que l'orateur, phrase par phrase. Ton oreille, ton accent et ta fluidité progressent ensemble.</p>
+    ${sub?`
+    <div class="px" style="margin-top:10px">
+      <div class="card" style="padding:15px 16px;border:1.5px solid var(--ok)">
+        <b style="font-size:14.5px">✅ Abonnement actif</b>
+        <span class="muted" style="font-size:13px;display:block;margin-top:4px">${days>0?`Encore ${days} jour${days>1?'s':''} d'accès${S.enrolled.echo.expiresAt?` · jusqu'au ${new Date(S.enrolled.echo.expiresAt).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}`:''}`:'Accès actif'}</span>
+        <a class="btn" style="margin-top:12px;text-decoration:none;text-align:center;display:block" href="/echo/">Ouvrir Echo 🎧</a>
+      </div>
+    </div>`:''}
+    <div class="sect">La méthode, en 4 étapes</div>
+    <div class="px"><div class="card howto">
+      <div class="hrow"><span class="hn">1</span><div><b>Écoute</b><span>Une phrase courte, avec texte surligné en karaoké et traduction française.</span></div></div>
+      <div class="hrow"><span class="hn">2</span><div><b>Répète en même temps</b><span>Mode Écho (pause après chaque phrase) et vitesses 0.7× / 0.85× / 1×.</span></div></div>
+      <div class="hrow"><span class="hn">3</span><div><b>Enregistre-toi</b><span>Compare ta voix au modèle, phrase par phrase.</span></div></div>
+      <div class="hrow"><span class="hn">4</span><div><b>Valide et avance</b><span>Progression sauvegardée, célébrations, séances courtes quotidiennes.</span></div></div>
+    </div></div>
+    <div class="sect">Ce que contient Echo aujourd'hui</div>
+    <ul class="learnlist">
+      <li>${I.checkc}<span>Leçon 1 : « Best Days and Worst Days » — discours réel en anglais (8,4 min)</span></li>
+      <li>${I.checkc}<span>8 parties courtes · 89 phrases alignées à l'audio mot à mot</span></li>
+      <li>${I.checkc}<span>Traduction française + vocabulaire clé pour chaque phrase</span></li>
+      <li>${I.checkc}<span>Nouvelles leçons ajoutées régulièrement pendant ton abonnement</span></li>
+    </ul>
+    ${sub?'':`<div class="sect">Choisis ta formule</div>
+    <div class="px plangrid">${planCard('echo-m')}${planCard('echo-y')}</div>`}
+    ${sub?`<div class="sect">Prolonger mon accès</div>
+    <div class="px plangrid">${planCard('echo-m')}${planCard('echo-y')}</div>`:''}
+    <div class="px" style="margin-top:14px">
+      <div class="card" style="padding:14px 15px;font-size:13px;line-height:1.7;color:var(--muted)">
+        <b style="color:var(--ink)">En toute transparence</b><br>
+        • Paiement Wave <b>unique</b> à chaque fois : <b>aucun prélèvement automatique</b>.<br>
+        • Ton accès dure ${SUB_PRODUCTS['echo-m'].days} jours (mensuel) ou ${SUB_PRODUCTS['echo-y'].days} jours (annuel), puis tu choisis librement de prolonger.<br>
+        • Renouveler en avance <b>ajoute</b> les jours à la fin de ta période — rien n'est perdu.<br>
+        • Reçu par e-mail à chaque paiement · accès sur tous tes appareils via ton compte.
+      </div>
+    </div>
+  </div>`;
+}
+/* Carte Echo du catalogue (catégorie Anglais). */
+function echoCard(){
+  if(filters.q || (filters.cat!=='Tout'&&filters.cat!=='Anglais')) return '';
+  const sub = echoSub();
+  return `<div class="px" style="margin-top:10px">
+    <button class="card pathstep" style="border:1.5px solid var(--primary)" onclick="App.openEcho()">
+      <span class="thumb" style="background:${GRADS[2]};width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-size:20px;flex:none">🎧</span>
+      <span class="inf"><span class="r-lab">${sub?'Abonnement actif · '+echoDaysLeft()+' j restants':'Nouveau · par abonnement'}</span>
+        <b>Echo — L'anglais par le shadowing</b>
+        <span class="muted" style="font-size:12.5px">${sub?'Continue ton entraînement quotidien':(echoPromoOn()?'Promo −50 % sur l\'annuel jusqu\'au 5 août':'Répète avec de vrais discours anglais')}</span></span>
+      ${I.arrowr}
+    </button>
   </div>`;
 }
 
@@ -3457,6 +3559,14 @@ function screenMyCourses(){
       ${mine.length?`<div class="tagline" style="padding:0">${resume?'Continue sur ta lancée !':'Beau travail — tout est à jour.'}</div>`:''}</div>
       <div class="hdact">${bellBtn()}</div>
     </header>
+    ${S.enrolled.echo&&S.enrolled.echo.paid?`<div class="px" style="padding-top:2px">
+      <button class="card pathstep" style="border:1.5px solid ${echoSub()?'var(--ok)':'var(--danger)'}" onclick="App.openEcho()">
+        <span class="thumb" style="background:${GRADS[2]};width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none">🎧</span>
+        <span class="inf"><span class="r-lab">${echoSub()?'Abonnement actif · '+echoDaysLeft()+' j restants':'Abonnement expiré'}</span>
+          <b>Echo — Shadowing</b>
+          <span class="muted" style="font-size:12.5px">${echoSub()?'Ouvre ton entraînement du jour':'Prolonge ton accès pour continuer'}</span></span>
+        ${I.arrowr}
+      </button></div>`:''}
     ${mine.length===0
       ? `<div class="empty">${I.book}<b>Aucun cours pour l'instant</b><span>Fais le diagnostic pour trouver ton parcours, ou explore les cours — le premier est gratuit.</span>
          <button class="btn" style="width:auto;padding:12px 22px" onclick="App.startDiag()">Trouver mon parcours</button>
@@ -4202,10 +4312,10 @@ function renderFlow(){
             <span class="radio"></span>
           </button>`).join('')}
         </div>
-        <div class="coupon">
+        ${SUB_PRODUCTS[flow.courseId]?`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">Abonnement ${SUB_PRODUCTS[flow.courseId].days} jours — paiement unique, aucun prélèvement automatique.${flow.courseId==='echo-y'&&echoPromoOn()?' Promo −50 % appliquée.':''}</p>`:`<div class="coupon">
           <input id="couponInput" type="text" placeholder="Code promo" value="${esc(flow.data.coupon||'')}" autocapitalize="characters" spellcheck="false" aria-label="Code promo" onkeydown="if(event.key==='Enter'){event.preventDefault();App.applyCoupon();}">
           <button class="btn soft" style="width:auto;padding:12px 16px" onclick="App.applyCoupon()">Appliquer</button>
-        </div>
+        </div>`}
         <p class="qerr" id="ferr" ${flow.couponOK?'style="color:var(--primary)"':''}>${flow.err?esc(flow.err):(flow.couponOK?esc(flow.couponOK):'')}</p>`;
       foot = `<button class="btn" ${flow.data.op?'':'disabled'} onclick="App.payNext()">${API.mode==='live'?'Payer avec Wave':'Continuer'} ${I.arrowr}</button>`;
     }
@@ -4337,7 +4447,8 @@ function applyAccount(j){
   }
   if(Array.isArray(j.enrollments)) for(const e of j.enrollments){
     const cur = S.enrolled[e.courseId]||{at:e.at||Date.now()};
-    S.enrolled[e.courseId] = {at:cur.at, paid: cur.paid||!!e.paid, op: e.paid?'Wave':(cur.op||null), ref: e.orderRef||cur.ref||null};
+    S.enrolled[e.courseId] = {at:cur.at, paid: cur.paid||!!e.paid, op: e.paid?'Wave':(cur.op||null), ref: e.orderRef||cur.ref||null,
+      expiresAt: e.expiresAt!==undefined ? e.expiresAt : (cur.expiresAt||null)};
     if(!S.done[e.courseId]) S.done[e.courseId]={};
   }
   if(Array.isArray(j.progress)) for(const p of j.progress){ if(!S.done[p.courseId]) S.done[p.courseId]={}; S.done[p.courseId][p.lessonKey]=true; }
@@ -4509,7 +4620,7 @@ const App = {
   proceedAfterSignup(cid){
     loadNotices();   // membre connecté : initialise la cloche (sans badge pour les annonces antérieures)
     if(cid && payable(cid) && payable(cid).price>0){
-      flow = {type:'pay', courseId:cid, step:'op', data:{prefix:S.user.prefix||'+225', phone:S.user.whatsapp}};
+      flow = {type:'pay', courseId:cid, step:'op', data:Object.assign({prefix:S.user.prefix||'+225', phone:S.user.whatsapp}, SUB_PRODUCTS[cid]?{amount:echoPlanPrice(cid)}:{})};
       renderFlow();
     } else if(cid){ this.finishEnroll(cid,null); }
     else { flow = {type:'welcome', courseId:null}; renderFlow(); render(); }
@@ -4682,7 +4793,12 @@ const App = {
   /* Paiement confirmé par le serveur (source de vérité : réconciliation Wave). */
   onPaid(j){
     const cid = (j && j.courseId) || (flow && flow.courseId) || (S.pendingOrder && S.pendingOrder.courseId);
-    if(cid){ const ids = cid==='pack' ? BUNDLE.includes : [cid];
+    if(SUB_PRODUCTS[cid]){
+      /* Abonnement : période d'accès (estimée ici, le serveur fait foi via la synchro). */
+      const prev=(S.enrolled.echo&&S.enrolled.echo.expiresAt)||0;
+      S.enrolled.echo = {at:Date.now(), paid:true, op:'Wave', ref:j.ref,
+        expiresAt: Math.max(Date.now(),prev) + SUB_PRODUCTS[cid].days*86400e3};
+    } else if(cid){ const ids = cid==='pack' ? BUNDLE.includes : [cid];
       for(const id of ids){ S.enrolled[id] = {at:Date.now(), paid:true, op:'Wave', ref:j.ref}; if(!S.done[id]) S.done[id]={}; } }
     delete S.pendingOrder; save();
     if(flow && flow.type==='pay'){
@@ -4706,6 +4822,13 @@ const App = {
   },
   payDone(){
     const cid=flow.courseId, pay={op:OPERATORS.find(o=>o.id===flow.data.op).name, ref:flow.data.ref};
+    if(SUB_PRODUCTS[cid]){
+      const prev=(S.enrolled.echo&&S.enrolled.echo.expiresAt)||0;
+      S.enrolled.echo={at:Date.now(), paid:true, op:pay.op, ref:pay.ref,
+        expiresAt: Math.max(Date.now(),prev) + SUB_PRODUCTS[cid].days*86400e3};
+      save(); flow=null; renderFlow();
+      toast('Abonnement Echo activé 🎧'); this.openEcho(); return;
+    }
     const ids = cid==='pack' ? BUNDLE.includes : [cid];
     for(const id of ids){ S.enrolled[id]={at:Date.now(), paid:true, op:pay.op, ref:pay.ref}; if(!S.done[id]) S.done[id]={}; }
     save(); flow=null; renderFlow();
@@ -4744,6 +4867,17 @@ const App = {
     render();
   },
   openCert(id){ go('mescours','cert',{id}); },
+  /* --- Echo (abonnement) --- */
+  openEcho(){ go('cours','echo',{}); },
+  subscribe(pid){
+    const p=SUB_PRODUCTS[pid]; if(!p) return;
+    if(S.user){
+      flow={type:'pay', courseId:pid, step:'op', data:{prefix:S.user.prefix||'+225', phone:S.user.whatsapp, amount:echoPlanPrice(pid)}};
+    } else {
+      flow={type:'enroll', courseId:pid, step:0, data:{}};
+    }
+    renderFlow();
+  },
   /* --- Défis --- */
   openChal(id){ go('mescours','chal',{id}); },
   chalStart(id){ if(!S.chal[id]) S.chal[id]={startedAt:Date.now(), done:{}}; save(); render(); toast('Défi lancé — jour 1 t\'attend 💪'); },
@@ -4990,7 +5124,7 @@ function render(){
     catalog:screenCatalog, course:screenCourse, learn:screenLearn, lesson:screenLesson,
     feed:screenFeed, post:screenPost, leader:screenLeader, compose:screenCompose,
     my:screenMyCourses, profil:screenProfile, admin:screenAdmin, notifs:screenNotifs, path:screenPath,
-    cert:screenCert, verif:screenVerif, chal:screenChal, atelier:screenAtelier,
+    cert:screenCert, verif:screenVerif, chal:screenChal, atelier:screenAtelier, echo:screenEcho,
   };
   /* Communauté verrouillée tant que l'utilisateur n'a pas de compte. */
   const commuScreens = {feed:1, post:1, leader:1, compose:1};
@@ -5088,7 +5222,8 @@ loadNotices();
 function routeHash(){
   if(location.hash==='#admin'){ App.openAdmin(); return; }
   const mv = location.hash.match(/^#verif=([A-Za-z0-9-]+)/);
-  if(mv){ App.openVerif(mv[1]); }
+  if(mv){ App.openVerif(mv[1]); return; }
+  if(location.hash==='#echo'){ App.openEcho(); }
 }
 if(location.pathname.replace(/\/+$/,'')==='/boyiaadmin') App.openAdmin(); else routeHash();
 window.addEventListener('hashchange', routeHash);

@@ -37,6 +37,7 @@ Aucune donnée ne quitte le navigateur : tout est stocké en `localStorage` (bou
 - **Défis & motivation** : Défi IA 7 jours, ChatGPT 14 jours, Anglais 21 jours (une action par jour, jamais de blocage artificiel — les leçons terminées valident automatiquement les jours correspondants), objectif quotidien réglable (5–20 min), badges sobres calculés depuis l'activité réelle.
 - **Atelier de prompts** : rédiger ses consignes (checklist Tâche + Contexte + Format en direct), sauvegarder, copier en un geste.
 - **Communauté** : publication taguée par cours (optionnel) + règles visibles.
+- **Echo — L'anglais par le shadowing** (`/echo/`, app dédiée) : accès par **abonnement à renouvellement manuel** (aucun prélèvement automatique — chaque paiement Wave ouvre une période datée, prolongeable ; renouveler en avance ADDITIONNE les jours). Plans serveur dans `lib/wave.js` (`SUB_PLANS`) : mensuel 2 000 F/31 j, annuel 20 000 F/366 j avec **promo 10 000 F jusqu'au 5 août 2026 11h59 GMT** (`planPrice` recalcule toujours côté serveur). Colonne `enrollments.expires_at` auto-migrée ; l'app Echo lit la session locale commune et se verrouille sans abonnement actif.
 - **Pack IA complet** : les 3 cours payants en un achat Wave unique (12 000 F au lieu de 15 000 F), `PRICES.pack` côté serveur, déblocage des 3 cours au paiement (`PACK_COURSES`). Pas d'abonnement, pas de renouvellement automatique.
 - **Profil** : informations, points, thème clair/sombre/auto, réinitialisation de la démo.
 
