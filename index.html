@@ -4301,7 +4301,9 @@ function renderFlow(){
     if(flow.step==='op'){
       const priceLine = hasCoupon
         ? `<b class="num" style="color:var(--primary)">${fcfa(amt)}</b> <s class="num" style="color:var(--muted);font-weight:500">${fcfa(c.price)}</s> <span class="pill free" style="vertical-align:middle">${esc(flow.data.coupon)}</span>`
-        : `<b class="num" style="color:var(--ink)">${fcfa(c.price)}</b>`;
+        : (amt<c.price
+          ? `<b class="num" style="color:var(--primary)">${fcfa(amt)}</b> <s class="num" style="color:var(--muted);font-weight:500">${fcfa(c.price)}</s>`
+          : `<b class="num" style="color:var(--ink)">${fcfa(amt)}</b>`);
       inner = `
         <h2 class="qlabel">Comment veux-tu payer ?</h2>
         <p class="qhelp">Inscription à « ${esc(c.title)} » — ${priceLine}</p>
@@ -4766,7 +4768,8 @@ const App = {
   },
   /* Paiement réel : crée la session Wave côté serveur puis redirige vers l'app Wave */
   async payWaveStart(){
-    const c = courseById(flow.courseId);
+    const c = payable(flow.courseId);        // cours, pack OU plan d'abonnement
+    if(!c){ flow.step='op'; flow.err='Produit introuvable. Ferme et réessaie.'; renderFlow(); return; }
     flow.step='redirect'; flow.err=null; renderFlow();
     try{
       const r = await fetch('/api/checkout', {method:'POST', headers:{'Content-Type':'application/json'},
@@ -4794,10 +4797,13 @@ const App = {
   onPaid(j){
     const cid = (j && j.courseId) || (flow && flow.courseId) || (S.pendingOrder && S.pendingOrder.courseId);
     if(SUB_PRODUCTS[cid]){
-      /* Abonnement : période d'accès (estimée ici, le serveur fait foi via la synchro). */
-      const prev=(S.enrolled.echo&&S.enrolled.echo.expiresAt)||0;
-      S.enrolled.echo = {at:Date.now(), paid:true, op:'Wave', ref:j.ref,
-        expiresAt: Math.max(Date.now(),prev) + SUB_PRODUCTS[cid].days*86400e3};
+      /* Abonnement : période estimée (le serveur fait foi via la synchro).
+         Idempotent par commande : une même référence ne crédite qu'une fois. */
+      if(!(S.enrolled.echo && S.enrolled.echo.ref===j.ref)){
+        const prev=(S.enrolled.echo&&S.enrolled.echo.expiresAt)||0;
+        S.enrolled.echo = {at:Date.now(), paid:true, op:'Wave', ref:j.ref,
+          expiresAt: Math.max(Date.now(),prev) + SUB_PRODUCTS[cid].days*86400e3};
+      }
     } else if(cid){ const ids = cid==='pack' ? BUNDLE.includes : [cid];
       for(const id of ids){ S.enrolled[id] = {at:Date.now(), paid:true, op:'Wave', ref:j.ref}; if(!S.done[id]) S.done[id]={}; } }
     delete S.pendingOrder; save();
@@ -4823,9 +4829,12 @@ const App = {
   payDone(){
     const cid=flow.courseId, pay={op:OPERATORS.find(o=>o.id===flow.data.op).name, ref:flow.data.ref};
     if(SUB_PRODUCTS[cid]){
-      const prev=(S.enrolled.echo&&S.enrolled.echo.expiresAt)||0;
-      S.enrolled.echo={at:Date.now(), paid:true, op:pay.op, ref:pay.ref,
-        expiresAt: Math.max(Date.now(),prev) + SUB_PRODUCTS[cid].days*86400e3};
+      /* Idempotent : si onPaid a déjà crédité cette commande, on ne rajoute rien. */
+      if(!(S.enrolled.echo && S.enrolled.echo.ref===pay.ref)){
+        const prev=(S.enrolled.echo&&S.enrolled.echo.expiresAt)||0;
+        S.enrolled.echo={at:Date.now(), paid:true, op:pay.op, ref:pay.ref,
+          expiresAt: Math.max(Date.now(),prev) + SUB_PRODUCTS[cid].days*86400e3};
+      }
       save(); flow=null; renderFlow();
       toast('Abonnement Echo activé 🎧'); this.openEcho(); return;
     }
