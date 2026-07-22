@@ -128,6 +128,10 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .chip-btn.rec-on{background:#FDE8E8;color:var(--red);animation:pulse-red 1s infinite}
 @keyframes pulse-red{0%,100%{opacity:1}50%{opacity:.6}}
 .chip-btn.done-btn.on{background:var(--green-soft);color:var(--green)}
+.chip-btn.done-btn.locked{opacity:.5}
+.score-line{margin-top:10px;background:var(--green-soft);border-radius:12px;padding:9px 13px;font-size:12.5px;font-weight:600;color:#0E7A57;width:100%}
+.score-line.low{background:#FFF0E4;color:#8A4B12}
+.score-line small{display:block;font-weight:500;margin-top:3px;color:inherit;opacity:.85}
 .fr-block{margin-top:12px;background:var(--primary-soft);border-radius:14px;padding:11px 14px;
   font-size:14px;line-height:1.5;color:#4A3A8F;font-weight:500}
 .vocab{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
@@ -204,7 +208,8 @@ const store = {
   get(){ try{ return JSON.parse(localStorage.getItem('echo-v1')||'{}'); }catch(e){ return this._m||{}; } },
   set(d){ this._m=d; try{ localStorage.setItem('echo-v1', JSON.stringify(d)); }catch(e){} }
 };
-let state = Object.assign({completed:{}, speed:1, mode:'normal'}, store.get());
+let state = Object.assign({completed:{}, speed:1, mode:'normal', listened:{}, recorded:{}, scores:{}}, store.get());
+if(!state.listened) state.listened={}; if(!state.recorded) state.recorded={}; if(!state.scores) state.scores={};
 const save = ()=> store.set(state);
 
 const lesson = window.LESSONS[0];
@@ -282,9 +287,9 @@ function showMethod(){
     <div class="step"><div class="n">3</div><div><b>Enregistre-toi 🎙️</b>
       <p>Appuie sur le micro, dis la phrase, puis compare ta voix avec l'originale. C'est comme ça qu'on progresse le plus vite.</p></div></div>
     <div class="step"><div class="n">4</div><div><b>Valide et avance ✅</b>
-      <p>Quand tu te sens à l'aise, marque la phrase « maîtrisée ». Un peu chaque jour vaut mieux que beaucoup une seule fois : vise 1 partie par jour !</p></div></div>
+      <p>Le bouton « Je maîtrise » se déverrouille quand tu as écouté la phrase ET enregistré ta voix au moins une fois — c'est la méthode qui fait progresser. Un peu chaque jour vaut mieux que beaucoup une seule fois : vise 1 partie par jour !</p></div></div>
     <div class="step"><div class="n">💡</div><div><b>Astuces</b>
-      <p>Utilise la vitesse 🐢 0.7 au début, puis accélère. Le mode <b>Écho</b> laisse un silence après chaque phrase pour que tu répètes. Le mode <b>Boucle</b> répète la phrase sans t'arrêter.</p></div></div>
+      <p>Utilise la vitesse 🐢 0.7 au début, puis accélère. Le mode <b>Écho</b> laisse un silence après chaque phrase pour que tu répètes. Le mode <b>Boucle</b> répète la phrase sans t'arrêter. Sur la plupart des téléphones, Echo écoute aussi ta diction pendant l'enregistrement et t'affiche un <b>score de précision 🎯</b>.</p></div></div>
     <button class="close-modal" onclick="closeModal()">C'est parti ! 🚀</button>`);
 }
 
@@ -343,7 +348,7 @@ function renderPart(){
         <div class="actions">
           <button class="chip-btn" id="tr${i}" onclick="toggleFr(${i})">👁 Traduction</button>
           <button class="chip-btn" id="rec${i}" onclick="toggleRec(${i})">🎙 M'enregistrer</button>
-          <button class="chip-btn done-btn ${comp?'on':''}" id="dn${i}" onclick="toggleDone(${i})">${comp?'✅ Maîtrisée !':'✓ Je maîtrise'}</button>
+          <button class="chip-btn done-btn ${comp?'on':''} ${comp||(state.listened[key]&&state.recorded[key])?'':'locked'}" id="dn${i}" onclick="toggleDone(${i})">${comp?'✅ Maîtrisée !':((state.listened[key]&&state.recorded[key])?'✓ Je maîtrise':'🔒 Je maîtrise')}</button>
         </div>
         <div class="fr-block hidden" id="fr${i}">
           ${s.fr}
@@ -365,6 +370,18 @@ function setSpeed(s){ state.speed=s; save(); player.playbackRate=s; syncSeg(); }
 
 /* ================= AUDIO ENGINE ================= */
 function stopAll(){ playSession++; player.pause(); clearHighlights(); const pa=$('#playall'); if(pa){pa.textContent='▶ Tout'; pa.classList.remove('playing');} }
+/* Écoute et enregistrement comptés par phrase : conditions pour valider « Je maîtrise ». */
+function markListened(i){
+  const key=currentPart.id+':'+i;
+  if(!state.listened[key]){ state.listened[key]=1; save(); refreshDoneBtn(i); }
+}
+function refreshDoneBtn(i){
+  const key=currentPart.id+':'+i, b=document.getElementById('dn'+i);
+  if(!b || state.completed[key]) return;
+  const un=state.listened[key]&&state.recorded[key];
+  b.classList.toggle('locked', !un);
+  b.textContent = un?'✓ Je maîtrise':'🔒 Je maîtrise';
+}
 function clearHighlights(){ document.querySelectorAll('.scard.active').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.play-s.playing').forEach(e=>{e.classList.remove('playing');e.textContent='▶';}); }
 
@@ -403,6 +420,7 @@ async function playSentence(i){
   do{
     const ok = await playRange(s.s, s.e, session);
     if(!ok) return;
+    markListened(i);
     if(state.mode==='echo'){ setEchoUI(i,true); const w = await wait(dur+400, session); setEchoUI(i,false); if(!w) return; }
   } while(state.mode!=='normal' && session===playSession);
   if(session===playSession) clearHighlights();
@@ -429,6 +447,7 @@ async function togglePlayAll(){
     highlight(i, true);
     const ok = await playRange(s.s, s.e, session);
     if(!ok) return;
+    markListened(i);
     if(state.mode==='echo'){ setEchoUI(i,true); const w=await wait((s.e-s.s)/state.speed*1000+400, session); setEchoUI(i,false); if(!w) return; }
     if(state.mode==='loop'){ const ok2 = await playRange(s.s, s.e, session); if(!ok2) return; }
   }
@@ -443,6 +462,32 @@ function toggleFr(i){
 }
 
 /* ================= RECORDING ================= */
+/* ---- Précision de la diction : reconnaissance vocale DU NAVIGATEUR (gratuite,
+   aucune API payante). Si le téléphone ne la propose pas, la fonction s'efface
+   d'elle-même — l'enregistrement et la comparaison manuelle restent. ---- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let recog=null, recogText='';
+function normWords(t){ return String(t||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z' ]+/g,' ').split(/\s+/).filter(Boolean); }
+/* Score = plus longue sous-séquence commune (ordre respecté) / mots de la phrase cible. */
+function pronScore(target, said){
+  const a=normWords(target), b=normWords(said);
+  if(!a.length) return {pct:0, missed:[]};
+  const dp=Array.from({length:a.length+1},()=>new Array(b.length+1).fill(0));
+  for(let x=1;x<=a.length;x++) for(let y=1;y<=b.length;y++)
+    dp[x][y]=a[x-1]===b[y-1]?dp[x-1][y-1]+1:Math.max(dp[x-1][y],dp[x][y-1]);
+  const hit=dp[a.length][b.length];
+  const got=new Set(b);
+  return {pct:Math.round(100*hit/a.length), missed:a.filter(w=>!got.has(w)).slice(0,5)};
+}
+function scoreMsg(p){ return p>=90?'Excellent ! Ta diction est très proche du modèle 🌟':p>=70?'Très bien ! Encore un ou deux mots à polir 💪':p>=45?'Bon début — réécoute le modèle et réessaie 👂':'Réécoute bien la phrase, puis réessaie lentement 🐢'; }
+function applyScore(i, text){
+  const key=currentPart.id+':'+i;
+  const r=pronScore(currentPart.sentences[i].en, text);
+  state.scores[key]=Math.max(state.scores[key]||0, r.pct); save();
+  const el=document.getElementById('sl'+i);
+  if(el) el.innerHTML=`<div class="score-line ${r.pct<70?'low':''}">🎯 Précision : ${r.pct} % — ${scoreMsg(r.pct)}${r.missed.length?`<small>Mots à travailler : ${r.missed.join(', ')}</small>`:''}</div>`;
+}
+
 async function toggleRec(i){
   const btn = document.getElementById('rec'+i);
   if(activeRec && activeRec.i===i){ activeRec.rec.stop(); return; }
@@ -453,8 +498,18 @@ async function toggleRec(i){
     const rec = new MediaRecorder(stream, mime?{mimeType:mime}:undefined);
     const chunks=[];
     rec.ondataavailable = e=>chunks.push(e.data);
+    recogText='';
+    if(SR){ try{
+      recog=new SR(); recog.lang='en-US'; recog.continuous=true; recog.interimResults=false; recog.maxAlternatives=1;
+      recog.onresult=e=>{ for(let k=e.resultIndex;k<e.results.length;k++){ if(e.results[k].isFinal) recogText+=' '+e.results[k][0].transcript; } };
+      recog.onerror=()=>{}; recog.start();
+    }catch(err){ recog=null; } }
     rec.onstop = ()=>{
       stream.getTracks().forEach(t=>t.stop());
+      if(recog){ try{recog.stop();}catch(err){} }
+      { const key=currentPart.id+':'+i;
+        if(!state.recorded[key]){ state.recorded[key]=1; save(); refreshDoneBtn(i); } }
+      setTimeout(()=>{ if(recogText.trim()) applyScore(i, recogText); recog=null; }, 800);
       const blob = new Blob(chunks,{type:mime||'audio/webm'});
       const key = currentPart.id+':'+i;
       if(recorders[key]) URL.revokeObjectURL(recorders[key].url);
@@ -478,7 +533,8 @@ function showRecPanel(i){
   el.classList.remove('hidden');
   el.innerHTML = `<span>Compare les deux, puis réessaie ! 💪</span>
     <button class="rp-btn model" onclick="playSentence(${i})">🔊 Le modèle</button>
-    <button class="rp-btn" onclick="playMyVoice('${key}')">🎧 Ma voix</button>`;
+    <button class="rp-btn" onclick="playMyVoice('${key}')">🎧 Ma voix</button>
+    <div id="sl${i}" style="width:100%">${state.scores[key]?`<div class="score-line ${state.scores[key]<70?'low':''}">🎯 Meilleure précision : ${state.scores[key]} %</div>`:''}</div>`;
 }
 let myAudio = null;
 function playMyVoice(key){
@@ -491,6 +547,17 @@ function playMyVoice(key){
 /* ================= COMPLETION ================= */
 function toggleDone(i){
   const key = currentPart.id+':'+i;
+  /* Pour valider, il faut avoir ÉCOUTÉ la phrase et ENREGISTRÉ sa voix au moins
+     une fois — c'est le cœur de la méthode. (Décocher reste toujours possible.) */
+  if(!state.completed[key]){
+    const heard=state.listened[key], recd=state.recorded[key];
+    if(!heard || !recd){
+      toast(!heard&&!recd ? 'Écoute la phrase 👂 puis enregistre ta voix 🎙 avant de valider'
+        : !heard ? 'Écoute d\'abord la phrase au moins une fois 👂'
+        : 'Enregistre ta voix au moins une fois avant de valider 🎙');
+      return;
+    }
+  }
   state.completed[key] = !state.completed[key];
   save();
   const p = currentPart;
