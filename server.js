@@ -153,7 +153,7 @@ const server = http.createServer(async (req, res) => {
       if (!/^[\w.-]+$/.test(rel)) return send(res, { status: 404, body: { error: 'not-found' } });
       const fp = path.join(__dirname, 'echo', rel);
       if (fs.existsSync(fp)) {
-        const types = { html: 'text/html; charset=utf-8', js: 'application/javascript; charset=utf-8', svg: 'image/svg+xml', json: 'application/json' };
+        const types = { html: 'text/html; charset=utf-8', js: 'application/javascript; charset=utf-8', svg: 'image/svg+xml', json: 'application/json', mp3: 'audio/mpeg' };
         res.writeHead(200, { 'Content-Type': types[rel.split('.').pop()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
         return res.end(fs.readFileSync(fp));
       }

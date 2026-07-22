@@ -196,6 +196,7 @@ footer{padding:26px 22px;text-align:center;font-size:11.5px;color:var(--muted);l
 })();
 </script>
 
+<div id="lessons" class="screen hidden"></div>
 <div id="home" class="screen"></div>
 <div id="part" class="screen hidden"></div>
 <div id="modal-root"></div>
@@ -212,7 +213,7 @@ let state = Object.assign({completed:{}, speed:1, mode:'normal', listened:{}, re
 if(!state.listened) state.listened={}; if(!state.recorded) state.recorded={}; if(!state.scores) state.scores={};
 const save = ()=> store.set(state);
 
-const lesson = window.LESSONS[0];
+let lesson = window.LESSONS[0];
 const player = document.getElementById('player');
 const $ = s=>document.querySelector(s);
 let currentPart = null;
@@ -220,30 +221,32 @@ let playSession = 0;          // token to cancel async play loops
 let recorders = {};           // sentenceKey -> {blob,url}
 let activeRec = null;
 
-const totalSentences = lesson.parts.reduce((a,p)=>a+p.sentences.length,0);
+const totalSentences = ()=> lesson.parts.reduce((a,p)=>a+p.sentences.length,0);
+const lessonDone = L => L.parts.reduce((a,p)=>a+p.sentences.filter((_,i)=>state.completed[p.id+':'+i]).length,0);
+const initials = n => { const w=n.split(/\s+/).filter(Boolean); return ((w[0]||'')[0]+((w.length>1?w[w.length-1]:'')[0]||'')).toUpperCase(); };
 const doneCount = p => p.sentences.filter((_,i)=>state.completed[p.id+':'+i]).length;
 const fmtDur = s => Math.round(s/60*10)/10 >= 1 ? `${Math.floor(s/60)} min ${Math.round(s%60)} s` : `${Math.round(s)} s`;
 
 /* ================= HOME ================= */
 function renderHome(){
-  const done = Object.keys(state.completed).filter(k=>state.completed[k]).length;
-  const pct = Math.round(done/totalSentences*100);
+  const done = lessonDone(lesson);
+  const pct = Math.round(done/totalSentences()*100);
   $('#home').innerHTML = `
   <div class="hero">
     <div class="brand">
-      <div class="logo">🎧</div>
+      ${window.LESSONS.length>1?`<button class="back-btn" onclick="goLessons()" aria-label="Toutes les leçons">‹</button>`:`<div class="logo">🎧</div>`}
       <div><h1>Echo</h1><span>Apprends l'anglais par le shadowing</span></div>
     </div>
     <div class="lesson-tag">📚 Leçon ${lesson.num} · ${lesson.source}</div>
     <h2>${lesson.title}</h2>
     <div class="fr-title">${lesson.titleFr}</div>
     <div class="speaker">
-      <div class="avatar">EF</div>
+      <div class="avatar">${initials(lesson.speaker)}</div>
       <div><b>${lesson.speaker}</b><small>${lesson.role}</small></div>
     </div>
     <div class="theme-quote">💛 ${lesson.theme}</div>
     <div class="global-progress">
-      <div class="row"><span>Ma progression</span><span>${done} / ${totalSentences} phrases</span></div>
+      <div class="row"><span>Ma progression</span><span>${done} / ${totalSentences()} phrases</span></div>
       <div class="gbar"><div style="width:${pct}%"></div></div>
     </div>
   </div>
@@ -252,7 +255,7 @@ function renderHome(){
     <div><b>C'est quoi, le shadowing ?</b><small>La méthode en 4 étapes — commence ici !</small></div>
     <div class="chev">›</div>
   </button>
-  <div class="section-label" style="margin-top:20px">Les 8 parties de la leçon</div>
+  <div class="section-label" style="margin-top:20px">Les ${lesson.parts.length} parties de la leçon</div>
   <div class="parts">
     ${lesson.parts.map(p=>{
       const d = doneCount(p), n = p.sentences.length, pc = Math.round(d/n*100);
@@ -273,6 +276,50 @@ function renderHome(){
   </div>
   <footer>Discours « ${lesson.title} » — ${lesson.speaker}, ${lesson.source}.<br>
   Audio et texte © Intellectual Reserve, Inc. Utilisé à des fins pédagogiques.</footer>`;
+}
+
+/* ================= LESSONS LIST (tout est inclus dans l'abonnement) ================= */
+function renderLessons(){
+  $('#lessons').innerHTML = `
+  <div class="hero">
+    <div class="brand">
+      <div class="logo">🎧</div>
+      <div><h1>Echo</h1><span>Apprends l'anglais par le shadowing</span></div>
+    </div>
+    <h2>Choisis ta leçon</h2>
+    <div class="fr-title">De vrais discours en anglais, phrase par phrase. Ton abonnement inclut toutes les leçons — et chaque nouvelle leçon ajoutée.</div>
+  </div>
+  <div class="section-label" style="margin-top:20px">${window.LESSONS.length} leçon${window.LESSONS.length>1?'s':''} disponibles</div>
+  <div class="parts">
+    ${window.LESSONS.map((L,idx)=>{
+      const tot=L.parts.reduce((a,p)=>a+p.sentences.length,0), d=lessonDone(L), pc=Math.round(100*d/tot);
+      const R=19, C=2*Math.PI*R;
+      return `<button class="pcard ${d===tot?'done':''}" onclick="openLesson(${idx})">
+        <div class="emoji">${d===tot?'✅':'📚'}</div>
+        <div class="info"><b>Leçon ${L.num} · ${L.titleFr}</b><small>${L.speaker} · ${L.source}</small>
+          <div class="meta"><span>🧩 ${L.parts.length} parties</span><span>💬 ${tot} phrases</span></div>
+        </div>
+        <div class="ring">
+          <svg width="44" height="44"><circle cx="22" cy="22" r="${R}" fill="none" stroke="#EFEBFA" stroke-width="4.5"/>
+          <circle cx="22" cy="22" r="${R}" fill="none" stroke="${d===tot?'#1FA97C':'#5B3DD6'}" stroke-width="4.5"
+            stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pc/100)}"/></svg>
+          <div class="pct">${pc}%</div>
+        </div>
+      </button>`;
+    }).join('')}
+  </div>
+  <footer>Ton abonnement Echo donne accès à toutes les leçons, sans limite.</footer>`;
+}
+function openLesson(idx){
+  lesson = window.LESSONS[idx]; stopAll();
+  renderHome();
+  $('#lessons').classList.add('hidden'); $('#part').classList.add('hidden');
+  $('#home').classList.remove('hidden'); window.scrollTo(0,0);
+}
+function goLessons(){
+  stopAll(); renderLessons();
+  $('#home').classList.add('hidden'); $('#part').classList.add('hidden');
+  $('#lessons').classList.remove('hidden'); window.scrollTo(0,0);
 }
 
 /* ================= METHOD MODAL ================= */
@@ -314,7 +361,7 @@ function renderPart(){
   <div class="topbar">
     <div class="row1">
       <button class="back-btn" onclick="goHome()">‹</button>
-      <div class="titles"><b>${p.emoji} ${p.title}</b><small>Partie ${p.num} / 8 · ${p.sub}</small></div>
+      <div class="titles"><b>${p.emoji} ${p.title}</b><small>Partie ${p.num} / ${lesson.parts.length} · ${p.sub}</small></div>
       <div class="count" id="pcount">${doneCount(p)}/${p.sentences.length}</div>
     </div>
     <div class="controls">
@@ -605,7 +652,8 @@ function toast(msg){
   clearTimeout(toastT); toastT=setTimeout(()=>t.remove(), 2600);
 }
 
-renderHome();
+if(window.LESSONS.length>1){ $('#home').classList.add('hidden'); $('#lessons').classList.remove('hidden'); renderLessons(); }
+else renderHome();
 </script>
 </body>
 </html>
