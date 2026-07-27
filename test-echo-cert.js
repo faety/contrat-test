@@ -74,10 +74,8 @@ async function subscriber(email, ref) {
   assert.strictEqual(r.status, 400); assert.strictEqual(r.body.done, 2);
   ok('2 leçons complètes → toujours palier non atteint (Niveau 1 = 3 leçons)');
 
-  /* Simule la future leçon 3 (le référentiel serveur pilote les paliers). */
-  w.ECHO_LESSONS.l3 = 2;
-  await H.meProgress(auth, { courseId: 'echo', lessonKey: 'l3p1' });
-  await H.meProgress(auth, { courseId: 'echo', lessonKey: 'l3p2' });
+  /* Termine la leçon 3 (réelle) → palier Niveau 1 atteint. */
+  for (let i = 1; i <= w.ECHO_LESSONS.l3; i++) await H.meProgress(auth, { courseId: 'echo', lessonKey: 'l3p' + i });
   r = await H.meCertificate(auth, { courseId: 'echo' });
   assert.strictEqual(r.status, 200);
   assert.strictEqual(r.body.certificate.courseId, 'echo-n1');
@@ -96,7 +94,6 @@ async function subscriber(email, ref) {
   ok('vérification publique : certificat authentique, nom « Niveau 1 »');
 
   assert.strictEqual((await H.meCertificate('Bearer ' + noEnr.body.token, { courseId: 'echo' })).status, 403);
-  delete w.ECHO_LESSONS.l3; // retour au réel pour la partie UI
   ok('demande de certificat Echo refusée sans abonnement (403)');
 
   /* ---- 4. UI : synchronisation dans l'app Echo ---- */

@@ -3292,6 +3292,7 @@ function screenEcho(){
     <ul class="learnlist">
       <li>${I.checkc}<span>Leçon 1 : « Best Days and Worst Days » — discours réel (8,4 min · 8 parties · 89 phrases)</span></li>
       <li>${I.checkc}<span>Leçon 2 : « Servir : comme je vous ai aimés » — discours réel (8,7 min · 11 parties · 100 phrases)</span></li>
+      <li>${I.checkc}<span>Leçon 3 : « L'expérience du sépulcre vide » — discours réel (12,3 min · 15 parties · 127 phrases)</span></li>
       <li>${I.checkc}<span>Chaque phrase : audio aligné mot à mot, traduction française, vocabulaire clé, score de précision 🎯</span></li>
       <li>${I.checkc}<span>L'abonnement inclut TOUTES les leçons — y compris chaque nouvelle leçon ajoutée</span></li>
     </ul>
@@ -3301,7 +3302,7 @@ function screenEcho(){
         const got=(S.certs||[]).some(c=>c.courseId===cid);
         return `<div class="hrow"><span class="hn">${got?'✓':(i+1)}</span><div><b>${t} ${got?'— obtenu 🎉':''}</b><span>${d} (écoutées, répétées et enregistrées, toutes parties validées).</span></div></div>`;}).join('')}
     </div></div>
-    <p class="muted px" style="font-size:12.5px;margin-top:8px">Chaque certificat est vérifié côté serveur, <b>acquis à vie</b> (même si ton abonnement s'arrête ensuite) et vérifiable publiquement par son numéro. Ta progression Echo est synchronisée à ton compte automatiquement.</p>
+    <p class="muted px" style="font-size:12.5px;margin-top:8px">Avec 3 leçons disponibles, le <b>certificat Niveau 1 est désormais atteignable</b>. Chaque certificat est vérifié côté serveur, <b>acquis à vie</b> (même si ton abonnement s'arrête ensuite) et vérifiable publiquement par son numéro. Ta progression Echo est synchronisée à ton compte automatiquement.</p>
     ${sub?'':`<div class="sect">Choisis ta formule</div>
     <div class="px plangrid">${planCard('echo-m')}${planCard('echo-y')}</div>`}
     ${sub?`<div class="sect">Prolonger mon accès</div>
