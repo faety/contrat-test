@@ -615,7 +615,7 @@ function toggleDone(i){
   btn.textContent = on?'✅ Maîtrisée !':'✓ Je maîtrise';
   num.textContent = on?'✓':(i+1);
   document.getElementById('pcount').textContent = doneCount(p)+'/'+p.sentences.length;
-  if(on && doneCount(p)===p.sentences.length) celebrate(p);
+  if(on && doneCount(p)===p.sentences.length){ celebrate(p); Sync.push(); }
   else if(on) miniConfetti(6);
 }
 function celebrate(p){
@@ -651,6 +651,107 @@ function toast(msg){
   document.body.appendChild(t);
   clearTimeout(toastT); toastT=setTimeout(()=>t.remove(), 2600);
 }
+
+/* ================= SYNC COMPTE (progression serveur + certificats) =================
+   Chaque partie terminée est envoyée au compte Boyia : preuve serveur pour les
+   certificats par paliers (3/6/10 leçons, acquis à vie) et reprise multi-appareils.
+   Sans connexion ou hors ligne, l'app fonctionne normalement en local. */
+const Sync = (function(){
+  let token=null;
+  try{ token=(JSON.parse(localStorage.getItem('kalan-v1')||'{}')).token||null; }catch(e){}
+  const CERT_LEVELS=[{lv:1,need:3},{lv:2,need:6},{lv:3,need:10}];
+  const allParts = ()=>{ const a=[]; for(const L of window.LESSONS) for(const p of L.parts) a.push(p); return a; };
+  const partComplete = p => p.sentences.every((_,i)=>state.completed[p.id+':'+i]);
+  const serverParts = new Set();
+  let busy=false, again=false;
+
+  async function api(path, body){
+    const r = await fetch(path, { method: body?'POST':'GET',
+      headers: Object.assign({'Authorization':'Bearer '+token}, body?{'Content-Type':'application/json'}:{}),
+      body: body?JSON.stringify(body):undefined });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw Object.assign(new Error(j.error||('http '+r.status)), {status:r.status, body:j});
+    return j;
+  }
+
+  /* Intègre une réponse hydratée du serveur : rattrapage descendant (parties
+     validées sur un autre appareil) + détection de nouveaux certificats. */
+  function absorb(j){
+    let changed=false;
+    if(Array.isArray(j.progress)){
+      for(const row of j.progress){
+        if(row.courseId!=='echo') continue;
+        serverParts.add(row.lessonKey);
+        const p = allParts().find(x=>x.id===row.lessonKey);
+        if(p && !partComplete(p)){
+          p.sentences.forEach((_,i)=>{ const k=p.id+':'+i; state.completed[k]=true; state.listened[k]=true; state.recorded[k]=true; });
+          changed=true;
+        }
+      }
+    }
+    if(changed){ save(); refreshScreens(); }
+    if(Array.isArray(j.certificates)) maybeCongrats(j.certificates);
+  }
+  function refreshScreens(){
+    if(!$('#lessons').classList.contains('hidden')) renderLessons();
+    else if(!$('#home').classList.contains('hidden')) renderHome();
+  }
+  function lessonsComplete(){
+    let n=0;
+    for(const L of window.LESSONS) if(L.parts.every(p=>serverParts.has(p.id)||partComplete(p))) n++;
+    return n;
+  }
+  function maybeCongrats(certs){
+    state.certsSeen = state.certsSeen||{};
+    let top=null;
+    for(const c of certs){
+      const m=/^echo-n(\d)$/.exec(c.courseId||'');
+      if(m && !state.certsSeen[c.courseId] && (!top || +m[1]>top.lv)) top={lv:+m[1], cert:c};
+    }
+    if(!top) return;
+    for(const c of certs) if(/^echo-n\d$/.test(c.courseId||'')) state.certsSeen[c.courseId]=true;
+    save();
+    const need=(CERT_LEVELS.find(l=>l.lv===top.lv)||{}).need;
+    openModal(`<div class="congrats">
+      <div class="big">📜</div>
+      <h3>Certificat Niveau ${top.lv} obtenu !</h3>
+      <div class="sub">${need} leçons complètes de shadowing : ton certificat est émis, vérifiable publiquement et <b>acquis à vie</b>. Retrouve-le dans ton tableau de bord Boyia Institute.</div>
+      <button class="close-modal" onclick="location.href='/#verif=${top.cert.id}'">Voir mon certificat ✅</button>
+      <button style="margin-top:10px;font-weight:600;color:var(--muted);font-size:13.5px;width:100%" onclick="closeModal()">Continuer l'entraînement</button>
+    </div>`);
+  }
+
+  /* Envoie au serveur les parties terminées localement qu'il ne connaît pas,
+     puis demande le certificat si un palier est atteignable (le serveur tranche). */
+  async function push(){
+    if(!token) return;
+    if(busy){ again=true; return; }
+    busy=true;
+    try{
+      const todo = allParts().filter(p=>partComplete(p)&&!serverParts.has(p.id));
+      let last=null;
+      for(const p of todo){
+        try{ last=await api('/api/me/progress',{courseId:'echo',lessonKey:p.id}); serverParts.add(p.id); }
+        catch(e){ if(e.status===401) token=null; return; }
+      }
+      if(last) absorb(last);
+      if(lessonsComplete()>=CERT_LEVELS[0].need){
+        try{ absorb(await api('/api/me/certificate',{courseId:'echo'})); }catch(e){}
+      }
+    }finally{
+      busy=false;
+      if(again){ again=false; push(); }
+    }
+  }
+  async function init(){
+    if(!token) return;
+    try{ absorb(await api('/api/me')); }
+    catch(e){ if(e&&e.status===401) token=null; return; }
+    push();
+  }
+  init();
+  return { push };
+})();
 
 if(window.LESSONS.length>1){ $('#home').classList.add('hidden'); $('#lessons').classList.remove('hidden'); renderLessons(); }
 else renderHome();

@@ -3295,6 +3295,13 @@ function screenEcho(){
       <li>${I.checkc}<span>Chaque phrase : audio aligné mot à mot, traduction française, vocabulaire clé, score de précision 🎯</span></li>
       <li>${I.checkc}<span>L'abonnement inclut TOUTES les leçons — y compris chaque nouvelle leçon ajoutée</span></li>
     </ul>
+    <div class="sect">Certificats par paliers 📜</div>
+    <div class="px"><div class="card howto">
+      ${[['Niveau 1','3 leçons complètes','echo-n1'],['Niveau 2','6 leçons complètes','echo-n2'],['Niveau 3','10 leçons complètes','echo-n3']].map(([t,d,cid],i)=>{
+        const got=(S.certs||[]).some(c=>c.courseId===cid);
+        return `<div class="hrow"><span class="hn">${got?'✓':(i+1)}</span><div><b>${t} ${got?'— obtenu 🎉':''}</b><span>${d} (écoutées, répétées et enregistrées, toutes parties validées).</span></div></div>`;}).join('')}
+    </div></div>
+    <p class="muted px" style="font-size:12.5px;margin-top:8px">Chaque certificat est vérifié côté serveur, <b>acquis à vie</b> (même si ton abonnement s'arrête ensuite) et vérifiable publiquement par son numéro. Ta progression Echo est synchronisée à ton compte automatiquement.</p>
     ${sub?'':`<div class="sect">Choisis ta formule</div>
     <div class="px plangrid">${planCard('echo-m')}${planCard('echo-y')}</div>`}
     ${sub?`<div class="sect">Prolonger mon accès</div>
@@ -3413,15 +3420,22 @@ function screenChal(){
 }
 
 /* ================= Écrans : Certificat & vérification publique ================= */
+/* Certificats Echo par paliers : ids serveur echo-n1/n2/n3 (pas des cours du catalogue). */
+const CERT_ECHO = { 'echo-n1':{lv:1,lessons:3}, 'echo-n2':{lv:2,lessons:6}, 'echo-n3':{lv:3,lessons:10} };
+function certTitle(c){
+  const eco = CERT_ECHO[c.courseId]; if(eco) return `Echo — L'anglais par le shadowing · Niveau ${eco.lv}`;
+  const course = courseById(c.courseId);
+  return course?course.title:(c.courseName||c.courseId);
+}
 function certBody(c){
   const d = new Date(c.at||Date.now());
-  const course = courseById(c.courseId);
+  const eco = CERT_ECHO[c.courseId];
   return `<div class="cert" id="certprint">
     <div class="c-head"><b>Boyia</b> Institute</div>
     <div class="c-kind">Certificat de complétion</div>
     <div class="c-name">${esc(c.name)}</div>
-    <div class="c-for">a terminé avec succès le cours</div>
-    <div class="c-course">${esc(course?course.title:(c.courseName||c.courseId))}</div>
+    <div class="c-for">${eco?`a atteint le Niveau ${eco.lv} (${eco.lessons} leçons complètes) du programme`:'a terminé avec succès le cours'}</div>
+    <div class="c-course">${esc(eco?"Echo — L'anglais par le shadowing":certTitle(c))}</div>
     <div class="c-meta">
       <span>${d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</span>
       <span class="num">${esc(c.id)}</span>
@@ -3443,7 +3457,7 @@ function screenCert(){
       <button class="btn soft" onclick="App.copyCertLink('${esc(c.id)}')">Copier le lien de vérification</button>
       <a class="btn ghost" style="text-decoration:none;text-align:center" target="_blank" rel="noopener"
         href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}">Partager sur LinkedIn</a>
-      <p class="muted" style="font-size:12.5px;text-align:center">Certificat de complétion Boyia Institute — atteste que toutes les leçons du cours ont été terminées. Ce n'est pas un diplôme accrédité.</p>
+      <p class="muted" style="font-size:12.5px;text-align:center">${CERT_ECHO[c.courseId]?`Certificat de complétion Boyia Institute — atteste que ${CERT_ECHO[c.courseId].lessons} leçons complètes de shadowing ont été validées (Niveau ${CERT_ECHO[c.courseId].lv}).`:'Certificat de complétion Boyia Institute — atteste que toutes les leçons du cours ont été terminées.'} Ce n'est pas un diplôme accrédité.</p>
     </div>
   </div>`;
 }
@@ -3628,19 +3642,18 @@ function screenMyCourses(){
             <span class="pct">${pct===100?'Terminé 🎓':pct+' %'}</span>
           </span>
         </button>`;}).join('')}</div>
-    ${(S.certs&&S.certs.length)?`<div class="sect">Mes certificats 📜</div>
-    <div class="px" style="display:flex;flex-direction:column;gap:0">${S.certs.map(x=>{
-      const co=courseById(x.courseId);
-      return `<button class="card pathstep" onclick="App.openCert('${esc(x.id)}')">
-        <span class="hn">📜</span>
-        <span class="inf"><b>${esc(co?co.title:x.courseId)}</b>
-          <span class="muted" style="font-size:12.5px">${esc(x.id)} · ${ago(x.at)}</span></span>
-        ${I.arrowr}</button>`;}).join('')}</div>`:''}
     ${(()=>{ /* Recommandation : le prochain cours du parcours actif, sinon du diagnostic. */
       const src = activePath || (S.diag&&pathById(S.diag.pathId));
       const nxt = src && pathNext(src);
       return (nxt && !S.enrolled[nxt.id]) ? `<div class="sect">Recommandé pour toi</div><div class="courselist">${courseCard(nxt)}</div>` : '';
     })()}`}
+    ${(S.certs&&S.certs.length)?`<div class="sect">Mes certificats 📜</div>
+    <div class="px" style="display:flex;flex-direction:column;gap:0">${S.certs.map(x=>{
+      return `<button class="card pathstep" onclick="App.openCert('${esc(x.id)}')">
+        <span class="hn">📜</span>
+        <span class="inf"><b>${esc(certTitle(x))}</b>
+          <span class="muted" style="font-size:12.5px">${esc(x.id)} · ${ago(x.at)}</span></span>
+        ${I.arrowr}</button>`;}).join('')}</div>`:''}
   </div>`;
 }
 
