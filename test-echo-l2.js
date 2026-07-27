@@ -15,7 +15,7 @@ let pass=0,fail=0; const ok=n=>{pass++;console.log('OK  '+n)},ko=(n,e)=>{fail++;
     /* Liste des leçons affichée (3 leçons) */
     await p.waitForSelector('#lessons .pcard');
     const n=await p.locator('#lessons .pcard').count();
-    if(n!==3) throw new Error('leçons listées: '+n);
+    if(n!==4) throw new Error('leçons listées: '+n);
     const t=await p.$eval('#lessons', e=>e.textContent);
     if(!/Servir : comme je vous ai aimés/.test(t)) throw new Error('leçon 2 absente');
     if(!/toutes les leçons/i.test(t)) throw new Error('mention « toutes les leçons » absente');
