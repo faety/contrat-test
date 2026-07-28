@@ -45,10 +45,13 @@ const waveStub=http.createServer((req,res)=>{
 
 (async()=>{
   waveStub.listen(WAVE_PORT);
-  const srv=spawn('node',['./server.js'],{env:{...process.env,PORT:String(APP_PORT),APP_URL,WAVE_API_KEY:'wave_ci_test_key',WAVE_WEBHOOK_SECRET:SECRET,WAVE_API_BASE:`http://127.0.0.1:${WAVE_PORT}`},stdio:['ignore','pipe','pipe']});
+  /* ECHO_FREE=0 : on teste la machinerie PAYANTE (celle du retour à l'abonnement). */
+  const srv=spawn('node',['./server.js'],{env:{...process.env,PORT:String(APP_PORT),APP_URL,ECHO_FREE:'0',WAVE_API_KEY:'wave_ci_test_key',WAVE_WEBHOOK_SECRET:SECRET,WAVE_API_BASE:`http://127.0.0.1:${WAVE_PORT}`},stdio:['ignore','pipe','pipe']});
   await new Promise(r=>setTimeout(r,800));
   const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
-  const p=await (await b.newContext({viewport:{width:390,height:844}})).newPage();
+  const ctx=await b.newContext({viewport:{width:390,height:844}});
+  await ctx.addInitScript(()=>{ window.__ECHO_FREE__=false; });
+  const p=await ctx.newPage();
   const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   try{
     const hp=p.waitForResponse(r=>r.url().includes('/api/health'),{timeout:8000});

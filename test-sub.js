@@ -30,8 +30,32 @@ let n = 0; const ok = s => console.log(`  ✓ ${++n}. ${s}`);
   assert.strictEqual(Math.round((e.expiresAt - Date.now()) / 86400e3), 397);
   ok('renouvellement : les jours s\'ADDITIONNENT (31 + 366 = 397)');
 
-  assert.strictEqual((await H.meEnroll('Bearer ' + v.body.token, { courseId: 'echo' })).status, 400);
-  ok('« echo » jamais accessible par inscription gratuite (400)');
+  /* Période gratuite (ECHO_FREE, défaut) : inscription libre, paiement refusé. */
+  assert.strictEqual(w.ECHO_FREE, true);
+  const sent2 = []; mail._setTransport({ sendMail: async m => sent2.push(m) });
+  const su = await H.signup({ email: 'libre@x.com', prenom: 'Adjoua', nom: 'B', whatsapp: '0102030405', password: 'secret9' });
+  const rf = await H.meEnroll('Bearer ' + su.body.token, { courseId: 'echo' });
+  assert.strictEqual(rf.status, 200);
+  const ef = rf.body.enrollments.find(x => x.courseId === 'echo');
+  assert.ok(ef && !ef.paid && !ef.expiresAt);
+  ok('période gratuite : « echo » s\'active librement (paid:false, sans expiration)');
+
+  await H.meEnroll('Bearer ' + v.body.token, { courseId: 'echo' });   // abonné payé qui clique « activer »
+  e = (await H.me('Bearer ' + v.body.token)).body.enrollments.find(x => x.courseId === 'echo');
+  assert.ok(e.paid && Math.round((e.expiresAt - Date.now()) / 86400e3) === 397);
+  ok('un abonné payé qui « active » ne perd RIEN (paid + 397 j intacts)');
+
+  const realIsLive = w.isLive; w.isLive = () => true;
+  const rc = await H.checkout({ courseId: 'echo-m', prenom: 'A', nom: 'B', whatsapp: 'x', email: 'libre@x.com' }, 'http://x');
+  w.isLive = realIsLive;
+  assert.strictEqual(rc.status, 400); assert.strictEqual(rc.body.error, 'gratuit-temporaire');
+  ok('période gratuite : encaisser un abonnement Echo est REFUSÉ (gratuit-temporaire)');
+
+  /* Retour au payant (ECHO_FREE=false) : comportement historique. */
+  w.ECHO_FREE = false;
+  assert.strictEqual((await H.meEnroll('Bearer ' + su.body.token, { courseId: 'echo' })).status, 400);
+  w.ECHO_FREE = true;
+  ok('drapeau éteint : « echo » redevient inaccessible gratuitement (400)');
 
   assert.ok(/abonnement mensuel/.test(w.COURSE_NAMES['echo-m']) && /abonnement annuel/.test(w.COURSE_NAMES['echo-y']));
   ok('noms de reçus des plans présents');

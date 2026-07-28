@@ -11,7 +11,10 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Police NON bloquante : sur réseau lent (ou CDN inaccessible), l'app démarre
+     immédiatement avec la police système, puis Outfit s'applique quand elle arrive. -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --bg:#F6F3EE; --card:#FFFFFF; --ink:#231A3D; --muted:#7A7290;
@@ -175,20 +178,23 @@ footer{padding:26px 22px;text-align:center;font-size:11.5px;color:var(--muted);l
    Même origine que l'app principale : on lit la même sauvegarde locale. */
 (function(){
   try{
+    var FREE=true;   /* période gratuite Echo — remettre à false au retour du payant */
     var S=JSON.parse(localStorage.getItem('kalan-v1')||'{}');
     var e=S.enrolled&&S.enrolled.echo;
-    var ok=e&&e.paid&&(!e.expiresAt||e.expiresAt>Date.now());
+    /* Accès : abonnement payé non expiré, OU accès gratuit activé (période
+       de lancement — inscription libre depuis la page Echo du site). */
+    var ok=!!e&&(e.paid?(!e.expiresAt||e.expiresAt>Date.now()):FREE);
     if(ok) return;
     var lock=function(){
       var d=document.createElement('div');
       d.style.cssText='position:fixed;inset:0;z-index:9999;background:#0F1524;color:#EDF1FB;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;gap:14px;font-family:system-ui,sans-serif';
       d.innerHTML='<div style="font-size:44px">🎧</div>'
-        +'<h2 style="margin:0;font-size:22px">Echo est r\u00e9serv\u00e9 aux abonn\u00e9s</h2>'
+        +'<h2 style="margin:0;font-size:22px">Echo est r\u00e9serv\u00e9 aux membres</h2>'
         +'<p style="color:#93A1C4;max-width:300px;margin:0;font-size:14.5px;line-height:1.6">'
-        +(e?'Ton abonnement Echo a expir\u00e9. Prolonge ton acc\u00e8s pour continuer ton entra\u00eenement.':'Abonne-toi depuis Boyia Institute pour acc\u00e9der \u00e0 l\u2019entra\u00eenement complet de shadowing.')
+        +(e?'Ton acc\u00e8s Echo a expir\u00e9. Prolonge-le pour continuer ton entra\u00eenement.':'Active ton acc\u00e8s depuis Boyia Institute pour acc\u00e9der \u00e0 l\u2019entra\u00eenement complet de shadowing.')
         +'</p>'
         +'<a href="/#echo" style="background:#3D63AE;color:#fff;text-decoration:none;padding:14px 24px;border-radius:12px;font-weight:700">'
-        +(e?'Prolonger mon acc\u00e8s':'D\u00e9couvrir Echo')+'</a>';
+        +(e?'Prolonger mon acc\u00e8s':'Activer mon acc\u00e8s')+'</a>';
       document.body.appendChild(d);
     };
     if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',lock); else lock();
