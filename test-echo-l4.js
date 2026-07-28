@@ -22,11 +22,11 @@ let pass=0,fail=0; const ok=n=>{pass++;console.log('OK  '+n)},ko=(n,e)=>{fail++;
     await p.goto('http://127.0.0.1:'+PORT+'/echo/'); await p.waitForTimeout(500);
     await p.waitForSelector('#lessons .pcard');
     const n=await p.locator('#lessons .pcard').count();
-    if(n!==4) throw new Error('leçons: '+n);
+    if(n!==Object.keys(w.ECHO_LESSONS).length) throw new Error('leçons: '+n);
     const t=await p.$eval('#lessons', e=>e.textContent);
     if(!/Le mariage éternel est un voyage éternel/.test(t)) throw new Error('leçon 4 absente');
     if(!/16 parties/.test(t)||!/128 phrases/.test(t)) throw new Error('méta: '+t.slice(0,200));
-    ok('accueil : 4 leçons, leçon 4 listée (16 parties · 128 phrases)');
+    ok('accueil : leçon 4 listée (16 parties · 128 phrases)');
 
     await p.locator('#lessons .pcard').nth(3).click();
     await p.waitForSelector('#home .hero');

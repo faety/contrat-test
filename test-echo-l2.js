@@ -1,6 +1,7 @@
 'use strict';
 const PORT=4345; process.env.PORT=String(PORT); delete process.env.DATABASE_URL; delete process.env.WAVE_API_KEY;
 const { chromium } = require('playwright');
+const w = require('./lib/wave');
 const server = require('./server.js');
 let pass=0,fail=0; const ok=n=>{pass++;console.log('OK  '+n)},ko=(n,e)=>{fail++;console.log('FAIL '+n+' :: '+e)};
 (async()=>{
@@ -12,14 +13,15 @@ let pass=0,fail=0; const ok=n=>{pass++;console.log('OK  '+n)},ko=(n,e)=>{fail++;
     await p.goto('http://127.0.0.1:'+PORT);
     await p.evaluate(()=>{ S.enrolled.echo={at:Date.now(),paid:true,op:'Wave',ref:'T',expiresAt:Date.now()+30*86400e3}; save(); });
     await p.goto('http://127.0.0.1:'+PORT+'/echo/'); await p.waitForTimeout(500);
-    /* Liste des leçons affichée (3 leçons) */
+    /* Liste des leçons affichée (autant que le référentiel serveur) */
+    const NL = Object.keys(w.ECHO_LESSONS).length;
     await p.waitForSelector('#lessons .pcard');
     const n=await p.locator('#lessons .pcard').count();
-    if(n!==4) throw new Error('leçons listées: '+n);
+    if(n!==NL) throw new Error('leçons listées: '+n+' ≠ '+NL);
     const t=await p.$eval('#lessons', e=>e.textContent);
     if(!/Servir : comme je vous ai aimés/.test(t)) throw new Error('leçon 2 absente');
     if(!/toutes les leçons/i.test(t)) throw new Error('mention « toutes les leçons » absente');
-    ok('accueil : 3 leçons listées + « toutes les leçons incluses »');
+    ok('accueil : '+NL+' leçons listées + « toutes les leçons incluses »');
     /* Ouvre leçon 2 */
     await p.locator('#lessons .pcard').nth(1).click();
     await p.waitForSelector('#home .hero');
