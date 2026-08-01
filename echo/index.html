@@ -281,7 +281,7 @@ function renderHome(){
     }).join('')}
   </div>
   <footer>Discours « ${lesson.title} » — ${lesson.speaker}, ${lesson.source}.<br>
-  Audio et texte © Intellectual Reserve, Inc. Utilisé à des fins pédagogiques.</footer>`;
+  ${lesson.rights||'Audio et texte © Intellectual Reserve, Inc. Utilisé à des fins pédagogiques.'}</footer>`;
 }
 
 /* ================= LESSONS LIST (tout est inclus dans l'abonnement) ================= */
