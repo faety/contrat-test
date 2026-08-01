@@ -3312,6 +3312,7 @@ function screenEcho(){
       <li>${I.checkc}<span>Leçon 4 : « Le mariage éternel est un voyage éternel » — discours réel (11,5 min · 16 parties · 128 phrases)</span></li>
       <li>${I.checkc}<span>Leçon 5 : « Au service du Père » — discours réel (11,1 min · 14 parties · 127 phrases)</span></li>
       <li>${I.checkc}<span>Leçon 6 : « L'impala et le lion » — leçon express (2,3 min · 3 parties · 33 phrases)</span></li>
+      <li>${I.checkc}<span>Leçon 7 : « Voici ce qu'est l'amour » — leçon express (3 min · 5 parties · 43 phrases)</span></li>
       <li>${I.checkc}<span>Chaque phrase : audio aligné mot à mot, traduction française, vocabulaire clé, score de précision 🎯</span></li>
       <li>${I.checkc}<span>${ECHO_FREE?'L\'accès':'L\'abonnement'} inclut TOUTES les leçons — y compris chaque nouvelle leçon ajoutée</span></li>
     </ul>
@@ -3321,7 +3322,7 @@ function screenEcho(){
         const got=(S.certs||[]).some(c=>c.courseId===cid);
         return `<div class="hrow"><span class="hn">${got?'✓':(i+1)}</span><div><b>${t} ${got?'— obtenu 🎉':''}</b><span>${d} (écoutées, répétées et enregistrées, toutes parties validées).</span></div></div>`;}).join('')}
     </div></div>
-    <p class="muted px" style="font-size:12.5px;margin-top:8px">Avec 6 leçons disponibles, les <b>certificats Niveau 1 (3 leçons) et Niveau 2 (6 leçons)</b> sont atteignables. Chaque certificat est vérifié côté serveur, <b>acquis à vie</b> (même si ton abonnement s'arrête ensuite) et vérifiable publiquement par son numéro. Ta progression Echo est synchronisée à ton compte automatiquement.</p>
+    <p class="muted px" style="font-size:12.5px;margin-top:8px">Avec 7 leçons disponibles, les <b>certificats Niveau 1 (3 leçons) et Niveau 2 (6 leçons)</b> sont atteignables. Chaque certificat est vérifié côté serveur, <b>acquis à vie</b> (même si ton abonnement s'arrête ensuite) et vérifiable publiquement par son numéro. Ta progression Echo est synchronisée à ton compte automatiquement.</p>
     ${ECHO_FREE?`
     ${(sub||free)?'':`<div class="sect">Activer mon accès — gratuit 🎁</div>
     <div class="px">
