@@ -31,9 +31,10 @@ let pass=0,fail=0; const ok=n=>{pass++;console.log('OK  '+n)},ko=(n,e)=>{fail++;
     await p.waitForSelector('#home .hero');
     const h=await p.$eval('#home', e=>e.textContent);
     if(!/Les 5 parties/.test(h)||!/Psaume 22/.test(h)) throw new Error('accueil: '+h.slice(0,180));
+    if(!/Renny Tan/.test(h)||!/RT/.test(h)) throw new Error('crédit Renny Tan absent');
     if(!/Brooke Ligertwood/.test(h)) throw new Error('crédit Ligertwood absent');
     if(/Intellectual Reserve/.test(h)) throw new Error('mention IRI affichée à tort');
-    ok('leçon 7 : 5 parties, méditation Psaume 22, crédit Brooke Ligertwood');
+    ok('leçon 7 : 5 parties, Renny Tan (RT), crédit Brooke Ligertwood');
 
     await p.locator('#home .pcard').first().click();
     await p.waitForSelector('#part .scard');
